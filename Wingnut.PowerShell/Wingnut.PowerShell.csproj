@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{33869593-3128-4F23-ABD9-899979B62D9E}</ProjectGuid>
+    <ProjectGuid>{774D011F-38B0-4559-A03E-1CD382D718B4}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Wingnut.Core</RootNamespace>
-    <AssemblyName>Wingnut.Core</AssemblyName>
+    <RootNamespace>Wingnut.PowerShell</RootNamespace>
+    <AssemblyName>Wingnut.PowerShell</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -18,7 +18,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -31,26 +31,13 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Management.Automation" />
     <Reference Include="System.ServiceModel" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ManagementService.cs" />
-    <Compile Include="ServerConnection.cs" />
-    <Compile Include="ServerContext.cs" />
-    <Compile Include="ServiceRuntime.cs" />
-    <Compile Include="UpsContext.cs" />
-    <Compile Include="UpsMonitor.cs" />
+    <Compile Include="GetNutServer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -62,13 +49,6 @@
       <Project>{1d0d7910-3762-48d5-b446-15903ff289f7}</Project>
       <Name>Wingnut.Data</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Wingnut.Tracing\Wingnut.Tracing.csproj">
-      <Project>{91ae0118-1692-4a7c-90bf-53b27f91aa38}</Project>
-      <Name>Wingnut.Tracing</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
