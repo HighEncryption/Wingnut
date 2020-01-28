@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
@@ -14,16 +15,10 @@
 
     public class ServerContext
     {
-        internal readonly ServerConfiguration configuration;
-        private readonly int readLockAcquisitionTimeout = 5000;
-
-
-        // TODO: Can we remove these?
-        private readonly char[] tokenSplitChar = { ' ' };
-        private readonly char[] tokenTrimChar = { '\"' };
+        internal readonly ServerConfiguration Configuration;
 
         private CancellationTokenSource cancellationTokenSource;
-        private ReaderWriterLockSlim monitoringSyncLock;
+        private AsyncReaderWriterLock readerWriterLock;
         private AutoResetEvent upsStatusChangedEvent;
         public Task MonitoringTask { get; private set; }
 
@@ -33,10 +28,12 @@
 
         public ServerConnection Connection { get; }
 
+        public DateTime LastPollTime { get; private set; }
+
         public ServerContext(Server server, ServerConfiguration configuration)
         {
             this.UpsContexts = new List<UpsContext>();
-            this.configuration = configuration;
+            this.Configuration = configuration;
             this.ServerState = server;
 
             this.Connection = new ServerConnection(this);
@@ -65,15 +62,6 @@
             return upsList;
         }
 
-        public async Task<Dictionary<string, string>> GetUpsVariablesAsync(
-            string deviceName,
-            CancellationToken cancellationToken)
-        {
-            return await this.Connection
-                .ListVarsAsync($"VAR {deviceName}", cancellationToken)
-                .ConfigureAwait(false);
-        }
-
         /// <summary>
         /// Update...
         /// </summary>
@@ -83,8 +71,10 @@
         /// Note: The caller must hold a reader lock from UpsMonitor prior to calling
         /// this method
         /// </remarks>
-        internal async Task<bool> UpdateStatusAsync(CancellationToken cancellationToken)
+        private async Task<bool> UpdateStatusAsync(CancellationToken cancellationToken)
         {
+            Logger.Debug("ServerContext: Starting UpdateStatusAsync()");
+
             ServerConfiguration serverConfiguration =
                 ServiceRuntime.Instance.Configuration.Servers.FirstOrDefault(s => s.Name == this.ServerState.Name);
 
@@ -95,6 +85,7 @@
             }
 
             List<DeviceDefinition> deviceDefinitions = null;
+            bool anyStatusChanged = false;
 
             // Add any new devices
             foreach (UpsConfiguration upsConfig in serverConfiguration.Upses)
@@ -125,7 +116,7 @@
                 }
 
                 Dictionary<string, string> deviceVars =
-                    await this.GetUpsVariablesAsync(upsConfig.Name, cancellationToken)
+                    await this.Connection.ListVarsAsync(upsConfig.Name, cancellationToken)
                         .ConfigureAwait(false);
 
                 upsContext = new UpsContext(
@@ -137,9 +128,8 @@
                 Logger.Info("Created new UpsContext for device '{0}'", upsConfig.Name);
 
                 this.UpsContexts.Add(upsContext);
+                anyStatusChanged = true;
             }
-
-            bool anyStatusChanged = false;
 
             foreach (UpsContext upsContext in this.UpsContexts)
             {
@@ -151,7 +141,7 @@
                 }
 
                 Dictionary<string, string> deviceVars =
-                    await this.GetUpsVariablesAsync(upsContext.Name, cancellationToken)
+                    await this.Connection.ListVarsAsync(upsContext.Name, cancellationToken)
                         .ConfigureAwait(false);
 
                 if (upsContext.Update(deviceVars))
@@ -160,15 +150,18 @@
                 }
             }
 
+            this.LastPollTime = DateTime.Now;
+
+            Logger.Debug("ServerContext: Finished UpdateStatusAsync(). anyStatusChanged=" + anyStatusChanged);
             return anyStatusChanged;
         }
 
         public void StartMonitoring(
-            ReaderWriterLockSlim readerWriterLock,
+            AsyncReaderWriterLock monitoringReaderWriterLock,
             AutoResetEvent upsStatusChanged,
             CancellationToken monitoringCancellationToken)
         {
-            this.monitoringSyncLock = readerWriterLock;
+            this.readerWriterLock = monitoringReaderWriterLock;
             this.upsStatusChangedEvent = upsStatusChanged;
 
             this.cancellationTokenSource = 
@@ -178,6 +171,13 @@
             this.MonitoringTask = Task.Run(
                 async () => await this.MonitorServerMain().ConfigureAwait(false),
                 this.cancellationTokenSource.Token);
+        }
+
+        private readonly AutoResetEvent pollNowEvent = new AutoResetEvent(false);
+
+        public void PollNow()
+        {
+            this.pollNowEvent.Set();
         }
 
         private async Task MonitorServerMain()
@@ -221,27 +221,17 @@
                             "MonitorServerMain[Server={0}]: Calling UpdateStatusAsync()",
                             this.ServerState.Name);
 
-                        bool readLockAcquired = false;
-
-                        try
+                        using (await this.readerWriterLock.ReaderLockAsync())
                         {
-                            readLockAcquired =
-                                this.monitoringSyncLock.TryEnterReadLock(readLockAcquisitionTimeout);
-
-                            if (!readLockAcquired)
-                            {
-                                Logger.Warning(
-                                    "MonitorServerMain[Server={0}]: Failed to acquire read lock! Will try again later.",
-                                    this.ServerState.Name);
-                            }
-                            else
+                            try
                             {
                                 bool anyUpsStatusChanged = await this
                                     .UpdateStatusAsync(this.cancellationTokenSource.Token)
-                                    .ConfigureAwait(false);
+                                    .ConfigureAwait(true);
 
                                 if (anyUpsStatusChanged)
                                 {
+                                    Logger.Debug("Setting StatusChangedEvent");
                                     this.upsStatusChangedEvent.Set();
                                 }
 
@@ -249,31 +239,24 @@
                                     "MonitorServerMain[Server={0}]: Successfully queried server",
                                     this.ServerState.Name);
                             }
-                        }
-                        catch (NutCommunicationException communicationException)
-                        {
-                            Logger.Warning(
-                                "MonitorServerMain[Server={0}]: Lost connection to the server. The exception was: {1}",
-                                this.ServerState.Name,
-                                communicationException.Message);
-
-                            this.Disconnect(true);
-
-                            this.ServerState.ConnectionStatus =
-                                ServerConnectionStatus.LostConnection;
-                        }
-                        catch (Exception exception)
-                        {
-                            Logger.Warning(
-                                "MonitorServerMain[Server={0}]: Failed to query server. The exception was: {1}",
-                                this.ServerState.Name,
-                                exception.Message);
-                        }
-                        finally
-                        {
-                            if (readLockAcquired)
+                            catch (NutCommunicationException communicationException)
                             {
-                                monitoringSyncLock.ExitReadLock();
+                                Logger.Warning(
+                                    "MonitorServerMain[Server={0}]: Lost connection to the server. The exception was: {1}",
+                                    this.ServerState.Name,
+                                    communicationException.Message);
+
+                                this.Disconnect(true);
+
+                                this.ServerState.ConnectionStatus =
+                                    ServerConnectionStatus.LostConnection;
+                            }
+                            catch (Exception exception)
+                            {
+                                Logger.Warning(
+                                    "MonitorServerMain[Server={0}]: Failed to query server. The exception was: {1}",
+                                    this.ServerState.Name,
+                                    exception.Message);
                             }
                         }
                     }
@@ -283,10 +266,26 @@
                         this.ServerState.Name,
                         this.ServerState.PollFrequencyInSeconds);
 
-                    await Task.Delay(
-                            TimeSpan.FromSeconds(this.ServerState.PollFrequencyInSeconds),
-                            this.cancellationTokenSource.Token)
-                        .ConfigureAwait(false);
+                    Stopwatch delayStopwatch = Stopwatch.StartNew();
+
+                    while (true)
+                    {
+                        if (this.pollNowEvent.WaitOne(0))
+                        {
+                            // We need to poll now
+                            Logger.Debug("Polling triggered by PollNow() call");
+                            break;
+                        }
+
+                        if (delayStopwatch.Elapsed.TotalSeconds > this.ServerState.PollFrequencyInSeconds)
+                        {
+                            // We have waited enough time between polls
+                            Logger.Debug("Polling triggered by expired timer");
+                            break;
+                        }
+
+                        await Task.Delay(250, this.cancellationTokenSource.Token).ConfigureAwait(false);
+                    }
                 }
             }
             catch (OperationCanceledException)

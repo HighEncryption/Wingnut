@@ -14,7 +14,10 @@
         List<Server> GetServers(string name);
 
         [OperationContract]
-        Server AddServer(Server server, string password, bool ignoreConnectionFailure);
+        Server AddServer(
+            Server server, 
+            string password, 
+            bool ignoreConnectionFailure);
 
         [OperationContract]
         void UpdateServer(Server server);
@@ -23,10 +26,16 @@
         void DeleteServer(string name);
 
         [OperationContract]
-        Task<List<Ups>> GetUpsFromServer(string serverName, string upsName);
+        Task<List<Ups>> GetUpsFromServer(
+            string serverName, 
+            string upsName);
 
         [OperationContract]
-        Task<Ups> AddUps(string serverName, string upsName, bool monitorOnly);
+        Task<Ups> AddUps(
+            string serverName, 
+            string upsName, 
+            bool monitorOnly,
+            bool force);
     }
 
     public interface IManagementCallback

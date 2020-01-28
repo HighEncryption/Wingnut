@@ -136,7 +136,8 @@
         public async Task<Ups> AddUps(
             string serverName, 
             string upsName,
-            bool monitorOnly)
+            bool monitorOnly,
+            bool force)
         {
             ServerContext serverContext =
                 ServiceRuntime.Instance.ServerContexts.FirstOrDefault(
@@ -148,19 +149,61 @@
                     $"A server with the name '{serverName}' was not found.");
             }
 
-            Dictionary<string, string> upsVars =
-                await serverContext.Connection
-                    .ListVarsAsync(upsName, CancellationToken.None)
-                    .ConfigureAwait(false);
+            if (serverContext.UpsContexts.Any(s => s.Name == upsName))
+            {
+                throw new Exception("The ups already exist");
+            }
 
-            serverContext.configuration.Upses.Add(
-                new UpsConfiguration
+            serverContext.Configuration.Upses.Add(
+                new UpsConfiguration()
                 {
                     Name = upsName,
                     MonitorOnly = monitorOnly
                 });
 
-            throw new NotImplementedException();
+            DateTime pollTime = serverContext.LastPollTime;
+            Console.WriteLine("Initial poll time: " + pollTime);
+            serverContext.PollNow();
+            bool retry = false;
+
+            Console.WriteLine();
+
+            while (true)
+            {
+                if (serverContext.LastPollTime != pollTime)
+                {
+                    Console.WriteLine("Time Changed");
+                    // The server has completes a poll. Check if the UPS was added
+                    var ups = serverContext.UpsContexts.FirstOrDefault(u => u.Name == upsName);
+
+                    if (ups == null)
+                    {
+                        Console.WriteLine("UPS is null");
+                        if (!retry)
+                        {
+                            retry = true;
+                            pollTime = serverContext.LastPollTime;
+                            serverContext.PollNow();
+                        }
+                        else
+                        {
+                            if (force)
+                            {
+                                ServiceRuntime.Instance.SaveConfiguration();
+                            }
+
+                            throw new Exception("Failed to add ups after 2 polls");
+                        }
+                    }
+                    else
+                    {
+                        ServiceRuntime.Instance.SaveConfiguration();
+                        return ups.State;
+                    }
+                }
+
+                await Task.Delay(100).ConfigureAwait(false);
+            }
         }
     }
 }

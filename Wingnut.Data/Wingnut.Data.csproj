@@ -40,6 +40,8 @@
     <Reference Include="System.Security" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AsyncLock.cs" />
+    <Compile Include="AsyncReaderWriterLock.cs" />
     <Compile Include="Configuration\SecureStringToProtectedDataConverter.cs" />
     <Compile Include="Configuration\ServerConfiguration.cs" />
     <Compile Include="Configuration\WingnutConfiguration.cs" />

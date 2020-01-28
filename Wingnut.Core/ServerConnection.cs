@@ -10,6 +10,7 @@
     using System.Security;
     using System.Security.Cryptography.X509Certificates;
     using System.Text;
+    using System.Text.RegularExpressions;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -26,12 +27,14 @@
         private TcpClient tcpClient;
         private NetworkStream networkStream;
         private SslStream sslStream;
+        private readonly AsyncLock asyncLock;
 
         private Stream ActiveStream => this.sslStream ?? (Stream)this.networkStream;
 
         public ServerConnection(ServerContext serverContext)
         {
             this.serverContext = serverContext;
+            this.asyncLock = new AsyncLock();
         }
 
         public async Task ConnectAsync(
@@ -134,7 +137,7 @@
                         SslCertificateValidationCallback);
 
                     await this.sslStream
-                        .AuthenticateAsClientAsync(this.serverContext.configuration.SSLTargetName)
+                        .AuthenticateAsClientAsync(this.serverContext.Configuration.SSLTargetName)
                         .ConfigureAwait(false);
 
                     Logger.Info("Connection successfully upgraded to SSL");
@@ -188,22 +191,25 @@
             string request, 
             CancellationToken cancellationToken)
         {
-            await this.WriteToStreamAsync(
-                    $"GET {request}",
-                    cancellationToken)
-                .ConfigureAwait(false);
-
-            string responseLine = 
-                await this.ReadFromStreamAsync(cancellationToken).ConfigureAwait(false);
-
-            ValidateResponse(responseLine, request);
-
-            if (!responseLine.StartsWith(request))
+            using (this.asyncLock.Lock())
             {
-                throw new Exception("Bad response?");
-            }
+                await this.WriteToStreamAsync(
+                        $"GET {request}",
+                        cancellationToken)
+                    .ConfigureAwait(false);
 
-            return responseLine;
+                string responseLine =
+                    await this.ReadFromStreamAsync(cancellationToken).ConfigureAwait(false);
+
+                ValidateResponse(responseLine, request);
+
+                if (!responseLine.StartsWith(request))
+                {
+                    throw new Exception("Bad response?");
+                }
+
+                return responseLine;
+            }
         }
 
         private void ValidateResponse(string responseLine, string request)
@@ -221,7 +227,7 @@
             CancellationToken cancellationToken)
         {
             List<string> listResponse = 
-                await this.ListAsync($"VAR {request}", cancellationToken).ConfigureAwait(false);
+                await this.ListWith4TokensAsync($"VAR {request}", cancellationToken).ConfigureAwait(false);
 
             Dictionary<string, string> varDictionary = new Dictionary<string, string>();
 
@@ -230,6 +236,29 @@
                 // Each line will have the format: <upsname> <varname> "<value>"
                 // For example: su700 ups.mfr "APC"
                 // Split the line into 3 tokens
+                string[] lineTokens = varLine.Split(this.tokenSplitChar, 4);
+
+                varDictionary.Add(
+                    lineTokens[2],
+                    lineTokens[3].Trim(this.tokenTrimChar));
+            }
+
+            return varDictionary;
+        }
+
+        public async Task<Dictionary<string, string>> ListUpsAsync(
+            CancellationToken cancellationToken)
+        {
+            List<string> listResponse = 
+                await this.ListWith3TokensAsync("UPS", cancellationToken).ConfigureAwait(false);
+
+            Dictionary<string, string> varDictionary = new Dictionary<string, string>();
+
+            foreach (string varLine in listResponse)
+            {
+                // Each line will have the format: <upsname> "<description>"
+                // For example: su700 "Development box"
+                // Split the line into 2 tokens
                 string[] lineTokens = varLine.Split(this.tokenSplitChar, 3);
 
                 varDictionary.Add(
@@ -240,155 +269,170 @@
             return varDictionary;
         }
 
-        public async Task<Dictionary<string, string>> ListUpsAsync(
+        public async Task<List<string>> ListWith3TokensAsync(
+            string request,
             CancellationToken cancellationToken)
         {
-            List<string> listResponse = 
-                await this.ListAsync("UPS", cancellationToken).ConfigureAwait(false);
-
-            Dictionary<string, string> varDictionary = new Dictionary<string, string>();
-
-            foreach (string varLine in listResponse)
             {
-                // Each line will have the format: <upsname> "<description>"
-                // For example: su700 "Development box"
-                // Split the line into 2 tokens
-                string[] lineTokens = varLine.Split(this.tokenSplitChar, 2);
+                await this.WriteToStreamAsync($"LIST {request}", cancellationToken).ConfigureAwait(false);
 
-                varDictionary.Add(
-                    lineTokens[0],
-                    lineTokens[1].Trim(this.tokenTrimChar));
+                StringBuilder stringBuilder = new StringBuilder();
+
+                while (true)
+                {
+                    string readResponse =
+                        await this.ReadFromStreamAsync(cancellationToken).ConfigureAwait(false);
+
+                    ValidateResponse(readResponse, request);
+
+                    stringBuilder.Append(readResponse);
+
+                    if (stringBuilder.ToString().EndsWith("END LIST " + request))
+                    {
+                        break;
+                    }
+                }
+
+                string strResponse = stringBuilder.ToString();
+
+                string prefix = $"BEGIN LIST {request}";
+                string postfix = $"END LIST {request}";
+                string innerResponse =
+                    strResponse.Substring(
+                        prefix.Length,
+                        strResponse.Length - (prefix.Length + postfix.Length));
+
+                Regex regex = new Regex(@"(\w+ \w+ "".*?"")");
+                MatchCollection matches = regex.Matches(innerResponse);
+
+                List<string> list = new List<string>();
+                foreach (Match match in matches)
+                {
+                    list.Add(match.Value);
+                }
+
+                return list;
             }
-
-            return varDictionary;
         }
 
-        public async Task<List<string>> ListAsync(
-            string request, 
+        public async Task<List<string>> ListWith4TokensAsync(
+            string request,
             CancellationToken cancellationToken)
         {
-            await this.WriteToStreamAsync($"LIST {request}", cancellationToken).ConfigureAwait(false);
-
-            List<string> list = null;
-            string prependNextResponse = null;
-
-            while (true)
             {
-                string readResponse =
-                    await this.ReadFromStreamAsync(cancellationToken).ConfigureAwait(false);
+                await this.WriteToStreamAsync($"LIST {request}", cancellationToken).ConfigureAwait(false);
 
-                if (prependNextResponse != null)
+                StringBuilder stringBuilder = new StringBuilder();
+
+                while (true)
                 {
-                    readResponse = prependNextResponse + readResponse;
+                    string readResponse =
+                        await this.ReadFromStreamAsync(cancellationToken).ConfigureAwait(false);
+
+                    ValidateResponse(readResponse, request);
+
+                    stringBuilder.Append(readResponse);
+
+                    if (stringBuilder.ToString().EndsWith("END LIST " + request))
+                    {
+                        break;
+                    }
                 }
 
-                string[] responseLines = readResponse.Split('\n');
-                for (int i = 0; i < responseLines.Length; i++)
+                string strResponse = stringBuilder.ToString();
+
+                string prefix = $"BEGIN LIST {request}";
+                string postfix = $"END LIST {request}";
+                string innerResponse =
+                    strResponse.Substring(
+                        prefix.Length,
+                        strResponse.Length - (prefix.Length + postfix.Length));
+
+                Regex regex = new Regex(@"(\w+ \w+ \S+ "".*?"")");
+                MatchCollection matches = regex.Matches(innerResponse);
+
+                List<string> list = new List<string>();
+                foreach (Match match in matches)
                 {
-                    string responseLine = responseLines[i];
-                    ValidateResponse(responseLine, request);
-
-                    if (responseLine.StartsWith($"BEGIN LIST {request}"))
-                    {
-                        // The list is being started. This should be the first list from the server,
-                        // so verify that we haven't start receiving list items yet.
-                        if (list != null)
-                        {
-                            throw new Exception("Bad response?");
-                        }
-
-                        list = new List<string>();
-                    }
-                    else if (responseLine.StartsWith($"END LIST {request}"))
-                    {
-                        return list;
-                    }
-                    else
-                    {
-                        if (list == null)
-                        {
-                            throw new Exception("Received list item before start of list?");
-                        }
-
-                        if (i == responseLines.Length - 1)
-                        {
-                            // There will be another payload to continue this
-                            prependNextResponse = responseLine;
-                        }
-                        else
-                        {
-                            string[] lineTokens = responseLine.Split(this.tokenSplitChar, 2);
-
-                            list.Add(lineTokens[1]);
-                        }
-                    }
+                    list.Add(match.Value);
                 }
+
+                return list;
             }
         }
 
         private async Task<string> StartTLSAsync(
             CancellationToken cancellationToken)
         {
-            await this.WriteToStreamAsync(
-                    "STARTTLS",
-                    cancellationToken)
-                .ConfigureAwait(false);
-
-            string responseLine =
-                await this.ReadFromStreamAsync(cancellationToken).ConfigureAwait(false);
-
-            ValidateResponse(responseLine, "STARTTLS");
-
-            if (!responseLine.StartsWith("OK"))
+            using (this.asyncLock.Lock())
             {
-                return responseLine;
-            }
+                await this.WriteToStreamAsync(
+                        "STARTTLS",
+                        cancellationToken)
+                    .ConfigureAwait(false);
 
-            return null;
+                string responseLine =
+                    await this.ReadFromStreamAsync(cancellationToken).ConfigureAwait(false);
+
+                ValidateResponse(responseLine, "STARTTLS");
+
+                if (!responseLine.StartsWith("OK"))
+                {
+                    return responseLine;
+                }
+
+                return null;
+            }
         }
 
         private async Task<string> UsernameAsync(
             string username,
             CancellationToken cancellationToken)
         {
-            await this.WriteToStreamAsync(
-                    $"USERNAME {username}",
-                    cancellationToken)
-                .ConfigureAwait(false);
-
-            string responseLine =
-                await this.ReadFromStreamAsync(cancellationToken).ConfigureAwait(false);
-
-            ValidateResponse(responseLine, $"USERNAME {username}");
-
-            if (!responseLine.StartsWith("OK"))
+            using (this.asyncLock.Lock())
             {
-                return responseLine;
-            }
+                await this.WriteToStreamAsync(
+                        $"USERNAME {username}",
+                        cancellationToken)
+                    .ConfigureAwait(false);
 
-            return null;
+                string responseLine =
+                    await this.ReadFromStreamAsync(cancellationToken).ConfigureAwait(false);
+
+                ValidateResponse(responseLine, $"USERNAME {username}");
+
+                if (!responseLine.StartsWith("OK"))
+                {
+                    return responseLine;
+                }
+
+                return null;
+            }
         }
 
         private async Task<string> PasswordAsync(
             SecureString password,
             CancellationToken cancellationToken)
         {
-            await this.WriteToStreamAsync(
-                    $"PASSWORD {password.GetDecrypted()}",
-                    cancellationToken)
-                .ConfigureAwait(false);
-
-            string responseLine =
-                await this.ReadFromStreamAsync(cancellationToken).ConfigureAwait(false);
-
-            ValidateResponse(responseLine, "PASSWORD <password>}");
-
-            if (!responseLine.StartsWith("OK"))
+            using (this.asyncLock.Lock())
             {
-                return responseLine;
-            }
+                await this.WriteToStreamAsync(
+                        $"PASSWORD {password.GetDecrypted()}",
+                        cancellationToken)
+                    .ConfigureAwait(false);
 
-            return null;
+                string responseLine =
+                    await this.ReadFromStreamAsync(cancellationToken).ConfigureAwait(false);
+
+                ValidateResponse(responseLine, "PASSWORD <password>}");
+
+                if (!responseLine.StartsWith("OK"))
+                {
+                    return responseLine;
+                }
+
+                return null;
+            }
         }
 
         private async Task WriteToStreamAsync(
@@ -427,13 +471,12 @@
         {
             try
             {
-                byte[] buffer = new byte[1024];
+                byte[] buffer = new byte[10240];
                 int bytesReceived =
                     await this.ActiveStream.ReadAsync(buffer, 0, buffer.Length, cancellationToken)
                         .ConfigureAwait(false);
 
                 var str = Encoding.ASCII.GetString(buffer, 0, bytesReceived).Trim();
-                Console.WriteLine("ReadFromStreamAsync => '{0}'", str);
                 return str;
 
             }
