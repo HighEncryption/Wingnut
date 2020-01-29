@@ -452,7 +452,7 @@
                 if (this.tcpClient.Client.Poll(1, SelectMode.SelectRead) &&
                     !this.networkStream.DataAvailable)
                 {
-                    throw new Exception("Server disconnected. Handle this properly.");
+                    throw new Exception("Server disconnected.");
                 }
 
                 await this.ActiveStream.WriteAsync(reqBytes, 0, reqBytes.Length, cancellationToken)

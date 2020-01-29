@@ -29,11 +29,14 @@
 
         public List<UpsConfiguration> Upses { get; set; }
 
+        public int NoCommNotifyDelayInSeconds { get; set; }
+
         public string Name => $"{this.Username}@{this.Address}:{this.Port}";
 
         public ServerConfiguration()
         {
             this.Upses = new List<UpsConfiguration>();
+            this.NoCommNotifyDelayInSeconds = 300;
         }
 
         public static ServerConfiguration Create(Server server)
@@ -85,6 +88,12 @@
         public string Name { get; set; }
 
         public bool MonitorOnly { get; set; }
+
+        /// <summary>
+        /// The number of power supplies on this device being powered by this UPS. This is
+        /// equivalent to the 'power value' settings in ups.conf.
+        /// </summary>
+        public int NumPowerSupplies { get; set; }
 
         public int BatterRuntimeLowOverride { get; set; }
     }

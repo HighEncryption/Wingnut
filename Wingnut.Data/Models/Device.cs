@@ -10,11 +10,14 @@
         [DataMember]
         protected Dictionary<string, string> VariableDictionary;
 
+        [DataMember]
+        private string deviceName;
+
         protected Device(string name)
         {
             this.VariableDictionary = new Dictionary<string, string>();
 
-            this.Name = name;
+            this.deviceName = name;
         }
 
         public string GetString(string name)
@@ -61,7 +64,7 @@
         /// <summary>
         /// The name of the device as defined in the server's configuration
         /// </summary>
-        public string Name { get;  }
+        public string Name => this.deviceName;
 
         public string Manufacturer => this.GetString("device.mfr");
         public string Model => this.GetString("device.model");

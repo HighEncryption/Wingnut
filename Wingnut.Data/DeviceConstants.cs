@@ -176,4 +176,18 @@
             return statusInfo.Severity;
         }
     }
+
+    public enum NotificationType
+    {
+        Online,
+        OnBattery,
+        LowBattery,
+        ForcedShutdown,
+        CommunicationRestored,
+        CommunicationLost,
+        Shutdown,
+        ReplaceBattery,
+        NoCommunication
+    }
+
 }

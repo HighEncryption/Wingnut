@@ -53,6 +53,8 @@
 
         public List<ServerContext> ServerContexts { get; }
 
+        public int ActivePowerValue { get; internal set; }
+
         public void Initialize()
         {
             if (this.isInitialized)
@@ -138,6 +140,19 @@
                 Formatting.Indented);
 
             File.WriteAllText(this.configurationPath, configJson);
+        }
+
+        public void Notify(
+            ServerContext serverContext, 
+            UpsContext upsContext, 
+            NotificationType notification)
+        {
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine("NOTIFY {0} from device {1} on server {2}",
+                notification,
+                upsContext.Name,
+                serverContext.ServerState.Name);
+            Console.ResetColor();
         }
     }
 }

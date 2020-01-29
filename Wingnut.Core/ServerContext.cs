@@ -30,6 +30,12 @@
 
         public DateTime LastPollTime { get; private set; }
 
+        /// <summary>
+        /// The DateTime when the notification was last sent that communication with the UPS has
+        /// been lost.
+        /// </summary>
+        public DateTime? LastNoCommNotifyTime { get; set; }
+
         public ServerContext(Server server, ServerConfiguration configuration)
         {
             this.UpsContexts = new List<UpsContext>();
@@ -120,9 +126,10 @@
                         .ConfigureAwait(false);
 
                 upsContext = new UpsContext(
+                    this,
                     new Ups(upsConfig.Name, deviceVars)
                     {
-                        LastPollTime = DateTime.UtcNow
+                        LastPollTime = DateTime.MinValue
                     });
 
                 Logger.Info("Created new UpsContext for device '{0}'", upsConfig.Name);
@@ -133,20 +140,66 @@
 
             foreach (UpsContext upsContext in this.UpsContexts)
             {
-                TimeSpan timeSinceLastPoll = DateTime.UtcNow - upsContext.State.LastPollTime;
+                TimeSpan timeSinceLastPoll = DateTime.UtcNow - upsContext.State.LastPollTime.ToUniversalTime();
                 if (timeSinceLastPoll < TimeSpan.FromSeconds(this.ServerState.PollFrequencyInSeconds))
                 {
                     // Not enough time has passed since the last poll
                     continue;
                 }
 
-                Dictionary<string, string> deviceVars =
-                    await this.Connection.ListVarsAsync(upsContext.Name, cancellationToken)
-                        .ConfigureAwait(false);
+                Dictionary<string, string> deviceVars = null;
 
-                if (upsContext.Update(deviceVars))
+                try
                 {
-                    anyStatusChanged = true;
+                    deviceVars =
+                        await this.Connection.ListVarsAsync(upsContext.Name, cancellationToken)
+                            .ConfigureAwait(false);
+
+                    if (upsContext.Update(deviceVars))
+                    {
+                        anyStatusChanged = true;
+                    }
+
+                    upsContext.State.LastPollTime = DateTime.Now;
+
+                    if (this.LastNoCommNotifyTime != null)
+                    {
+                        ServiceRuntime.Instance.Notify(
+                            this,
+                            upsContext,
+                            NotificationType.CommunicationRestored);
+
+                        this.LastNoCommNotifyTime = null;
+                    }
+                }
+                catch (NutCommunicationException commEx)
+                {
+                    if (this.LastNoCommNotifyTime == null)
+                    {
+                        Logger.Error(
+                            "Communication lost with UPS {0} on server {1}. The exception was: {2}",
+                            upsContext.Name,
+                            this.ServerState.Name,
+                            commEx);
+
+                        ServiceRuntime.Instance.Notify(
+                            this,
+                            upsContext,
+                            NotificationType.CommunicationLost);
+
+                        this.LastNoCommNotifyTime = DateTime.Now;
+                    }
+                    else if (
+                        this.LastNoCommNotifyTime.Value < DateTime.Now.AddSeconds(
+                            0 - this.Configuration.NoCommNotifyDelayInSeconds))
+                    {
+                        ServiceRuntime.Instance.Notify(
+                            this,
+                            upsContext,
+                            NotificationType.NoCommunication);
+
+                        this.LastNoCommNotifyTime = DateTime.Now;
+                    }
                 }
             }
 
@@ -297,7 +350,7 @@
         {
             Logger.Info("Closing connection to server {0}", this.ServerState.Name);
 
-            // TODO: This about this design. When do we issue a logout to the server?
+            // TODO: Think about this design. When do we issue a logout to the server?
             // TODO: Should be retry for a while?
             try
             {

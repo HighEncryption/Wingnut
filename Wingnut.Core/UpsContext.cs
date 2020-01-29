@@ -1,6 +1,7 @@
 ﻿namespace Wingnut.Core
 {
     using System.Collections.Generic;
+    using System.Diagnostics;
 
     using Wingnut.Data;
     using Wingnut.Data.Models;
@@ -8,12 +9,14 @@
 
     public class UpsContext
     {
+        private readonly ServerContext serverContext;
         public string Name => this.State.Name;
 
         public Ups State { get; }
 
-        public UpsContext(Ups state)
+        public UpsContext(ServerContext serverContext, Ups state)
         {
+            this.serverContext = serverContext;
             this.State = state;
         }
 
@@ -25,6 +28,19 @@
 
             if (this.State.Status != initialStatus)
             {
+                if (this.State.Status == DeviceStatusType.Online)
+                {
+                    ServiceRuntime.Instance.Notify(this.serverContext, this, NotificationType.Online);
+                }
+                else if (this.State.Status == DeviceStatusType.OnBattery)
+                {
+                    ServiceRuntime.Instance.Notify(this.serverContext, this, NotificationType.OnBattery);
+                }
+                else if (this.State.Status == DeviceStatusType.LowBattery)
+                {
+                    ServiceRuntime.Instance.Notify(this.serverContext, this, NotificationType.LowBattery);
+                }
+
                 Logger.LogLevel logLevel = Logger.LogLevel.Info;
                 DeviceSeverityType severity = DeviceConstants.GetStatusSeverity(this.State.Status);
 

@@ -205,5 +205,39 @@
                 await Task.Delay(100).ConfigureAwait(false);
             }
         }
+
+        public Task<List<Ups>> GetUps(string serverName, string upsName)
+        {
+            ServerContext serverContext =
+                ServiceRuntime.Instance.ServerContexts.FirstOrDefault(
+                    s => string.Equals(s.ServerState.Name, serverName));
+
+            if (serverContext == null)
+            {
+                throw new WingnutException(
+                    $"A server with the name '{serverName}' was not found.");
+            }
+
+            List<Ups> upsList = new List<Ups>();
+
+            if (string.IsNullOrWhiteSpace(upsName))
+            {
+                upsList.AddRange(serverContext.UpsContexts.Select(u => u.State));
+            }
+            else
+            {
+                var upsContext = serverContext.UpsContexts.FirstOrDefault(s => s.Name == upsName);
+
+                if (upsContext == null)
+                {
+                    throw new WingnutException(
+                        $"A UPS device with name '{upsName}' was not found on server '{serverName}'");
+                }
+
+                upsList.Add(upsContext.State);
+            }
+
+            return Task.FromResult(upsList);
+        }
     }
 }

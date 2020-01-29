@@ -36,6 +36,11 @@
             string upsName, 
             bool monitorOnly,
             bool force);
+
+        [OperationContract]
+        Task<List<Ups>> GetUps(
+            string serverName, 
+            string upsName);
     }
 
     public interface IManagementCallback

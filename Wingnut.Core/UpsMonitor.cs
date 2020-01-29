@@ -106,8 +106,8 @@
 
         private void ProcessUpsStatusChanges()
         {
-            //throw new NotImplementedException();
             Logger.Info("Processing status change");
+
         }
 
         private void InitializeFromConfiguration()
