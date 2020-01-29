@@ -3,8 +3,6 @@
     using System;
     using System.Collections.Generic;
     using System.IO;
-    using System.Net.Sockets;
-    using System.Security;
     using System.ServiceModel;
     using System.ServiceModel.Description;
     using Newtonsoft.Json;
@@ -12,14 +10,13 @@
     using Wingnut.Channels;
     using Wingnut.Data;
     using Wingnut.Data.Configuration;
-    using Wingnut.Data.Models;
     using Wingnut.Tracing;
 
     public class ServiceRuntime
     {
         private ServiceRuntime()
         {
-            this.ServerContexts = new List<ServerContext>();
+            this.UpsContexts = new List<UpsContext>();
         }
 
         private static object initLock = new object();
@@ -51,7 +48,7 @@
 
         public WingnutConfiguration Configuration { get; private set; }
 
-        public List<ServerContext> ServerContexts { get; }
+        public List<UpsContext> UpsContexts { get;}
 
         public int ActivePowerValue { get; internal set; }
 
@@ -78,7 +75,10 @@
             }
             else
             {
-                this.Configuration = new WingnutConfiguration();
+                this.Configuration = new WingnutConfiguration
+                {
+                    ServiceConfiguration = WingnutServiceConfiguration.CreateDefault()
+                };
             }
 
             // Initialization is finished
@@ -143,15 +143,14 @@
         }
 
         public void Notify(
-            ServerContext serverContext, 
-            UpsContext upsContext, 
+            UpsContext upsContext,
             NotificationType notification)
         {
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine("NOTIFY {0} from device {1} on server {2}",
                 notification,
                 upsContext.Name,
-                serverContext.ServerState.Name);
+                upsContext.ServerConfiguration.DisplayName);
             Console.ResetColor();
         }
     }

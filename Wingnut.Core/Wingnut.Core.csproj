@@ -47,7 +47,6 @@
   <ItemGroup>
     <Compile Include="ManagementService.cs" />
     <Compile Include="ServerConnection.cs" />
-    <Compile Include="ServerContext.cs" />
     <Compile Include="ServiceRuntime.cs" />
     <Compile Include="UpsContext.cs" />
     <Compile Include="UpsMonitor.cs" />

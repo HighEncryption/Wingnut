@@ -91,92 +91,6 @@
         Error = 2
     }
 
-    public static class DeviceConstants
-    {
-        private class DeviceStatusInfo
-        {
-            public string Identifier;
-            public DeviceStatusType StatusType;
-            public DeviceSeverityType Severity;
-        }
-
-        private static readonly List<DeviceStatusInfo> statusInfos;
-
-        static DeviceConstants()
-        {
-            FieldInfo[] enumValues =
-                typeof(DeviceStatusType).GetFields(BindingFlags.Public | BindingFlags.Static);
-
-            statusInfos = new List<DeviceStatusInfo>();
-
-            foreach (FieldInfo enumValue in enumValues)
-            {
-                DeviceStatusIdentifierAttribute idAttribute =
-                    enumValue.GetCustomAttributes(typeof(DeviceStatusIdentifierAttribute))
-                        .OfType<DeviceStatusIdentifierAttribute>()
-                        .FirstOrDefault();
-
-                if (idAttribute == null)
-                {
-                    continue;
-                }
-
-                DeviceStatusSeverityAttribute severityAttribute =
-                    enumValue.GetCustomAttributes(typeof(DeviceStatusSeverityAttribute))
-                        .OfType<DeviceStatusSeverityAttribute>()
-                        .First();
-
-                statusInfos.Add(
-                    new DeviceStatusInfo()
-                    {
-                        Identifier = idAttribute.Name,
-                        Severity = severityAttribute.Severity,
-                        StatusType = (DeviceStatusType)enumValue.GetRawConstantValue()
-                    });
-            }
-        }
-
-        public static DeviceStatusType GetStatusType(string identifier)
-        {
-            DeviceStatusInfo statusInfo =
-                statusInfos.FirstOrDefault(
-                    s => string.Equals(s.Identifier, identifier, StringComparison.OrdinalIgnoreCase));
-
-            if (statusInfo == null)
-            {
-                throw new Exception($"The identifier {identifier} is not defined");
-            }
-
-            return statusInfo.StatusType;
-        }
-
-        public static DeviceSeverityType GetStatusSeverity(string identifier)
-        {
-            DeviceStatusInfo statusInfo =
-                statusInfos.FirstOrDefault(
-                    s => string.Equals(s.Identifier, identifier, StringComparison.OrdinalIgnoreCase));
-
-            if (statusInfo == null)
-            {
-                throw new Exception($"The identifier {identifier} is not defined");
-            }
-
-            return statusInfo.Severity;
-        }
-
-        public static DeviceSeverityType GetStatusSeverity(DeviceStatusType status)
-        {
-            DeviceStatusInfo statusInfo = statusInfos.FirstOrDefault(s => s.StatusType == status);
-
-            if (statusInfo == null)
-            {
-                throw new Exception($"The status type {status} is not defined");
-            }
-
-            return statusInfo.Severity;
-        }
-    }
-
     public enum NotificationType
     {
         Online,
@@ -188,6 +102,101 @@
         Shutdown,
         ReplaceBattery,
         NoCommunication
+    }
+
+    public static class Constants
+    {
+        public const int DefaultPollFrequencyInSeconds = 15;
+
+        public const int DefaultPortNumber = 3493;
+
+        public const int DefaultNumPowerSupplies = 1;
+
+        public static class Device
+        {
+            private class DeviceStatusInfo
+            {
+                public string Identifier;
+                public DeviceStatusType StatusType;
+                public DeviceSeverityType Severity;
+            }
+
+            private static readonly List<DeviceStatusInfo> statusInfos;
+
+            static Device()
+            {
+                FieldInfo[] enumValues =
+                    typeof(DeviceStatusType).GetFields(BindingFlags.Public | BindingFlags.Static);
+
+                statusInfos = new List<DeviceStatusInfo>();
+
+                foreach (FieldInfo enumValue in enumValues)
+                {
+                    DeviceStatusIdentifierAttribute idAttribute =
+                        enumValue.GetCustomAttributes(typeof(DeviceStatusIdentifierAttribute))
+                            .OfType<DeviceStatusIdentifierAttribute>()
+                            .FirstOrDefault();
+
+                    if (idAttribute == null)
+                    {
+                        continue;
+                    }
+
+                    DeviceStatusSeverityAttribute severityAttribute =
+                        enumValue.GetCustomAttributes(typeof(DeviceStatusSeverityAttribute))
+                            .OfType<DeviceStatusSeverityAttribute>()
+                            .First();
+
+                    statusInfos.Add(
+                        new DeviceStatusInfo()
+                        {
+                            Identifier = idAttribute.Name,
+                            Severity = severityAttribute.Severity,
+                            StatusType = (DeviceStatusType)enumValue.GetRawConstantValue()
+                        });
+                }
+            }
+
+            public static DeviceStatusType GetStatusType(string identifier)
+            {
+                DeviceStatusInfo statusInfo =
+                    statusInfos.FirstOrDefault(
+                        s => String.Equals(s.Identifier, identifier, StringComparison.OrdinalIgnoreCase));
+
+                if (statusInfo == null)
+                {
+                    throw new Exception($"The identifier {identifier} is not defined");
+                }
+
+                return statusInfo.StatusType;
+            }
+
+            public static DeviceSeverityType GetStatusSeverity(string identifier)
+            {
+                DeviceStatusInfo statusInfo =
+                    statusInfos.FirstOrDefault(
+                        s => String.Equals(s.Identifier, identifier, StringComparison.OrdinalIgnoreCase));
+
+                if (statusInfo == null)
+                {
+                    throw new Exception($"The identifier {identifier} is not defined");
+                }
+
+                return statusInfo.Severity;
+            }
+
+            public static DeviceSeverityType GetStatusSeverity(DeviceStatusType status)
+            {
+                DeviceStatusInfo statusInfo = statusInfos.FirstOrDefault(s => s.StatusType == status);
+
+                if (statusInfo == null)
+                {
+                    throw new Exception($"The status type {status} is not defined");
+                }
+
+                return statusInfo.Severity;
+            }
+        }
     }
 
 }

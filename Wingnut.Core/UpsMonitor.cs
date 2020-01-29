@@ -8,7 +8,6 @@
 
     using Wingnut.Data;
     using Wingnut.Data.Configuration;
-    using Wingnut.Data.Models;
     using Wingnut.Tracing;
 
     public enum MonitorStatus
@@ -65,11 +64,13 @@
 
                 while (!this.cancellationTokenSource.IsCancellationRequested)
                 {
-                    foreach (ServerContext serverContext in ServiceRuntime.Instance.ServerContexts)
+                    foreach (UpsContext upsContext in ServiceRuntime.Instance.UpsContexts)
                     {
-                        if (serverContext.MonitoringTask == null)
+                        // Start (or restart) any monitoring tasks
+                        if (upsContext.MonitoringTask == null ||
+                            upsContext.MonitoringTask.IsCompleted)
                         {
-                            serverContext.StartMonitoring(
+                            upsContext.StartMonitoring(
                                 this.monitoringSyncLock,
                                 this.upsStatusChangedEvent,
                                 this.cancellationTokenSource.Token);
@@ -107,41 +108,48 @@
         private void ProcessUpsStatusChanges()
         {
             Logger.Info("Processing status change");
-
         }
 
         private void InitializeFromConfiguration()
         {
-            foreach (ServerConfiguration serverConfiguration
-                in ServiceRuntime.Instance.Configuration.Servers)
+            foreach (UpsConfiguration upsConfiguration in 
+                ServiceRuntime.Instance.Configuration.UpsConfigurations)
             {
-                serverConfiguration.ValidateProperties();
+                Logger.Info($"Loading server {upsConfiguration.DeviceName} from configuration");
 
-                Logger.Info($"Loading server {serverConfiguration.Name} from configuration");
-
-                if (ServiceRuntime.Instance.ServerContexts.Any(
-                    s => string.Equals(
-                        s.ServerState.Name,
-                        serverConfiguration.Name,
-                        StringComparison.OrdinalIgnoreCase)))
+                try
                 {
-                    throw new WingnutException("The server already exists");
+                    upsConfiguration.ValidateProperties();
+                }
+                catch (Exception exception)
+                {
+                    Logger.Error(
+                        "An error occurred while loading the configuration for the UPS '{0}' on server '{1}. The error was: {2}",
+                        upsConfiguration.DeviceName,
+                        upsConfiguration.ServerConfiguration.DisplayName,
+                        exception.Message);
+
+                    Logger.Debug("Exception during upsContext load. {0}", exception);
                 }
 
-                Server server = Server.CreateFromConfiguration(serverConfiguration);
-                ServerContext serverContext = new ServerContext(server, serverConfiguration);
+                if (ServiceRuntime.Instance.UpsContexts.Any(
+                    s => string.Equals(
+                        s.QualifiedName, 
+                        upsConfiguration.GetQualifiedName())))
+                {
+                    throw new WingnutException("The device already exists");
+                }
 
-                // Add to the server list without attempting to connect, since this will be
-                // handled in the monitoring loop.
-                ServiceRuntime.Instance.ServerContexts.Add(serverContext);
+                UpsContext upsContext = UpsContext.CreateFromConfiguration(upsConfiguration);
 
-                Logger.Info("Server loaded successfully");
+                ServiceRuntime.Instance.UpsContexts.Add(upsContext);
+
+                Logger.Info($"Ups '{upsContext.Name}' successfully loaded from configuration");
             }
 
             Logger.Info(
-                "Finished loading {0} servers from configuration",
-                ServiceRuntime.Instance.Configuration.Servers.Count);
+                "Finished loading {0} devices from configuration",
+                ServiceRuntime.Instance.Configuration.UpsConfigurations.Count);
         }
     }
-
 }

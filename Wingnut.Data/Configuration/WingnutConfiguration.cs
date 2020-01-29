@@ -6,14 +6,13 @@
     {
         public const string FileName = "configuration.json";
 
-        public List<ServerConfiguration> Servers { get; set; }
+        public WingnutServiceConfiguration ServiceConfiguration { get; set; }
 
-        public int MinimumPowerSupplies { get; set; }
+        public List<UpsConfiguration> UpsConfigurations { get; set; }
 
         public WingnutConfiguration()
         {
-            this.MinimumPowerSupplies = 1;
-            this.Servers = new List<ServerConfiguration>();
+            this.UpsConfigurations = new List<UpsConfiguration>();
         }
     }
 }

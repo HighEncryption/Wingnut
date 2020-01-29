@@ -13,11 +13,17 @@
         [DataMember]
         private string deviceName;
 
-        protected Device(string name)
+        [DataMember]
+        private Server server;
+
+        public Server Server => this.server;
+
+        protected Device(string name, Server server)
         {
             this.VariableDictionary = new Dictionary<string, string>();
 
             this.deviceName = name;
+            this.server = server;
         }
 
         public string GetString(string name)

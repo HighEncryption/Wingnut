@@ -8,7 +8,7 @@
     [Cmdlet(VerbsCommon.Get, "NutUps")]
     public class GetNutUps: PSCmdlet
     {
-        [Parameter(Mandatory = true)]
+        [Parameter]
         public string ServerName { get; set; }
 
         [Parameter]

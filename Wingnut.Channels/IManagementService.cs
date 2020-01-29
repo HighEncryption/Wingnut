@@ -4,36 +4,33 @@
     using System.ServiceModel;
     using System.Threading.Tasks;
 
+    using Wingnut.Data.Configuration;
     using Wingnut.Data.Models;
 
-    [ServiceContract(SessionMode = SessionMode.Required,
+    [ServiceContract(
+        SessionMode = SessionMode.Required,
         CallbackContract = typeof(IManagementCallback))]
     public interface IManagementService
     {
         [OperationContract]
-        List<Server> GetServers(string name);
+        WingnutServiceConfiguration GetServiceConfiguration();
 
         [OperationContract]
-        Server AddServer(
-            Server server, 
-            string password, 
-            bool ignoreConnectionFailure);
-
-        [OperationContract]
-        void UpdateServer(Server server);
-
-        [OperationContract]
-        void DeleteServer(string name);
+        void UpdateServiceConfiguration(
+            WingnutServiceConfiguration configuration);
 
         [OperationContract]
         Task<List<Ups>> GetUpsFromServer(
-            string serverName, 
+            Server server,
+            string password,
             string upsName);
 
         [OperationContract]
         Task<Ups> AddUps(
-            string serverName, 
+            Server server,
+            string password,
             string upsName, 
+            int numPowerSupplies,
             bool monitorOnly,
             bool force);
 
@@ -47,11 +44,5 @@
     {
         [OperationContract(IsOneWay = true)]
         void SendCallbackMessage(string message);
-    }
-
-    public enum CommunicationFaultType
-    {
-        Undefined,
-
     }
 }

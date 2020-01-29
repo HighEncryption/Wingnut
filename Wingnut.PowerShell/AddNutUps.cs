@@ -1,17 +1,34 @@
 ﻿namespace Wingnut.PowerShell
 {
     using System.Management.Automation;
+    using System.Net.Sockets;
 
+    using Wingnut.Data;
     using Wingnut.Data.Models;
 
     [Cmdlet(VerbsCommon.Add, "NutUps")]
     public class AddNutUps : PSCmdlet
     {
         [Parameter(Mandatory = true)]
-        public string ServerName { get; set; }
+        public string Address { get; set; }
+
+        [Parameter]
+        public int Port { get; set; } = Constants.DefaultPortNumber;
+
+        [Parameter(Mandatory = true)]
+        public PSCredential Credential { get; set; }
+
+        [Parameter]
+        public SSLUsage UseSSL { get; set; } = SSLUsage.Optional;
+
+        [Parameter]
+        public AddressFamily? PreferredAddressFamily { get; set; }
 
         [Parameter]
         public string UpsName { get; set; }
+
+        [Parameter]
+        public int NumPowerSupplies { get; set; } = Constants.DefaultNumPowerSupplies;
 
         [Parameter]
         public SwitchParameter MonitorOnly { get; set; }
@@ -23,8 +40,22 @@
         {
             ServiceHelper helper = ServiceHelper.Create();
 
-            Ups ups = helper.Channel
-                .AddUps(this.ServerName, this.UpsName, this.MonitorOnly, this.Force.ToBool())
+            Server server = new Server()
+            {
+                Address = this.Address,
+                Port = this.Port,
+                Username = this.Credential.UserName,
+                UseSSL = this.UseSSL,
+                PreferredAddressFamily = this.PreferredAddressFamily
+            };
+
+            Ups ups = helper.Channel.AddUps(
+                    server,
+                    this.Credential.Password.GetDecrypted(),
+                    this.UpsName,
+                    this.NumPowerSupplies,
+                    this.MonitorOnly,
+                    this.Force.ToBool())
                 .Result;
 
             this.WriteObject(ups);

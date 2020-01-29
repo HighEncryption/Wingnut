@@ -44,11 +44,13 @@
     <Compile Include="AsyncReaderWriterLock.cs" />
     <Compile Include="Configuration\SecureStringToProtectedDataConverter.cs" />
     <Compile Include="Configuration\ServerConfiguration.cs" />
+    <Compile Include="Configuration\UpsConfiguration.cs" />
     <Compile Include="Configuration\WingnutConfiguration.cs" />
+    <Compile Include="Configuration\WingnutServiceConfiguration.cs" />
     <Compile Include="Models\Device.cs" />
-    <Compile Include="Models\DeviceDefinition.cs" />
     <Compile Include="Models\NutCommunicationException.cs" />
     <Compile Include="Models\Server.cs" />
+    <Compile Include="Models\Ups.cs" />
     <Compile Include="SecureStringExtensions.cs" />
     <Compile Include="DeviceConstants.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -23,7 +23,7 @@
         private readonly char[] tokenSplitChar = { ' ' };
         private readonly char[] tokenTrimChar = { '\"' };
 
-        private readonly ServerContext serverContext;
+        private readonly Server serverState;
         private TcpClient tcpClient;
         private NetworkStream networkStream;
         private SslStream sslStream;
@@ -31,23 +31,23 @@
 
         private Stream ActiveStream => this.sslStream ?? (Stream)this.networkStream;
 
-        public ServerConnection(ServerContext serverContext)
+        public ServerConnection(Server serverState)
         {
-            this.serverContext = serverContext;
+            this.serverState = serverState;
             this.asyncLock = new AsyncLock();
         }
 
         public async Task ConnectAsync(
             CancellationToken cancellationToken)
         {
-            IPHostEntry hostEntry = Dns.GetHostEntry(this.serverContext.ServerState.Address);
+            IPHostEntry hostEntry = Dns.GetHostEntry(this.serverState.Address);
 
             var addresses = hostEntry.AddressList.ToList();
 
-            if (this.serverContext.ServerState.PreferredAddressFamily.HasValue)
+            if (this.serverState.PreferredAddressFamily.HasValue)
             {
                 addresses = hostEntry.AddressList
-                    .Where(a => a.AddressFamily == this.serverContext.ServerState.PreferredAddressFamily)
+                    .Where(a => a.AddressFamily == this.serverState.PreferredAddressFamily)
                     .ToList();
             }
 
@@ -94,7 +94,12 @@
                     lastException);
             }
 
-            this.serverContext.ServerState.LastConnectionTime = DateTime.UtcNow;
+            this.serverState.LastConnectionTime = DateTime.UtcNow;
+        }
+
+        public void Disconnect()
+        {
+            this.tcpClient.Close();
         }
 
         private async Task ConnectWithAddress(
@@ -105,9 +110,9 @@
 
             Logger.Info(
                 "Connecting to server at {0}", 
-                new IPEndPoint(address, this.serverContext.ServerState.Port));
+                new IPEndPoint(address, this.serverState.Port));
 
-            await this.tcpClient.ConnectAsync(address, this.serverContext.ServerState.Port).ConfigureAwait(false);
+            await this.tcpClient.ConnectAsync(address, this.serverState.Port).ConfigureAwait(false);
 
             this.tcpClient.Client.SetSocketOption(
                 SocketOptionLevel.Socket,
@@ -121,8 +126,8 @@
             this.networkStream = this.tcpClient.GetStream();
             string response;
 
-            if (this.serverContext.ServerState.UseSSL == SSLUsage.Optional ||
-                this.serverContext.ServerState.UseSSL == SSLUsage.Required)
+            if (this.serverState.UseSSL == SSLUsage.Optional ||
+                this.serverState.UseSSL == SSLUsage.Required)
             {
                 Logger.Info("Attempting to upgrade to SSL");
 
@@ -137,14 +142,14 @@
                         SslCertificateValidationCallback);
 
                     await this.sslStream
-                        .AuthenticateAsClientAsync(this.serverContext.Configuration.SSLTargetName)
+                        .AuthenticateAsClientAsync(this.serverState.SSLTargetName)
                         .ConfigureAwait(false);
 
                     Logger.Info("Connection successfully upgraded to SSL");
                 }
                 else
                 {
-                    if (this.serverContext.ServerState.UseSSL == SSLUsage.Required)
+                    if (this.serverState.UseSSL == SSLUsage.Required)
                     {
                         // SSL is required per the configuration, but the server did 
                         // not support it, so throw an exception.
@@ -158,18 +163,18 @@
             }
 
             response = await this.UsernameAsync(
-                    this.serverContext.ServerState.Username,
+                    this.serverState.Username,
                     cancellationToken)
                 .ConfigureAwait(false);
 
             if (response != null)
             {
                 throw new WingnutException(
-                    $"Failed to set username on server to '{this.serverContext.ServerState.Username}'. The response was: {response}");
+                    $"Failed to set username on server to '{this.serverState.Username}'. The response was: {response}");
             }
 
             response = await this.PasswordAsync(
-                    this.serverContext.ServerState.Password,
+                    this.serverState.Password,
                     cancellationToken)
                 .ConfigureAwait(false);
 
