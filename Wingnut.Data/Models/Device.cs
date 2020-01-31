@@ -42,9 +42,15 @@
             //return double.Parse(this.VariableDictionary[name]);
         }
 
-        public DateTime GetDateTime(string name)
+        public DateTime? GetDateTime(string name)
         {
-            return DateTime.Parse(this.VariableDictionary[name]);
+            if (this.VariableDictionary.TryGetValue(name, out string value) &&
+                !string.IsNullOrWhiteSpace(value))
+            {
+                return DateTime.Parse(value);
+            }
+
+            return null;
         }
 
         public TimeSpan GetTimeSpan(string name, TimeSpanUnits units)

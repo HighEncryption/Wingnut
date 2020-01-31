@@ -91,60 +91,100 @@
             EventIDs.UpsOnline,
             Channel = EventChannel.Operational,
             Level = EventLevel.Informational,
-            Message = "{0}")]
-        public void UpsOnline(string message)
+            Message = "The UPS {0} on server {1} is now online")]
+        public void UpsOnline(string upsName, string serverName)
         {
-            this.WriteEvent(EventIDs.UpsOnline, message);
+            this.WriteEvent(EventIDs.UpsOnline, upsName, serverName);
         }
 
         [Event(
             EventIDs.UpsOnBattery,
             Channel = EventChannel.Operational,
             Level = EventLevel.Warning,
-            Message = "{0}")]
-        public void UpsOnBattery(string message)
+            Message = "The UPS {0} on server {1} is running on battery")]
+        public void UpsOnBattery(string upsName, string serverName)
         {
-            this.WriteEvent(EventIDs.UpsOnBattery, message);
+            this.WriteEvent(EventIDs.UpsOnBattery, upsName, serverName);
         }
 
         [Event(
             EventIDs.UpsLowBattery,
             Channel = EventChannel.Operational,
             Level = EventLevel.Warning,
-            Message = "{0}")]
-        public void UpsLowBattery(string message)
+            Message = "The UPS {0} on server {1} has a low battery")]
+        public void UpsLowBattery(string upsName, string serverName)
         {
-            this.WriteEvent(EventIDs.UpsLowBattery, message);
+            this.WriteEvent(EventIDs.UpsLowBattery, upsName, serverName);
         }
 
         [Event(
             EventIDs.UpsBatteryNeedsReplaced,
             Channel = EventChannel.Operational,
             Level = EventLevel.Error,
-            Message = "{0}")]
-        public void UpsBatteryNeedsReplaced(string message)
+            Message = "The battery for UPS {0} on server {1} needs to be replaced. The previous install date is {1}")]
+        public void UpsBatteryNeedsReplaced(string upsName, string serverName, string lastReplaceDate)
         {
-            this.WriteEvent(EventIDs.UpsBatteryNeedsReplaced, message);
+            this.WriteEvent(EventIDs.UpsBatteryNeedsReplaced, upsName, serverName, lastReplaceDate);
         }
 
         [Event(
             EventIDs.CommunicationLost,
             Channel = EventChannel.Operational,
             Level = EventLevel.Error,
-            Message = "{0}")]
-        public void CommunicationLost(string message)
+            Message = "Communication lost to UPS {0} on server {1}. The error was: {2}")]
+        public void CommunicationLost(string upsName, string serverName, string error)
         {
-            this.WriteEvent(EventIDs.CommunicationLost, message);
+            this.WriteEvent(EventIDs.CommunicationLost, upsName, serverName, error);
         }
 
         [Event(
             EventIDs.CommunicationRestored,
             Channel = EventChannel.Operational,
             Level = EventLevel.Informational,
-            Message = "{0}")]
-        public void CommunicationRestored(string message)
+            Message = "Communication restored to UPS {0} on server {1}")]
+        public void CommunicationRestored(string upsName, string serverName)
         {
-            this.WriteEvent(EventIDs.CommunicationRestored, message);
+            this.WriteEvent(EventIDs.CommunicationRestored, upsName, serverName);
+        }
+
+        [Event(
+            EventIDs.ConnectedToServer,
+            Channel = EventChannel.Operational,
+            Level = EventLevel.Informational,
+            Message = "Successfully connected to server {0}")]
+        public void ConnectedToServer(string serverName)
+        {
+            this.WriteEvent(EventIDs.ConnectedToServer, serverName);
+        }
+
+        [Event(
+            EventIDs.FailedToQueryServer,
+            Channel = EventChannel.Operational,
+            Level = EventLevel.Informational,
+            Message = "Failed to query server {0}. The error was: {1}")]
+        public void FailedToQueryServer(string serverName, string error)
+        {
+            this.WriteEvent(EventIDs.FailedToQueryServer, serverName, error);
+        }
+
+        [Event(
+            EventIDs.PowerValueBelowThreshold,
+            Channel = EventChannel.Operational,
+            Level = EventLevel.Error,
+            Message = "Power value for the computer is {0}, which is below the threshold of {1}")]
+        public void PowerValueBelowThreshold(int powerValue, int threshold)
+        {
+            this.WriteEvent(EventIDs.CommunicationLost, powerValue, threshold);
+        }
+
+        [Event(
+            EventIDs.InitiatingShutdown,
+            Channel = EventChannel.Operational,
+            Level = EventLevel.Error,
+            Message = "The shutdown process is being initiated")]
+        public void InitiatingShutdown()
+        {
+            this.WriteEvent(EventIDs.CommunicationLost);
         }
 
         public class EventIDs
@@ -162,6 +202,10 @@
             public const int UpsBatteryNeedsReplaced = 13;
             public const int CommunicationLost = 14;
             public const int CommunicationRestored = 15;
+            public const int ConnectedToServer = 16;
+            public const int FailedToQueryServer = 17;
+            public const int PowerValueBelowThreshold = 18;
+            public const int InitiatingShutdown = 19;
         }
 
         public class Tasks

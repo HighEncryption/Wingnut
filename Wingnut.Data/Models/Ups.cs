@@ -9,11 +9,11 @@
     {
         public double? BatteryCharge => this.GetDouble("battery.charge");
 
-        public DateTime BatteryLastReplacement => this.GetDateTime("battery.date");
+        public DateTime? BatteryLastReplacement => this.GetDateTime("battery.date");
 
-        public TimeSpan BatteryRuntime => this.GetTimeSpan("battery.runtime", TimeSpanUnits.Seconds);
+        public TimeSpan? BatteryRuntime => this.GetTimeSpan("battery.runtime", TimeSpanUnits.Seconds);
 
-        public TimeSpan BatteryRuntimeLow => this.GetTimeSpan("battery.runtime.low", TimeSpanUnits.Seconds);
+        public TimeSpan? BatteryRuntimeLow => this.GetTimeSpan("battery.runtime.low", TimeSpanUnits.Seconds);
 
         public double? InputFrequency => this.GetDouble("input.frequency");
 
@@ -28,9 +28,19 @@
         public double? LoadPercentage => this.GetDouble("ups.load");
 
         public DeviceStatusType Status =>
-            Constants.Device.GetStatusType(this.GetString("ups.status"));
+            Constants.Device.ParseStatusString(this.GetString("ups.status"));
+
+        public bool NotResponding { get; set; }
 
         public override DeviceType DeviceType => DeviceType.UPS;
+
+        public Ups Clone()
+        {
+            return new Ups(
+                this.Name,
+                this.Server,
+                new Dictionary<string, string>(this.VariableDictionary));
+        }
 
         // TODO: Make internal
         public List<string> UpdateVariables(Dictionary<string, string> vars)

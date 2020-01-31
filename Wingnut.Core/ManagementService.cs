@@ -127,10 +127,7 @@
                 ServiceRuntime.Instance.SaveConfiguration();
 
                 // Add to the running instances
-                UpsContext upsContext = new UpsContext(
-                    serverConfiguration,
-                    server,
-                    upsName)
+                UpsContext upsContext = new UpsContext(upsConfiguration, server)
                 {
                     State = ups
                 };
@@ -172,7 +169,7 @@
             {
                 upsList.AddRange(
                     ServiceRuntime.Instance.UpsContexts
-                        .Where(ctx => ctx.ServerConfiguration.Address == serverName)
+                        .Where(ctx => ctx.UpsConfiguration.ServerConfiguration.Address == serverName)
                         .Select(ctx => ctx.State));
             }
             else
@@ -180,7 +177,7 @@
                 var upsContext =
                     ServiceRuntime.Instance.UpsContexts.FirstOrDefault(
                         ctx => ctx.Name == upsName &&
-                               ctx.ServerConfiguration.Address == serverName);
+                               ctx.UpsConfiguration.ServerConfiguration.Address == serverName);
 
                 if (upsContext == null)
                 {

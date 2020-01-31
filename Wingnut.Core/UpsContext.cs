@@ -12,13 +12,10 @@
 
     public class UpsContext
     {
-        //private readonly ServerContext serverContext;
+        internal readonly UpsConfiguration UpsConfiguration;
 
-        internal readonly ServerConfiguration ServerConfiguration;
-
+        private UpsMonitor upsMonitor;
         private CancellationTokenSource cancellationTokenSource;
-        private AsyncReaderWriterLock readerWriterLock;
-        private AutoResetEvent upsStatusChangedEvent;
 
         public Server ServerState { get; }
 
@@ -30,6 +27,8 @@
         /// </summary>
         public DateTime? LastNoCommNotifyTime { get; set; }
 
+        public DateTime? LastReplaceBatteryWarnTime { get; set; }
+
         internal Task MonitoringTask { get; private set; }
 
         public string Name { get; }
@@ -38,43 +37,28 @@
             string.Format(
                 "{0}@{1}:{2}", 
                 this.Name, 
-                this.ServerConfiguration.Address,
-                this.ServerConfiguration.Port);
+                this.UpsConfiguration.ServerConfiguration.Address,
+                this.UpsConfiguration.ServerConfiguration.Port);
 
         public Ups State { get; set; }
 
         public UpsContext(
-            ServerConfiguration serverConfiguration, 
-            Server server,
-            string name)
+            UpsConfiguration upsConfiguration, 
+            Server server)
         {
-            this.ServerConfiguration = serverConfiguration;
+            this.UpsConfiguration = upsConfiguration;
             this.ServerState = server;
-            this.Name = name;
+
+            this.Name = upsConfiguration.DeviceName;
 
             this.Connection = new ServerConnection(server);
         }
 
-        public static UpsContext CreateFromConfiguration(UpsConfiguration upsConfiguration)
-        {
-            Server server = Server.CreateFromConfiguration(
-                upsConfiguration.ServerConfiguration);
-
-            UpsContext upsContext = new UpsContext(
-                upsConfiguration.ServerConfiguration,
-                server, 
-                upsConfiguration.DeviceName);
-
-            return upsContext;
-        }
-
         public void StartMonitoring(
-            AsyncReaderWriterLock monitoringReaderWriterLock,
-            AutoResetEvent upsStatusChanged,
+            UpsMonitor monitor,
             CancellationToken monitoringCancellationToken)
         {
-            this.readerWriterLock = monitoringReaderWriterLock;
-            this.upsStatusChangedEvent = upsStatusChanged;
+            this.upsMonitor = monitor;
 
             this.cancellationTokenSource =
                 CancellationTokenSource.CreateLinkedTokenSource(
@@ -105,9 +89,11 @@
                             await this.Connection.ConnectAsync(this.cancellationTokenSource.Token)
                                 .ConfigureAwait(false);
 
-                            Logger.Info(
+                            Logger.Debug(
                                 "MonitorUpsMain[Ups={0}]: Successfully connected",
                                 this.QualifiedName);
+
+                            Logger.ConnectedToServer(this.ServerState.Name);
 
                             // The connection was successful
                             this.ServerState.ConnectionStatus = ServerConnectionStatus.Connected;
@@ -127,7 +113,7 @@
                             "MonitorUpsMain[Ups={0}]: Calling UpdateStatusAsync()",
                             this.QualifiedName);
 
-                        using (await this.readerWriterLock.ReaderLockAsync())
+                        using (await this.upsMonitor.readerWriterLock.ReaderLockAsync())
                         {
                             try
                             {
@@ -148,23 +134,12 @@
                                 {
                                     await this.UpdateStatusAsync(this.cancellationTokenSource.Token)
                                         .ConfigureAwait(true);
-
-                                    Logger.Debug(
-                                        "MonitorUpsMain[Ups={0}]: Successfully queried server",
-                                        this.QualifiedName);
                                 }
-                            }
-                            catch (NutCommunicationException communicationException)
-                            {
-                                Logger.Warning(
-                                    "MonitorUpsMain[Ups={0}]: Lost connection to the server. The exception was: {1}",
-                                    this.QualifiedName,
-                                    communicationException.Message);
-
-                                this.Disconnect(true, true);
                             }
                             catch (Exception exception)
                             {
+                                Logger.FailedToQueryServer(this.QualifiedName, exception.Message);
+
                                 Logger.Warning(
                                     "MonitorUpsMain[Ups={0}]: Failed to query server. The exception was: {1}",
                                     this.QualifiedName,
@@ -173,14 +148,26 @@
                         }
                     }
 
+                    int pollDelay = ServiceRuntime.Instance.Configuration
+                        .ServiceConfiguration.PollFrequencyInSeconds;
+
+                    bool pollUrgent = 
+                        this.State?.Status.HasFlag(DeviceStatusType.OnBattery) == true;
+
+                    if (pollUrgent)
+                    {
+                        pollDelay = ServiceRuntime.Instance.Configuration
+                            .ServiceConfiguration.PollFrequencyUrgentInSeconds;
+                    }
+
                     Logger.Debug(
-                        "MonitorUpsMain[Ups={0}]: Delaying for {1} seconds",
+                        "MonitorUpsMain[Ups={0}]: Delaying for {1} seconds{2}",
                         this.QualifiedName,
-                        ServiceRuntime.Instance.Configuration.ServiceConfiguration.PollFrequencyInSeconds);
+                        pollDelay,
+                        pollUrgent ? " (URGENT)" : string.Empty);
 
                     await Task.Delay(
-                            TimeSpan.FromSeconds(
-                                ServiceRuntime.Instance.Configuration.ServiceConfiguration.PollFrequencyInSeconds),
+                            TimeSpan.FromSeconds(pollDelay),
                             this.cancellationTokenSource.Token)
                         .ConfigureAwait(false);
                 }
@@ -199,17 +186,19 @@
         /// Note: The caller must hold a reader lock from UpsMonitor prior to calling
         /// this method
         /// </remarks>
-        private async Task<bool> UpdateStatusAsync(CancellationToken cancellationToken)
+        private async Task UpdateStatusAsync(CancellationToken cancellationToken)
         {
-            bool statusChanged = false;
-
             try
             {
                 // Get the current status of the device from the server
-                Dictionary<string, string> deviceVars =
+                Dictionary<string, string> deviceVars = 
                     await this.Connection
                         .ListVarsAsync(this.Name, cancellationToken)
                         .ConfigureAwait(false);
+
+                Logger.Debug(
+                    "UpdateStatusAsync[Ups={0}]: Successfully queried server",
+                    this.QualifiedName);
 
                 if (this.State == null)
                 {
@@ -219,13 +208,134 @@
                     // so don't bother comparing state.
                     this.State = new Ups(this.Name, this.ServerState, deviceVars);
 
-                    return true;
+                    // ReSharper disable once MethodSupportsCancellation
+                    this.upsMonitor.Changes.Add(
+                        new UpsStatusChangeData
+                        {
+                            // Pass null as the previous state to indicate that this is the first time
+                            // receiving state information for this device
+                            PreviousState = null,
+                            UpsContext = this
+                        });
+                }
+                else
+                {
+                    // Create a copy of the current state in case we need it below
+                    var previousState = this.State.Clone();
+
+                    // Update the state object is with the new variables from the server
+                    this.State.UpdateVariables(deviceVars);
+
+                    // The status has changed, so queue a status change notification
+                    if (previousState.Status != this.State.Status)
+                    {
+                        // ReSharper disable once MethodSupportsCancellation
+                        this.upsMonitor.Changes.Add(
+                            new UpsStatusChangeData
+                            {
+                                // Create a copy of the device state to pass to UpsMonitor
+                                PreviousState = this.State.Clone(),
+                                UpsContext = this
+                            });
+                    }
                 }
 
-                statusChanged = this.Update(deviceVars);
+                // We successfully queried the server, so update the property for this
+                this.State.LastPollTime = DateTime.Now;
+            }
+            catch (NutCommunicationException commEx)
+            {
+                Logger.Debug(
+                    "UpdateStatusAsync[Ups={0}]: Caught exception querying server. {1}",
+                    this.QualifiedName,
+                    commEx);
 
+                this.Disconnect(true, true);
+
+                // We failed to communicate with the server, so raise a change notification
+                // ReSharper disable once MethodSupportsCancellation
+                this.upsMonitor.Changes.Add(
+                    new UpsStatusChangeData
+                    {
+                        // Create a copy of the device state to pass to UpsMonitor
+                        PreviousState = this.State.Clone(),
+                        UpsContext = this,
+                        Exception = commEx
+                    });
+            }
+
+            Logger.Debug(
+                "UpdateStatusAsync[Ups={0}]: Finished UpdateStatusAsync()",
+                this.QualifiedName);
+        }
+
+        /// <summary>
+        /// Update...
+        /// </summary>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// Note: The caller must hold a reader lock from UpsMonitor prior to calling
+        /// this method
+        /// </remarks>
+        private async Task UpdateStatusAsync2(CancellationToken cancellationToken)
+        {
+            try
+            {
+                // Get the current status of the device from the server
+                Dictionary<string, string> deviceVars =
+                    await this.Connection
+                        .ListVarsAsync(this.Name, cancellationToken)
+                        .ConfigureAwait(false);
+
+                Logger.Debug(
+                    "MonitorUpsMain[Ups={0}]: Successfully queried server",
+                    this.QualifiedName);
+
+                if (this.State == null)
+                {
+                    // We haven't yet pulled the device information from the server yet, so
+                    // do that now. Since this will be the first time pulling device state
+                    // from the server, we won't have any previous state to compare it to,
+                    // so don't bother comparing state.
+                    this.State = new Ups(this.Name, this.ServerState, deviceVars);
+
+                    // ReSharper disable once MethodSupportsCancellation
+                    this.upsMonitor.Changes.Add(
+                        new UpsStatusChangeData
+                        {
+                            // Pass null as the previous state to indicate that this is the first time
+                            // receiving state information for this device
+                            PreviousState = null,
+                            UpsContext = this
+                        });
+                }
+                else
+                {
+                    // Create a copy of the current state in case we need it below
+                    var previousState = this.State.Clone();
+
+                    // Update the state object is with the new variables from the server
+                    this.State.UpdateVariables(deviceVars);
+
+                    // The status has changed, so queue a status change notification
+                    if (previousState.Status != this.State.Status)
+                    {
+                        // ReSharper disable once MethodSupportsCancellation
+                        this.upsMonitor.Changes.Add(
+                            new UpsStatusChangeData
+                            {
+                                // Create a copy of the device state to pass to UpsMonitor
+                                PreviousState = this.State.Clone(),
+                                UpsContext = this
+                            });
+                    }
+                }
+
+                // We successfully queried the server, so update the property for this
                 this.State.LastPollTime = DateTime.Now;
 
+                // Was communication previous lost and has not been re-established?
                 if (this.LastNoCommNotifyTime != null)
                 {
                     ServiceRuntime.Instance.Notify(
@@ -239,11 +349,14 @@
             {
                 if (this.LastNoCommNotifyTime == null)
                 {
-                    Logger.Error(
-                        "Communication lost with UPS {0} on server {1}. The exception was: {2}",
+                    Logger.UpsOnline(
                         this.Name,
-                        this.ServerState.Name,
-                        commEx);
+                        this.ServerState.Name);
+
+                    Logger.Debug(
+                        "MonitorUpsMain[Ups={0}]: Communication lost with UPS. The exception was: {1}",
+                        this.QualifiedName,
+                        commEx.Message);
 
                     ServiceRuntime.Instance.Notify(
                         this,
@@ -252,8 +365,9 @@
                     this.LastNoCommNotifyTime = DateTime.Now;
                 }
                 else if (
-                    this.LastNoCommNotifyTime.Value < DateTime.Now.AddSeconds(
-                        0 - ServiceRuntime.Instance.Configuration.ServiceConfiguration.NoCommNotifyDelayInSeconds))
+                    this.LastNoCommNotifyTime.Value.OlderThan(
+                        TimeSpan.FromSeconds(
+                            ServiceRuntime.Instance.Configuration.ServiceConfiguration.NoCommNotifyDelayInSeconds)))
                 {
                     ServiceRuntime.Instance.Notify(
                         this,
@@ -261,10 +375,13 @@
 
                     this.LastNoCommNotifyTime = DateTime.Now;
                 }
+
+                this.Disconnect(true, true);
             }
 
-            Logger.Debug("ServerContext: Finished UpdateStatusAsync(). anyStatusChanged=" + statusChanged);
-            return statusChanged;
+            Logger.Debug(
+                "MonitorUpsMain[Ups={0}]: Finished UpdateStatusAsync()",
+                this.QualifiedName);
         }
 
         public void StopMonitoring()
@@ -273,61 +390,15 @@
             this.MonitoringTask.Wait();
         }
 
-        public bool Update(Dictionary<string, string> deviceVars)
-        {
-            DeviceStatusType initialStatus = this.State.Status;
-
-            this.State.UpdateVariables(deviceVars);
-
-            if (this.State.Status != initialStatus)
-            {
-                if (this.State.Status == DeviceStatusType.Online)
-                {
-                    ServiceRuntime.Instance.Notify(this, NotificationType.Online);
-                }
-                else if (this.State.Status == DeviceStatusType.OnBattery)
-                {
-                    ServiceRuntime.Instance.Notify(this, NotificationType.OnBattery);
-                }
-                else if (this.State.Status == DeviceStatusType.LowBattery)
-                {
-                    ServiceRuntime.Instance.Notify(this, NotificationType.LowBattery);
-                }
-
-                Logger.LogLevel logLevel = Logger.LogLevel.Info;
-                DeviceSeverityType severity = Constants.Device.GetStatusSeverity(this.State.Status);
-
-                if (severity == DeviceSeverityType.Error)
-                {
-                    logLevel = Logger.LogLevel.Error;
-                }
-                else if (severity == DeviceSeverityType.Warning)
-                {
-                    logLevel = Logger.LogLevel.Warning;
-                }
-
-                Logger.Log(
-                    logLevel,
-                    "Status of UPS {0} has changed from {1} to {2}",
-                    this.Name,
-                    initialStatus,
-                    this.State.Status);
-
-                return true;
-            }
-
-            return false;
-        }
-
         public void Disconnect(bool suppressFailures, bool lostConnection)
         {
-            Logger.Info("Closing connection to server {0}", this.ServerState.Name);
+            Logger.Warning("Closing connection to server {0}", this.ServerState.Name);
 
             // TODO: Think about this design. When do we issue a logout to the server?
             // TODO: Should be retry for a while?
             try
             {
-                //this.Connection.Close();
+                this.Connection.Disconnect();
             }
             catch (Exception exception)
             {
@@ -335,6 +406,8 @@
                 throw;
             }
 
+            // Set the connection status according to whether the connection was intentionally
+            // closed or was unintentionally lost.
             if (lostConnection)
             {
                 this.ServerState.ConnectionStatus = ServerConnectionStatus.LostConnection;
@@ -344,5 +417,14 @@
                 this.ServerState.ConnectionStatus = ServerConnectionStatus.NotConnected;
             }
         }
+    }
+
+    public class UpsStatusChangeData
+    {
+        public UpsContext UpsContext { get; set; }
+
+        public Ups PreviousState { get; set; }
+
+        public Exception Exception { get; set; }
     }
 }

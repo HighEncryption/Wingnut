@@ -55,9 +55,11 @@
 
             foreach (IPAddress address in addresses)
             {
+
+                IPEndPoint endpoint = new IPEndPoint(address, this.serverState.Port);
                 try
                 {
-                    await this.ConnectWithAddress(address, cancellationToken)
+                    await this.ConnectWithAddress(endpoint, cancellationToken)
                         .ConfigureAwait(false);
 
                     break;
@@ -66,7 +68,8 @@
                 {
                     lastException = ex;
 
-                    Logger.Error($"Failed to connect to server. The exception was: {ex}");
+                    Logger.Error($"Failed to connect to server with endpoint '{endpoint}'. The error was: {ex.Message}");
+                    Logger.Debug($"Failed to connect to server. Exception: {ex}");
 
                     try
                     {
@@ -103,21 +106,19 @@
         }
 
         private async Task ConnectWithAddress(
-            IPAddress address,
+            IPEndPoint endpoint,
             CancellationToken cancellationToken)
         {
             this.tcpClient = new TcpClient();
 
-            Logger.Info(
-                "Connecting to server at {0}", 
-                new IPEndPoint(address, this.serverState.Port));
+            Logger.Info("Connecting to server at {0}", endpoint);
 
-            await this.tcpClient.ConnectAsync(address, this.serverState.Port).ConfigureAwait(false);
+            await this.tcpClient.ConnectAsync(endpoint.Address, endpoint.Port).ConfigureAwait(false);
 
-            this.tcpClient.Client.SetSocketOption(
-                SocketOptionLevel.Socket,
-                SocketOptionName.KeepAlive,
-                true);
+            //this.tcpClient.Client.SetSocketOption(
+            //    SocketOptionLevel.Socket,
+            //    SocketOptionName.KeepAlive,
+            //    true);
 
             //this.tcpClient.Client.IOControl(IOControlCode.KeepAliveValues)
 

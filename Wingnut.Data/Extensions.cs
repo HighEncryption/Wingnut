@@ -33,4 +33,13 @@
             return secureString;
         }
     }
+
+    public static class DateTimeExtensions
+    {
+        public static bool OlderThan(this DateTime dateTime, TimeSpan timeSpan)
+        {
+            return dateTime.ToUniversalTime() < DateTime.UtcNow.Subtract(timeSpan);
+        }
+    }
+
 }

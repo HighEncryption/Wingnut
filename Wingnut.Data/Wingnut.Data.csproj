@@ -51,7 +51,7 @@
     <Compile Include="Models\NutCommunicationException.cs" />
     <Compile Include="Models\Server.cs" />
     <Compile Include="Models\Ups.cs" />
-    <Compile Include="SecureStringExtensions.cs" />
+    <Compile Include="Extensions.cs" />
     <Compile Include="DeviceConstants.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WingnutException.cs" />

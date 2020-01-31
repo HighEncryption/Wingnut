@@ -50,8 +50,6 @@
 
         public List<UpsContext> UpsContexts { get;}
 
-        public int ActivePowerValue { get; internal set; }
-
         public void Initialize()
         {
             if (this.isInitialized)
@@ -77,7 +75,8 @@
             {
                 this.Configuration = new WingnutConfiguration
                 {
-                    ServiceConfiguration = WingnutServiceConfiguration.CreateDefault()
+                    ServiceConfiguration = WingnutServiceConfiguration.CreateDefault(),
+                    ShutdownConfiguration = ShutdownConfiguration.CreateDefault()
                 };
             }
 
@@ -150,7 +149,7 @@
             Console.WriteLine("NOTIFY {0} from device {1} on server {2}",
                 notification,
                 upsContext.Name,
-                upsContext.ServerConfiguration.DisplayName);
+                upsContext.UpsConfiguration.ServerConfiguration.DisplayName);
             Console.ResetColor();
         }
     }

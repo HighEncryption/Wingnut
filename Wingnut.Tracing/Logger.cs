@@ -1,6 +1,7 @@
 ﻿namespace Wingnut.Tracing
 {
     using System;
+    using System.Globalization;
 
     using JetBrains.Annotations;
 
@@ -101,6 +102,63 @@
                 default:
                     throw new NotImplementedException();
             }
+        }
+
+        public static void UpsOnline(string upsName, string serverName)
+        {
+            WingnutEventSource.Log.UpsOnline(upsName, serverName);
+        }
+
+        public static void UpsOnBattery(string upsName, string serverName)
+        {
+            WingnutEventSource.Log.UpsOnBattery(upsName, serverName);
+        }
+
+        public static void UpsLowBattery(string upsName, string serverName)
+        {
+            WingnutEventSource.Log.UpsLowBattery(upsName, serverName);
+        }
+
+        public static void UpsReplaceBattery(string upsName, string serverName, DateTime? lastReplaceDate)
+        {
+            string replacementDate = "(unknown)";
+
+            if (lastReplaceDate != null)
+            {
+                replacementDate = lastReplaceDate.Value.ToString("d", CultureInfo.CurrentCulture);
+            }
+
+            WingnutEventSource.Log.UpsBatteryNeedsReplaced(upsName, serverName, replacementDate);
+        }
+
+        public static void CommunicationLost(string upsName, string serverName, string error)
+        {
+            WingnutEventSource.Log.CommunicationLost(upsName, serverName, error);
+        }
+
+        public static void CommunicationRestored(string upsName, string serverName)
+        {
+            WingnutEventSource.Log.CommunicationRestored(upsName, serverName);
+        }
+
+        public static void ConnectedToServer(string serverName)
+        {
+            WingnutEventSource.Log.ConnectedToServer(serverName);
+        }
+
+        public static void FailedToQueryServer(string serverName, string error)
+        {
+            WingnutEventSource.Log.FailedToQueryServer(serverName, error);
+        }
+
+        public static void PowerValueBelowThreshold(int powerValue, int threshold)
+        {
+            WingnutEventSource.Log.PowerValueBelowThreshold(powerValue, threshold);
+        }
+
+        public static void InitiatingShutdown()
+        {
+            WingnutEventSource.Log.InitiatingShutdown();
         }
 
         private static void WriteToConsole(LogLevel level, string message, object[] args)

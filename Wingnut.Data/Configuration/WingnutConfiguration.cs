@@ -8,6 +8,8 @@
 
         public WingnutServiceConfiguration ServiceConfiguration { get; set; }
 
+        public ShutdownConfiguration ShutdownConfiguration { get; set; }
+
         public List<UpsConfiguration> UpsConfigurations { get; set; }
 
         public WingnutConfiguration()
