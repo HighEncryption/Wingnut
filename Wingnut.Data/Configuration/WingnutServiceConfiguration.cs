@@ -26,6 +26,8 @@
         // AKA RBWARNTIME
         public int ReplaceBatteryWarningTimeInSeconds { get; set; }
 
+        public string PowerShellNotificationScriptPath { get; set; }
+
         public void ValidateProperties()
         {
             if (Math.Max(this.PollFrequencyInSeconds, this.PollFrequencyUrgentInSeconds) %

@@ -26,10 +26,6 @@
                 Console.ResetColor();
             };
 
-            // Example for attaching a PowerShell notification event
-            //PowerShellNotifier psNotifier = new PowerShellNotifier("");
-            //ServiceRuntime.Instance.OnNotify += psNotifier.HandleNotification;
-
             // Start the WCF service and monitoring task
             ServiceRuntime.Instance.Start();
 

@@ -63,7 +63,9 @@
                 Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
                 "Wingnut");
 
-            Logger.Debug("ServiceRuntime: Initializing runtime with app data path: {0}", appDataPath);
+            Logger.Debug(
+                "ServiceRuntime: Initializing runtime with app data path: {0}", 
+                appDataPath);
 
             // Create the directory (safe to call even if the directory exists)
             Directory.CreateDirectory(appDataPath);
@@ -80,6 +82,30 @@
                     ServiceConfiguration = WingnutServiceConfiguration.CreateDefault(),
                     ShutdownConfiguration = ShutdownConfiguration.CreateDefault()
                 };
+            }
+
+            string notificationScriptPath =
+                this.Configuration.ServiceConfiguration.PowerShellNotificationScriptPath;
+
+            if (string.IsNullOrWhiteSpace(notificationScriptPath))
+            {
+                Logger.Info("No PowerShell script path found in configuration");
+            }
+            else
+            {
+                if (File.Exists(notificationScriptPath))
+                {
+                    Logger.Info(
+                        "Using PowerShell notification script from path {0}",
+                        notificationScriptPath);
+
+                    PowerShellNotifier psNotifier = new PowerShellNotifier(notificationScriptPath);
+                    this.OnNotify += psNotifier.HandleNotification;
+                }
+                else
+                {
+                    Logger.Info("No PowerShell script found at path {0}", notificationScriptPath);
+                }
             }
 
             // Initialization is finished
