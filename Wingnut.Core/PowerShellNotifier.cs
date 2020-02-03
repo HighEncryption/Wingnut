@@ -39,28 +39,28 @@
             {
                 pipeline.Streams.Error.DataAdded += (o, args) =>
                     Logger.Error(
-                        "PowerShellNotifier: {0}", 
-                        ((PSDataCollection<ErrorRecord>) sender)[args.Index].ToString());
+                        "PowerShellNotifier: {0}",
+                        pipeline.Streams.Error[args.Index].ToString());
 
                 pipeline.Streams.Warning.DataAdded += (o, args) =>
                     Logger.Warning(
                         "PowerShellNotifier: {0}",
-                        ((PSDataCollection<WarningRecord>)sender)[args.Index].ToString());
+                        pipeline.Streams.Warning[args.Index].ToString());
 
                 pipeline.Streams.Information.DataAdded += (o, args) =>
                     Logger.Info(
                         "PowerShellNotifier: {0}",
-                        ((PSDataCollection<InformationRecord>)sender)[args.Index].ToString());
+                        pipeline.Streams.Information[args.Index].ToString());
 
                 pipeline.Streams.Verbose.DataAdded += (o, args) =>
                     Logger.Debug(
                         "PowerShellNotifier: {0}",
-                        ((PSDataCollection<VerboseRecord>)sender)[args.Index].ToString());
+                        pipeline.Streams.Verbose[args.Index].ToString());
 
                 pipeline.Streams.Debug.DataAdded += (o, args) =>
                     Logger.Debug(
                         "PowerShellNotifier: {0}",
-                        ((PSDataCollection<DebugRecord>)sender)[args.Index].ToString());
+                        pipeline.Streams.Debug[args.Index].ToString());
 
                 // Add the contents of the script to the pipeline to be invoked
                 pipeline.AddScript(scriptContent);

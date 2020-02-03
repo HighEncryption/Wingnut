@@ -148,7 +148,7 @@
 
             if (newActivePowerValue == this.ActivePowerValue)
             {
-                Logger.Debug("Power value is unchanged ({0}", this.ActivePowerValue);
+                Logger.Debug("Power value is unchanged ({0})", this.ActivePowerValue);
             }
             else
             {
@@ -158,16 +158,16 @@
                     newActivePowerValue);
 
                 this.ActivePowerValue = newActivePowerValue;
+            }
 
-                if (this.ActivePowerValue <
-                    ServiceRuntime.Instance.Configuration.ServiceConfiguration.MinimumPowerSupplies)
-                {
-                    Logger.PowerValueBelowThreshold(
-                        this.ActivePowerValue,
-                        ServiceRuntime.Instance.Configuration.ServiceConfiguration.MinimumPowerSupplies);
+            if (this.ActivePowerValue <
+                ServiceRuntime.Instance.Configuration.ServiceConfiguration.MinimumPowerSupplies)
+            {
+                Logger.PowerValueBelowThreshold(
+                    this.ActivePowerValue,
+                    ServiceRuntime.Instance.Configuration.ServiceConfiguration.MinimumPowerSupplies);
 
-
-                }
+                this.InitiateShutdown();
             }
 
             Logger.Info("ProcessUpsStatusChanges: Finished.");
@@ -427,8 +427,13 @@
                 }
             }
 
+            // Add a time to allow the user to shutdown anything
             shutdownArgs.Add($"/t {shutdownConfig.ShutdownDelayInSeconds}");
 
+            // Add the force flag to ensure that apps aren't given extra delay to shutdown
+            shutdownArgs.Add("/f");
+
+            // Add a comment for tracking
             shutdownArgs.Add("/c \"Initiating shutdown due to power loss from UPS\"");
 
             // This is the reason code for 'Power Failure: Environment'

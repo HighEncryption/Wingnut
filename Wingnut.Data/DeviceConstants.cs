@@ -207,14 +207,18 @@
 
             public static DeviceSeverityType GetStatusSeverity(DeviceStatusType status)
             {
-                DeviceStatusInfo statusInfo = statusInfos.FirstOrDefault(s => s.StatusType == status);
+                DeviceSeverityType severity = DeviceSeverityType.OK;
 
-                if (statusInfo == null)
+                foreach (DeviceStatusInfo deviceStatusInfo in statusInfos)
                 {
-                    throw new Exception($"The status type {status} is not defined");
+                    if (status.HasFlag(deviceStatusInfo.StatusType) &&
+                        deviceStatusInfo.Severity > severity)
+                    {
+                        severity = deviceStatusInfo.Severity;
+                    }
                 }
 
-                return statusInfo.Severity;
+                return severity;
             }
         }
     }

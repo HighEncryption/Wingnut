@@ -176,17 +176,28 @@
             UpsContext upsContext,
             NotificationType notification)
         {
-            this.OnNotify?.BeginInvoke(
-                this,
-                new NotifyEventArgs(
-                    notification,
-                    upsContext),
-                ar =>
-                {
-                    ServiceRuntime runtime = (ServiceRuntime) ar.AsyncState;
-                    runtime.OnNotify.EndInvoke(ar);
-                },
-                this);
+            if (this.OnNotify == null)
+            {
+                return;
+            }
+
+            foreach (EventHandler<NotifyEventArgs> notifyDelegate in this.OnNotify.GetInvocationList())
+            {
+                notifyDelegate.BeginInvoke(
+                    this,
+                    new NotifyEventArgs(
+                        notification,
+                        upsContext),
+                    ar =>
+                    {
+                        EventHandler<NotifyEventArgs> thisDelegate = (EventHandler<NotifyEventArgs>) ar.AsyncState;
+                        thisDelegate.EndInvoke(ar);
+
+                        //ServiceRuntime runtime = (ServiceRuntime)ar.AsyncState;
+                        //runtime.OnNotify.EndInvoke(ar);
+                    },
+                    notifyDelegate);
+            }
         }
 
         public event EventHandler<NotifyEventArgs> OnNotify;

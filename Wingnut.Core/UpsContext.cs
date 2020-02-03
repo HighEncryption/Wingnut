@@ -117,24 +117,8 @@
                         {
                             try
                             {
-                                if (this.State == null)
-                                {
-                                    // We haven't yet pulled the device information from the server yet, so
-                                    // do that now. Since this will be the first time pulling device state
-                                    // from the server, we won't have any previous state to compare it to,
-                                    // so don't bother calling the UpdateStatusAsync method below.
-                                    Dictionary<string, string> upsVariables =
-                                        await this.Connection
-                                            .ListVarsAsync(this.Name, this.cancellationTokenSource.Token)
-                                            .ConfigureAwait(false);
-
-                                    this.State = new Ups(this.Name, this.ServerState, upsVariables);
-                                }
-                                else
-                                {
-                                    await this.UpdateStatusAsync(this.cancellationTokenSource.Token)
-                                        .ConfigureAwait(true);
-                                }
+                                await this.UpdateStatusAsync(this.cancellationTokenSource.Token)
+                                    .ConfigureAwait(true);
                             }
                             catch (Exception exception)
                             {
