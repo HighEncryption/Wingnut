@@ -138,6 +138,16 @@
         }
 
         [Event(
+            EventIDs.CommunicationLost,
+            Channel = EventChannel.Operational,
+            Level = EventLevel.Error,
+            Message = "Communication has failed to UPS {0} on server {1}. The error was: {2}")]
+        public void NoCommunication(string upsName, string serverName, string error)
+        {
+            this.WriteEvent(EventIDs.NoCommunication, upsName, serverName, error);
+        }
+
+        [Event(
             EventIDs.CommunicationRestored,
             Channel = EventChannel.Operational,
             Level = EventLevel.Informational,
@@ -211,12 +221,13 @@
             public const int UpsLowBattery = 12;
             public const int UpsBatteryNeedsReplaced = 13;
             public const int CommunicationLost = 14;
-            public const int CommunicationRestored = 15;
-            public const int ConnectedToServer = 16;
-            public const int FailedToQueryServer = 17;
-            public const int PowerValueBelowThreshold = 18;
-            public const int InitiatingShutdown = 19;
-            public const int NotificationScriptNotFound = 20;
+            public const int NoCommunication = 15;
+            public const int CommunicationRestored = 16;
+            public const int ConnectedToServer = 17;
+            public const int FailedToQueryServer = 18;
+            public const int PowerValueBelowThreshold = 19;
+            public const int InitiatingShutdown = 20;
+            public const int NotificationScriptNotFound = 21;
         }
 
         public class Tasks

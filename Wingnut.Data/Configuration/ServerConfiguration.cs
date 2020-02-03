@@ -20,7 +20,7 @@
 
         public SSLUsage UseSSL { get; set; }
 
-        public string SSLTargetName { get; set; }
+        public string ServerSSLName { get; set; }
 
         public AddressFamily? PreferredAddressFamily { get; set; }
 
@@ -58,7 +58,7 @@
                 Username = server.Username,
                 Password = server.Password,
                 UseSSL = server.UseSSL,
-                SSLTargetName = server.SSLTargetName,
+                ServerSSLName = server.ServerSSLName,
                 PreferredAddressFamily = server.PreferredAddressFamily,
             };
         }

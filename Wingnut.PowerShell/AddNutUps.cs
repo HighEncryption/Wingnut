@@ -22,6 +22,9 @@
         public SSLUsage UseSSL { get; set; } = SSLUsage.Optional;
 
         [Parameter]
+        public string ServerSSLName { get; set; }
+
+        [Parameter]
         public AddressFamily? PreferredAddressFamily { get; set; }
 
         [Parameter]
@@ -46,7 +49,8 @@
                 Port = this.Port,
                 Username = this.Credential.UserName,
                 UseSSL = this.UseSSL,
-                PreferredAddressFamily = this.PreferredAddressFamily
+                PreferredAddressFamily = this.PreferredAddressFamily,
+                ServerSSLName = this.ServerSSLName,
             };
 
             Ups ups = helper.Channel.AddUps(

@@ -136,6 +136,11 @@
             WingnutEventSource.Log.CommunicationLost(upsName, serverName, error);
         }
 
+        public static void NoCommunication(string upsName, string serverName, string error)
+        {
+            WingnutEventSource.Log.NoCommunication(upsName, serverName, error);
+        }
+
         public static void CommunicationRestored(string upsName, string serverName)
         {
             WingnutEventSource.Log.CommunicationRestored(upsName, serverName);
@@ -195,7 +200,7 @@
                         break;
                 }
 
-                System.Diagnostics.Debug.WriteLine(
+                Console.WriteLine(
                     "[{0:s}] {1} {2}", DateTime.Now,
                     strLevel,
                     string.Format(message, args));

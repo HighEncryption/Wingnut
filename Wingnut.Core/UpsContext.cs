@@ -113,7 +113,7 @@
                             "MonitorUpsMain[Ups={0}]: Calling UpdateStatusAsync()",
                             this.QualifiedName);
 
-                        using (await this.upsMonitor.readerWriterLock.ReaderLockAsync())
+                        using (await this.upsMonitor.ReaderWriterLock.ReaderLockAsync())
                         {
                             try
                             {

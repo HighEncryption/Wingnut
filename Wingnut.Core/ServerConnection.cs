@@ -63,11 +63,13 @@
 
             foreach (IPAddress address in addresses)
             {
-
                 IPEndPoint endpoint = new IPEndPoint(address, this.serverState.Port);
                 try
                 {
-                    await this.ConnectWithAddress(endpoint, cancellationToken)
+                    await this.ConnectWithAddress(
+                            endpoint,
+                            this.serverState.Address,
+                            cancellationToken)
                         .ConfigureAwait(false);
 
                     break;
@@ -115,6 +117,7 @@
 
         private async Task ConnectWithAddress(
             IPEndPoint endpoint,
+            string originalAddress,
             CancellationToken cancellationToken)
         {
             this.tcpClient = new TcpClient();
@@ -122,13 +125,6 @@
             Logger.Info("Connecting to server at {0}", endpoint);
 
             await this.tcpClient.ConnectAsync(endpoint.Address, endpoint.Port).ConfigureAwait(false);
-
-            //this.tcpClient.Client.SetSocketOption(
-            //    SocketOptionLevel.Socket,
-            //    SocketOptionName.KeepAlive,
-            //    true);
-
-            //this.tcpClient.Client.IOControl(IOControlCode.KeepAliveValues)
 
             Logger.Info("Connection succceded");
 
@@ -150,8 +146,10 @@
                         false,
                         SslCertificateValidationCallback);
 
+                    string targetHost = this.serverState.ServerSSLName ?? originalAddress;
+
                     await this.sslStream
-                        .AuthenticateAsClientAsync(this.serverState.SSLTargetName)
+                        .AuthenticateAsClientAsync(targetHost)
                         .ConfigureAwait(false);
 
                     Logger.Info("Connection successfully upgraded to SSL");
@@ -195,7 +193,11 @@
             Logger.Info("Successfully authenticated to server");
         }
 
-        private static bool SslCertificateValidationCallback(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslpolicyerrors)
+        private static bool SslCertificateValidationCallback(
+            object sender, 
+            X509Certificate certificate, 
+            X509Chain chain, 
+            SslPolicyErrors sslPolicyErrors)
         {
             // TODO
             return true;

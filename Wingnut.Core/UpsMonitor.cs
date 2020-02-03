@@ -4,10 +4,7 @@
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Globalization;
     using System.Linq;
-    using System.Reflection;
-    using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -49,8 +46,6 @@
             this.monitorTask.Wait();
         }
 
-        private readonly AutoResetEvent upsStatusChangedEvent = new AutoResetEvent(false);
-
         /// <summary>
         /// The synchronization object used gate access to process status changes for UPS devices.
         /// </summary>
@@ -59,8 +54,7 @@
         /// concurrently (by acquiring a reader lock), however processing those updates should be
         /// done while other updates cannot be made (by acquiring the writer lock).
         /// </remarks>
-        //private readonly ReaderWriterLockSlim readerWriterLock = new ReaderWriterLockSlim();
-        internal readonly AsyncReaderWriterLock readerWriterLock = new AsyncReaderWriterLock();
+        internal readonly AsyncReaderWriterLock ReaderWriterLock = new AsyncReaderWriterLock();
 
         private async Task UpsMonitorMain()
         {
@@ -90,7 +84,7 @@
 
                         // The status of a UPS has changed, so wait until we have exclusive access
                         // to all UPSes then process the change. 
-                        using (await this.readerWriterLock.WriterLockAsync())
+                        using (await this.ReaderWriterLock.WriterLockAsync())
                         {
                             // We have exclusive access to process status changes, so we need to be
                             // as efficient as possible in this area.
@@ -210,6 +204,12 @@
                         TimeSpan.FromSeconds(
                             ServiceRuntime.Instance.Configuration.ServiceConfiguration.NoCommNotifyDelayInSeconds)))
                 {
+                    string error = changeData.Exception == null
+                        ? "(none)"
+                        : changeData.Exception.Message;
+
+                    Logger.NoCommunication(ctx.Name, ctx.ServerState.Name, error);
+
                     ServiceRuntime.Instance.Notify(
                         ctx,
                         NotificationType.NoCommunication);
@@ -223,6 +223,8 @@
                 ServiceRuntime.Instance.Notify(
                     ctx,
                     NotificationType.CommunicationRestored);
+
+                Logger.CommunicationRestored(ctx.Name, ctx.ServerState.Name);
 
                 Logger.Info("Communication with UPS {0} was restored", ctx.QualifiedName);
 

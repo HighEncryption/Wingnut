@@ -29,7 +29,7 @@
                     Username = ups.Server.Username,
                     Password = ups.Server.Password,
                     UseSSL = ups.Server.UseSSL,
-                    SSLTargetName = ups.Server.SSLTargetName,
+                    ServerSSLName = ups.Server.ServerSSLName,
                     PreferredAddressFamily = ups.Server.PreferredAddressFamily,
                 },
                 DeviceName = ups.Name,

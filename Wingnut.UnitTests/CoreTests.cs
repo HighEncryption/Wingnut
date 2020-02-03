@@ -76,8 +76,6 @@ namespace Wingnut.UnitTests
                 {
                     server.HandleBasicAuthentication();
 
-                    int reqCount = 0;
-
                     // Send the first request with status=online
                     server.ExpectAndResponse(
                         "LIST VAR testups",
@@ -152,8 +150,6 @@ namespace Wingnut.UnitTests
                 () =>
                 {
                     server.HandleBasicAuthentication();
-
-                    int reqCount = 0;
 
                     // Send the first request with status=online
                     server.ExpectAndResponse(
@@ -392,7 +388,9 @@ namespace Wingnut.UnitTests
 
             while (!this.cts.IsCancellationRequested)
             {
+#pragma warning disable 4014
                 Task.Run(async () => await this.ClientListenMain(client).ConfigureAwait(false));
+#pragma warning restore 4014
             }
         }
 

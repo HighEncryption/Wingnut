@@ -1,6 +1,7 @@
 ﻿namespace Wingnut.Data.Models
 {
     using System;
+    using System.Management.Automation;
     using System.Net.Sockets;
     using System.Runtime.Serialization;
     using System.Security;
@@ -45,7 +46,8 @@
         [DataMember]
         public SSLUsage UseSSL { get; set; }
 
-        public string SSLTargetName { get; set; }
+        [DataMember]
+        public string ServerSSLName { get; set; }
 
         [DataMember]
         public AddressFamily? PreferredAddressFamily { get; set; }
@@ -71,10 +73,15 @@
                 Username = serverConfiguration.Username,
                 Password = serverConfiguration.Password,
                 UseSSL = serverConfiguration.UseSSL,
-                SSLTargetName = serverConfiguration.SSLTargetName,
+                ServerSSLName = serverConfiguration.ServerSSLName,
                 PreferredAddressFamily = serverConfiguration.PreferredAddressFamily,
                 ConnectionStatus = ServerConnectionStatus.NotConnected
             };
+        }
+
+        public override string ToString()
+        {
+            return this.Name;
         }
     }
 
