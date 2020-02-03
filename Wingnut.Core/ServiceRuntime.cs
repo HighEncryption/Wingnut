@@ -14,7 +14,6 @@
 
     public class ServiceRuntime
     {
-        // TODO: Make internal (needed to unit tests)
         private ServiceRuntime()
         {
             this.UpsContexts = new List<UpsContext>();
@@ -47,8 +46,7 @@
         private ServiceHost serviceHost;
         private UpsMonitor upsMonitor;
 
-        // TODO: Make setter internal
-        public WingnutConfiguration Configuration { get; set; }
+        public WingnutConfiguration Configuration { get; internal set; }
 
         public List<UpsContext> UpsContexts { get;}
 

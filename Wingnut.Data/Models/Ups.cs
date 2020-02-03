@@ -34,7 +34,7 @@
 
         public override DeviceType DeviceType => DeviceType.UPS;
 
-        public Ups Clone()
+        internal Ups Clone()
         {
             return new Ups(
                 this.Name,
@@ -42,8 +42,7 @@
                 new Dictionary<string, string>(this.VariableDictionary));
         }
 
-        // TODO: Make internal
-        public List<string> UpdateVariables(Dictionary<string, string> vars)
+        internal List<string> UpdateVariables(Dictionary<string, string> vars)
         {
             List<string> changedKeys = new List<string>();
             foreach (string key in vars.Keys)
