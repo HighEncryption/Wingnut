@@ -54,6 +54,10 @@
       <Project>{33869593-3128-4F23-ABD9-899979B62D9E}</Project>
       <Name>Wingnut.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Wingnut.Data\Wingnut.Data.csproj">
+      <Project>{1D0D7910-3762-48D5-B446-15903FF289F7}</Project>
+      <Name>Wingnut.Data</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Wingnut.Tracing\Wingnut.Tracing.csproj">
       <Project>{91AE0118-1692-4A7C-90BF-53B27F91AA38}</Project>
       <Name>Wingnut.Tracing</Name>

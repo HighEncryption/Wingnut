@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wingnut.Console", "Wingnut.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wingnut.Data", "Wingnut.Data\Wingnut.Data.csproj", "{1D0D7910-3762-48D5-B446-15903FF289F7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wingnut.UnitTests", "Wingnut.UnitTests\Wingnut.UnitTests.csproj", "{AC892E93-852C-4FC4-913E-89649CF4AE25}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,10 @@ Global
 		{1D0D7910-3762-48D5-B446-15903FF289F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1D0D7910-3762-48D5-B446-15903FF289F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1D0D7910-3762-48D5-B446-15903FF289F7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AC892E93-852C-4FC4-913E-89649CF4AE25}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AC892E93-852C-4FC4-913E-89649CF4AE25}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AC892E93-852C-4FC4-913E-89649CF4AE25}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AC892E93-852C-4FC4-913E-89649CF4AE25}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

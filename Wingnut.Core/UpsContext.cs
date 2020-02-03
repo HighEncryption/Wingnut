@@ -12,7 +12,7 @@
 
     public class UpsContext
     {
-        internal readonly UpsConfiguration UpsConfiguration;
+        public UpsConfiguration UpsConfiguration { get; }
 
         private UpsMonitor upsMonitor;
         private CancellationTokenSource cancellationTokenSource;
@@ -234,7 +234,7 @@
                             new UpsStatusChangeData
                             {
                                 // Create a copy of the device state to pass to UpsMonitor
-                                PreviousState = this.State.Clone(),
+                                PreviousState = previousState,
                                 UpsContext = this
                             });
                     }
@@ -387,7 +387,8 @@
         public void StopMonitoring()
         {
             this.cancellationTokenSource.Cancel();
-            this.MonitoringTask.Wait();
+            this.Disconnect(true, false);
+            this.MonitoringTask.Wait(1000);
         }
 
         public void Disconnect(bool suppressFailures, bool lostConnection)

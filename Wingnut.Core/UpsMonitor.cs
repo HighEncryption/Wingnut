@@ -229,21 +229,21 @@
                 ctx.LastNoCommNotifyTime = null;
             }
 
-            if (IsStatusTransition(changeData, DeviceStatusType.Online))
+            if (IsStatusTransition(changeData, DeviceStatusType.Online, true))
             {
                 // The device is going from !Online to Online
                 Logger.UpsOnline(ctx.Name, ctx.ServerState.Name);
                 ServiceRuntime.Instance.Notify(ctx, NotificationType.Online);
             }
 
-            if (IsStatusTransition(changeData, DeviceStatusType.OnBattery))
+            if (IsStatusTransition(changeData, DeviceStatusType.OnBattery, false))
             {
                 // The device is going from !OnBattery to OnBattery
                 Logger.UpsOnBattery(ctx.Name, ctx.ServerState.Name);
                 ServiceRuntime.Instance.Notify(ctx, NotificationType.OnBattery);
             }
 
-            if (IsStatusTransition(changeData, DeviceStatusType.LowBattery))
+            if (IsStatusTransition(changeData, DeviceStatusType.LowBattery, true))
             {
                 // The device is going from !LowBattery to LowBattery
                 Logger.UpsLowBattery(ctx.Name, ctx.ServerState.Name);
@@ -313,11 +313,23 @@
 
         private static bool IsStatusTransition(
             UpsStatusChangeData changeData, 
-            DeviceStatusType status)
+            DeviceStatusType status,
+            bool requirePreviousState)
         {
+            if (!requirePreviousState)
+            {
+                return changeData.UpsContext.State.Status.HasFlag(status) &&
+                       (changeData.PreviousState == null ||
+                        !changeData.PreviousState.Status.HasFlag(status));
+            }
+
+            if (changeData.PreviousState == null)
+            {
+                return false;
+            }
+
             return changeData.UpsContext.State.Status.HasFlag(status) &&
-                   (changeData.PreviousState == null ||
-                    !changeData.PreviousState.Status.HasFlag(status));
+                   !changeData.PreviousState.Status.HasFlag(status);
         }
 
         private static bool IsUpsDead(UpsContext upsContext)
@@ -417,9 +429,17 @@
 
             shutdownArgs.Add("/c \"Initiating shutdown due to power loss from UPS\"");
 
+            // This is the reason code for 'Power Failure: Environment'
             shutdownArgs.Add("/d 6:12");
 
-            var psi = new ProcessStartInfo(shutdownExePath, string.Join(" ", shutdownArgs));
+            string argString = string.Join(" ", shutdownArgs);
+
+            Logger.Info(
+                "Initiating shutdown command with path '{0}' and arguments '{1}'",
+                shutdownExePath,
+                argString);
+
+            var psi = new ProcessStartInfo(shutdownExePath, argString);
             psi.CreateNoWindow = true;
             psi.UseShellExecute = false;
 

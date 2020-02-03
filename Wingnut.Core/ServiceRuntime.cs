@@ -14,6 +14,7 @@
 
     public class ServiceRuntime
     {
+        // TODO: Make internal (needed to unit tests)
         private ServiceRuntime()
         {
             this.UpsContexts = new List<UpsContext>();
@@ -46,7 +47,8 @@
         private ServiceHost serviceHost;
         private UpsMonitor upsMonitor;
 
-        public WingnutConfiguration Configuration { get; private set; }
+        // TODO: Make setter internal
+        public WingnutConfiguration Configuration { get; set; }
 
         public List<UpsContext> UpsContexts { get;}
 
@@ -121,6 +123,11 @@
 
         public void Stop()
         {
+            foreach (UpsContext upsContext in UpsContexts)
+            {
+                upsContext.StopMonitoring();
+            }
+
             this.serviceHost.Close();
 
             this.upsMonitor.Stop();
@@ -145,12 +152,34 @@
             UpsContext upsContext,
             NotificationType notification)
         {
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine("NOTIFY {0} from device {1} on server {2}",
-                notification,
-                upsContext.Name,
-                upsContext.UpsConfiguration.ServerConfiguration.DisplayName);
-            Console.ResetColor();
+            this.OnNotify?.BeginInvoke(
+                this,
+                new NotifyEventArgs(
+                    notification,
+                    upsContext),
+                ar =>
+                {
+                    ServiceRuntime runtime = (ServiceRuntime) ar.AsyncState;
+                    runtime.OnNotify.EndInvoke(ar);
+                },
+                this);
+        }
+
+        public event EventHandler<NotifyEventArgs> OnNotify;
+    }
+
+    public class NotifyEventArgs : EventArgs
+    {
+        public NotificationType NotificationType { get; }
+
+        public UpsContext UpsContext { get; }
+
+        public NotifyEventArgs(
+            NotificationType notificationType,
+            UpsContext upsContext)
+        {
+            this.NotificationType = notificationType;
+            this.UpsContext = upsContext;
         }
     }
 }

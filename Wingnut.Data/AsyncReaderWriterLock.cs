@@ -72,7 +72,9 @@
                 }
             }
 
-            toWake?.SetResult(new Releaser(this, true));
+            // To avoid a potential deadlock, set the result asynchronously.
+            // See: https://stackoverflow.com/a/19497317/7852297
+            Task.Run(() => { toWake?.SetResult(new Releaser(this, true)); });
         }
 
         private void WriterRelease()

@@ -161,6 +161,11 @@
             WingnutEventSource.Log.InitiatingShutdown();
         }
 
+        public static void NotificationScriptNotFound(string scriptPath)
+        {
+            WingnutEventSource.Log.NotificationScriptNotFound(scriptPath);
+        }
+
         private static void WriteToConsole(LogLevel level, string message, object[] args)
         {
             try
@@ -190,7 +195,7 @@
                         break;
                 }
 
-                Console.WriteLine(
+                System.Diagnostics.Debug.WriteLine(
                     "[{0:s}] {1} {2}", DateTime.Now,
                     strLevel,
                     string.Format(message, args));

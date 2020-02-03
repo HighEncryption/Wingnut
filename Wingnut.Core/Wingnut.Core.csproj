@@ -36,6 +36,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Management.Automation" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -46,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ManagementService.cs" />
+    <Compile Include="PowerShellNotifier.cs" />
     <Compile Include="ServerConnection.cs" />
     <Compile Include="ServiceRuntime.cs" />
     <Compile Include="UpsContext.cs" />

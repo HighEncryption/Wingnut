@@ -40,13 +40,21 @@
         public async Task ConnectAsync(
             CancellationToken cancellationToken)
         {
-            IPHostEntry hostEntry = Dns.GetHostEntry(this.serverState.Address);
+            List<IPAddress> addresses = new List<IPAddress>();
 
-            var addresses = hostEntry.AddressList.ToList();
+            if (IPAddress.TryParse(this.serverState.Address, out IPAddress ipAddress))
+            {
+                addresses.Add(ipAddress);
+            }
+            else
+            {
+                IPHostEntry hostEntry = Dns.GetHostEntry(this.serverState.Address);
+                addresses.AddRange(hostEntry.AddressList);
+            }
 
             if (this.serverState.PreferredAddressFamily.HasValue)
             {
-                addresses = hostEntry.AddressList
+                addresses = addresses
                     .Where(a => a.AddressFamily == this.serverState.PreferredAddressFamily)
                     .ToList();
             }
@@ -380,12 +388,17 @@
                 string responseLine =
                     await this.ReadFromStreamAsync(cancellationToken).ConfigureAwait(false);
 
-                ValidateResponse(responseLine, "STARTTLS");
+                if (responseLine.StartsWith("OK"))
+                {
+                    return null;
+                }
 
-                if (!responseLine.StartsWith("OK"))
+                if (responseLine.Contains("FEATURE-NOT-SUPPORTED"))
                 {
                     return responseLine;
                 }
+
+                ValidateResponse(responseLine, "STARTTLS");
 
                 return null;
             }

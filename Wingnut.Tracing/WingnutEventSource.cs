@@ -187,6 +187,16 @@
             this.WriteEvent(EventIDs.CommunicationLost);
         }
 
+        [Event(
+            EventIDs.NotificationScriptNotFound,
+            Channel = EventChannel.Operational,
+            Level = EventLevel.Error,
+            Message = "The notification script was not found at the path '{0}'")]
+        public void NotificationScriptNotFound(string path)
+        {
+            this.WriteEvent(EventIDs.NotificationScriptNotFound, path);
+        }
+
         public class EventIDs
         {
             public const int LogCritical = 1;
@@ -206,6 +216,7 @@
             public const int FailedToQueryServer = 17;
             public const int PowerValueBelowThreshold = 18;
             public const int InitiatingShutdown = 19;
+            public const int NotificationScriptNotFound = 20;
         }
 
         public class Tasks
