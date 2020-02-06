@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.ServiceProcess;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Wingnut.Service
+﻿namespace Wingnut.Service
 {
+    using System.ServiceProcess;
+
     static class Program
     {
         /// <summary>
@@ -14,12 +9,12 @@ namespace Wingnut.Service
         /// </summary>
         static void Main()
         {
-            ServiceBase[] ServicesToRun;
-            ServicesToRun = new ServiceBase[]
+            ServiceBase[] servicesToRun = 
             {
                 new ServiceCore()
             };
-            ServiceBase.Run(ServicesToRun);
+
+            ServiceBase.Run(servicesToRun);
         }
     }
 }

@@ -171,6 +171,16 @@
             WingnutEventSource.Log.NotificationScriptNotFound(scriptPath);
         }
 
+        public static void ServiceStarting(string version)
+        {
+            WingnutEventSource.Log.ServiceStarting(version);
+        }
+
+        public static void ServiceStarted()
+        {
+            WingnutEventSource.Log.ServiceStarted();
+        }
+
         private static void WriteToConsole(LogLevel level, string message, object[] args)
         {
             try

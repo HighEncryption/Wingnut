@@ -50,6 +50,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Wingnut.Tracing\Properties\SharedAssemblyInfo.cs">
+      <Link>Properties\SharedAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="ManagementService.cs" />
     <Compile Include="PowerShellNotifier.cs" />
     <Compile Include="ServerConnection.cs" />
@@ -76,5 +79,11 @@
     <None Include="Notify.ps1" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="version.txt" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>git describe --always --dirty &gt;$(ProjectDir)\version.txt</PreBuildEvent>
+  </PropertyGroup>
 </Project>

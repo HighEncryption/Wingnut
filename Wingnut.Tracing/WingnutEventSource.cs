@@ -208,6 +208,26 @@
             this.WriteEvent(EventIDs.NotificationScriptNotFound, path);
         }
 
+        [Event(
+            EventIDs.ServiceStarting,
+            Channel = EventChannel.Operational,
+            Level = EventLevel.Informational,
+            Message = "Wingnut service version {0} is starting")]
+        public void ServiceStarting(string version)
+        {
+            this.WriteEvent(EventIDs.ServiceStarting, version);
+        }
+
+        [Event(
+            EventIDs.ServiceStarted,
+            Channel = EventChannel.Operational,
+            Level = EventLevel.Informational,
+            Message = "Wingnut service started successfully")]
+        public void ServiceStarted()
+        {
+            this.WriteEvent(EventIDs.ServiceStarted);
+        }
+
         public class EventIDs
         {
             public const int LogCritical = 1;
@@ -229,6 +249,8 @@
             public const int PowerValueBelowThreshold = 19;
             public const int InitiatingShutdown = 20;
             public const int NotificationScriptNotFound = 21;
+            public const int ServiceStarting = 22;
+            public const int ServiceStarted = 23;
         }
 
         public class Tasks

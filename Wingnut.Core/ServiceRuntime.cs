@@ -3,6 +3,8 @@
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
+    using System.Reflection;
     using System.ServiceModel;
     using System.ServiceModel.Description;
     using Newtonsoft.Json;
@@ -48,7 +50,7 @@
 
         public WingnutConfiguration Configuration { get; internal set; }
 
-        public List<UpsContext> UpsContexts { get;}
+        public List<UpsContext> UpsContexts { get; }
 
         public void Initialize()
         {
@@ -56,6 +58,8 @@
             {
                 throw new InvalidOperationException("Runtime is already initialized");
             }
+
+            Logger.ServiceStarting(GetAssemblyVersionString());
 
             string appDataPath = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
@@ -108,6 +112,8 @@
 
             // Initialization is finished
             Logger.Debug("ServiceRuntime: Initialization finished");
+            Logger.ServiceStarted();
+
             this.isInitialized = true;
         }
 
@@ -201,6 +207,87 @@
         }
 
         public event EventHandler<NotifyEventArgs> OnNotify;
+
+        private static string GetAssemblyVersionString()
+        {
+            var executingAssembly = Assembly.GetExecutingAssembly();
+
+            /*
+             * Notes on compiled git information
+             * By including a build action in the project (shown below), we can include information
+             * about the state of the code (such as the last commit ID) from when the when the 
+             * project was built. The command is:
+             * 
+             * git describe --always --long --dirty >$(ProjectDir)\version.txt
+             * 
+             * Add the command as a pre-build step, then build once to generate the file. Add
+             * the file to the root of the project as an embedded resource.
+             * 
+             * From the code, we can then read the state of the git repository at build time. The
+             * output from the command has one of the following two format:
+             * 
+             * {commidId}[-dirty]
+             *   or
+             * {latestTag}-{commitDistanceFromTag}-{commitId}[-dirty]
+             * 
+             * If there is a tag in the history, the second form will be used, which includes
+             * the tag and the number of commits from that tag to HEAD (or where the code was
+             * built). If there are no tags, the first form is used.
+             * 
+             * If there were any uncomitted changes (staged or unstaged), then the '-dirty' string
+             * will be appended to the commit ID.
+             */
+            string gitStatus;
+            using (Stream stream = executingAssembly.GetManifestResourceStream("Wingnut.Core.version.txt"))
+            {
+                //Pre.Assert(stream != null, "stream != null");
+                using (StreamReader reader = new StreamReader(stream))
+                {
+                    gitStatus = reader.ReadToEnd().Trim();
+                }
+            }
+
+            // Check if the output includes '-dirty' at the end to indicate the build state was dirty
+            bool isDirty = false;
+            if (gitStatus.EndsWith("-dirty"))
+            {
+                isDirty = true;
+                gitStatus = gitStatus.Substring(0, gitStatus.Length - 6);
+            }
+
+            // If the remaining output does not contain any dashes, then the non-tag format was used
+            // and we know that the remaining string is the commit ID
+            string tag = null;
+            string distanceFromTag = null;
+            string lastCommitId;
+            if (!gitStatus.Contains("-"))
+            {
+                lastCommitId = gitStatus;
+            }
+            else
+            {
+                // Split the remaining string and parse out the individual strings. Note that the
+                // tag itself may contain a dash, so we need to work backward from the end of the
+                // string.
+                string[] parts = gitStatus.Split('-');
+                lastCommitId = parts[parts.Length - 1];
+                distanceFromTag = parts[parts.Length - 2];
+                tag = string.Join("-", parts.Take(parts.Length - 2));
+            }
+
+            Logger.Info(
+                "Build information: Hash={0}, Tag={1}, TagDistance={2}, Dirty={3}",
+                lastCommitId,
+                tag,
+                distanceFromTag,
+                isDirty);
+
+            return string.Format(
+                "{0}-{1}{2}",
+                executingAssembly.GetName().Version,
+                lastCommitId,
+                isDirty ? "*" : null);
+        }
     }
 
     public class NotifyEventArgs : EventArgs

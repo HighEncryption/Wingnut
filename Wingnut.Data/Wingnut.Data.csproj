@@ -45,6 +45,9 @@
     <Reference Include="System.Security" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Wingnut.Tracing\Properties\SharedAssemblyInfo.cs">
+      <Link>Properties\SharedAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="AsyncLock.cs" />
     <Compile Include="AsyncReaderWriterLock.cs" />
     <Compile Include="Configuration\SecureStringToProtectedDataConverter.cs" />

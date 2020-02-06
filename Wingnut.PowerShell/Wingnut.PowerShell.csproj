@@ -41,6 +41,9 @@
     <Reference Include="System.ServiceModel" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Wingnut.Tracing\Properties\SharedAssemblyInfo.cs">
+      <Link>Properties\SharedAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="AddNutUps.cs" />
     <Compile Include="GetNutUps.cs" />
     <Compile Include="GetNutUpsFromServer.cs" />
