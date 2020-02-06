@@ -2,7 +2,8 @@
 {
     using System.Diagnostics.Tracing;
 
-    public class WingnutEventSource : EventSource
+    [EventSource(Name = "Wingnut-Tracing")]
+    public sealed class WingnutEventSource : EventSource
     {
         public static WingnutEventSource Log = new WingnutEventSource();
 
@@ -138,7 +139,7 @@
         }
 
         [Event(
-            EventIDs.CommunicationLost,
+            EventIDs.NoCommunication,
             Channel = EventChannel.Operational,
             Level = EventLevel.Error,
             Message = "Communication has failed to UPS {0} on server {1}. The error was: {2}")]
@@ -184,7 +185,7 @@
             Message = "Power value for the computer is {0}, which is below the threshold of {1}")]
         public void PowerValueBelowThreshold(int powerValue, int threshold)
         {
-            this.WriteEvent(EventIDs.CommunicationLost, powerValue, threshold);
+            this.WriteEvent(EventIDs.PowerValueBelowThreshold, powerValue, threshold);
         }
 
         [Event(
@@ -194,7 +195,7 @@
             Message = "The shutdown process is being initiated")]
         public void InitiatingShutdown()
         {
-            this.WriteEvent(EventIDs.CommunicationLost);
+            this.WriteEvent(EventIDs.InitiatingShutdown);
         }
 
         [Event(
