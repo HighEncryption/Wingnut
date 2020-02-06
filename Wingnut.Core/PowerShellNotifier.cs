@@ -28,7 +28,7 @@
 
             string scriptContent = File.ReadAllText(this.scriptPath);
 
-            Logger.Debug(
+            Logger.Info(
                 "PowerShellNotifier: Calling Receive-WingnutNotification with Type={0}, Ups={1}, ScriptPath={2}",
                 eventArgs.NotificationType,
                 eventArgs.UpsContext.QualifiedName,
@@ -76,7 +76,7 @@
                 pipeline.Invoke();
             }
 
-            Logger.Debug("PowerShellNotifier: Finished Receive-WingnutNotification");
+            Logger.Info("PowerShellNotifier: Finished Receive-WingnutNotification");
         }
     }
 }

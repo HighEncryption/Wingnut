@@ -41,6 +41,8 @@
       <ComponentRef Id="Wingnut_Service_exe_component" />
       <ComponentRef Id="Wingnut_Service_exe_config_component" />
       <ComponentRef Id="Wingnut_Tracing_dll_component" />
+      <ComponentRef Id="JetBrains_Annotations_dll_component" />
+      <ComponentRef Id="Newtonsoft_Json_dll_component" />
 
       <ComponentRef Id="Wingnut_Notify_ps1_component" />
 
@@ -108,6 +110,18 @@
                      Guid="c0970be4-8158-4051-aab9-a82ceedae13b">
             <File Id="Wingnut_Tracing_dll"
                   Source="$(var.ProjectDir)..\Wingnut.Tracing\bin\$(var.Configuration)\Wingnut.Tracing.dll"
+                  KeyPath="yes" />
+          </Component>
+          <Component Id="JetBrains_Annotations_dll_component"
+                     Guid="a32c212e-bd1c-4b98-8801-d0667f883c46">
+            <File Id="JetBrains_Annotations_dll"
+                  Source="$(var.ProjectDir)..\Wingnut.Tracing\bin\$(var.Configuration)\JetBrains.Annotations.dll"
+                  KeyPath="yes" />
+          </Component>
+          <Component Id="Newtonsoft_Json_dll_component"
+                     Guid="8816f67e-32be-45cf-82d1-562020c5421a">
+            <File Id="Newtonsoft_Json_dll"
+                  Source="$(var.ProjectDir)..\Wingnut.Core\bin\$(var.Configuration)\Newtonsoft.Json.dll"
                   KeyPath="yes" />
           </Component>
 

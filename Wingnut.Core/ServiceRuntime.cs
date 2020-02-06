@@ -65,7 +65,7 @@
                 Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
                 "Wingnut");
 
-            Logger.Debug(
+            Logger.Info(
                 "ServiceRuntime: Initializing runtime with app data path: {0}", 
                 appDataPath);
 
@@ -84,6 +84,11 @@
                     ServiceConfiguration = WingnutServiceConfiguration.CreateDefault(),
                     ShutdownConfiguration = ShutdownConfiguration.CreateDefault()
                 };
+            }
+
+            if (this.Configuration.EnableDetailedTracing)
+            {
+                Logger.OutputLogLevel = Logger.LogLevel.Debug;
             }
 
             string notificationScriptPath =

@@ -12,6 +12,8 @@
 
         public List<UpsConfiguration> UpsConfigurations { get; set; }
 
+        public bool EnableDetailedTracing { get; set; }
+
         public WingnutConfiguration()
         {
             this.UpsConfigurations = new List<UpsConfiguration>();

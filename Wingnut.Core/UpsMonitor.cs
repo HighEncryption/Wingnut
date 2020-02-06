@@ -106,7 +106,7 @@
 
         private void ProcessUpsStatusChanges(UpsStatusChangeData changeData)
         {
-            Logger.Info("ProcessUpsStatusChanges: Starting.");
+            Logger.Debug("ProcessUpsStatusChanges: Starting.");
 
             // Process the changes and send notification for the changes for this UPS
             this.ProcessSingleUpsStatusChange(changeData);
@@ -170,7 +170,7 @@
                 this.InitiateShutdown();
             }
 
-            Logger.Info("ProcessUpsStatusChanges: Finished.");
+            Logger.Debug("ProcessUpsStatusChanges: Finished.");
         }
 
         /// <summary>
@@ -267,7 +267,7 @@
                         ctx.ServerState.Name,
                         ctx.State.BatteryLastReplacement);
 
-                    Logger.Debug(
+                    Logger.Info(
                         "The UPS {0} is reporting that the battery should be replaced. The last replacement date is {1}",
                         ctx.QualifiedName,
                         ctx.State.BatteryLastReplacement);
@@ -366,7 +366,7 @@
                         upsConfiguration.ServerConfiguration.DisplayName,
                         exception.Message);
 
-                    Logger.Debug("Exception during upsContext load. {0}", exception);
+                    Logger.Info("Exception during upsContext load. {0}", exception);
                 }
 
                 if (ServiceRuntime.Instance.UpsContexts.Any(

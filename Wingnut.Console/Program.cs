@@ -12,6 +12,7 @@
         static void Main(string[] args)
         {
             Logger.SetOutputType(Logger.OutputType.Console);
+            Logger.OutputLogLevel = Logger.LogLevel.Debug;
 
             // Initialize the runtime (load configuration, etc.)
             ServiceRuntime.Instance.Initialize();

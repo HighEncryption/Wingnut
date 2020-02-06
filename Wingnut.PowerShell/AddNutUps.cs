@@ -1,5 +1,7 @@
 ﻿namespace Wingnut.PowerShell
 {
+    using System;
+    using System.Linq;
     using System.Management.Automation;
     using System.Net.Sockets;
 
@@ -53,16 +55,23 @@
                 ServerSSLName = this.ServerSSLName,
             };
 
-            Ups ups = helper.Channel.AddUps(
-                    server,
-                    this.Credential.Password.GetDecrypted(),
-                    this.UpsName,
-                    this.NumPowerSupplies,
-                    this.MonitorOnly,
-                    this.Force.ToBool())
-                .Result;
+            try
+            {
+                Ups ups = helper.Channel.AddUps(
+                        server,
+                        this.Credential.Password.GetDecrypted(),
+                        this.UpsName,
+                        this.NumPowerSupplies,
+                        this.MonitorOnly,
+                        this.Force.ToBool())
+                    .Result;
 
-            this.WriteObject(ups);
+                this.WriteObject(ups);
+            }
+            catch (AggregateException e) when (e.InnerExceptions.Count == 1)
+            {
+                throw e.InnerExceptions.First();
+            }
         }
     }
 }

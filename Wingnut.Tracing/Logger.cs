@@ -5,7 +5,7 @@
 
     using JetBrains.Annotations;
 
-    public class Logger
+    public static class Logger
     {
         public enum OutputType
         {
@@ -21,18 +21,20 @@
             Debug
         }
 
+        public static LogLevel OutputLogLevel = LogLevel.Info;
+
         private static OutputType outputType = OutputType.ETW;
 
         private static bool isOutputTypeSet = false;
 
-        public static void SetOutputType(OutputType outputType)
+        public static void SetOutputType(OutputType type)
         {
             if (isOutputTypeSet)
             {
                 throw new InvalidOperationException("Output type is already set");
             }
 
-            Logger.outputType = outputType;
+            Logger.outputType = type;
 
             isOutputTypeSet = true;
         }
@@ -79,6 +81,11 @@
         [StringFormatMethod("message")]
         public static void Log(LogLevel level, string message, params object[] args)
         {
+            if (level > OutputLogLevel)
+            {
+                return;
+            }
+
             if (outputType == OutputType.Console)
             {
                 WriteToConsole(level, message, args);
