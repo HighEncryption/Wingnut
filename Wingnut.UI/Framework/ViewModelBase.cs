@@ -1,0 +1,116 @@
+﻿
+namespace Wingnut.UI.Framework
+{
+    using System;
+    using System.ComponentModel;
+    using System.Diagnostics.CodeAnalysis;
+    using System.Runtime.CompilerServices;
+
+    public class ViewModelBase : IViewModel
+    {
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public event PropertyChangingEventHandler PropertyChanging;
+
+
+        #region Property Change Support
+
+        [SuppressMessage("Microsoft.Design", "CA1030:UseEventsWhereAppropriate", Justification = "Protected method is specifically for raising the event.")]
+        protected void RaisePropertyChanging(string property)
+        {
+            PropertyChanging?.Invoke(this, new PropertyChangingEventArgs(property));
+        }
+
+        [SuppressMessage("Microsoft.Design", "CA1030:UseEventsWhereAppropriate", Justification = "Protected method is specifically for raising the event.")]
+        protected void RaisePropertyChanged(string property)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
+        }
+
+        [SuppressMessage("Microsoft.Design", "CA1045:DoNotPassTypesByReference", Justification = "Design is specific to ViewModel pattern.")]
+        protected bool SetProperty<T>(ref T property, T newValue, [CallerMemberName] string propertyName = "")
+        {
+            if (string.IsNullOrEmpty(propertyName))
+            {
+                throw new ArgumentNullException(nameof(propertyName));
+            }
+
+            // ReSharper disable RedundantNameQualifier
+            if (object.Equals(property, default(T)) && object.Equals(newValue, default(T)))
+            {
+                return false;
+            }
+
+            if (!object.Equals(property, default(T)) && property.Equals(newValue))
+            {
+                return false;
+            }
+
+            // ReSharper restore RedundantNameQualifier
+            RaisePropertyChanging(propertyName);
+
+            property = newValue;
+
+            RaisePropertyChanged(propertyName);
+
+            return true;
+        }
+
+        internal delegate void SetPropertyDelegate();
+
+        internal bool SetPropertyDelegated<T>(T property, T newValue, SetPropertyDelegate setProperty, [CallerMemberName] string propertyName = "")
+        {
+            if (string.IsNullOrEmpty(propertyName))
+            {
+                throw new ArgumentNullException(nameof(propertyName));
+            }
+
+            if (!IsDifferent(property, newValue))
+            {
+                return false;
+            }
+
+            RaisePropertyChanging(propertyName);
+
+            setProperty();
+
+            RaisePropertyChanged(propertyName);
+
+            return true;
+        }
+
+        #endregion
+
+        public static bool IsDifferent<T>(T currentValue, T newValue)
+        {
+            // ReSharper disable RedundantNameQualifier
+            if (object.Equals(currentValue, default(T)) && object.Equals(newValue, default(T)))
+            {
+                return false;
+            }
+
+            if (!object.Equals(currentValue, default(T)) && currentValue.Equals(newValue))
+            {
+                return false;
+            }
+
+            // ReSharper restore RedundantNameQualifier
+            return true;
+        }
+    }
+
+    public abstract class ViewModelBase<TModel> : ViewModelBase, IViewModel<TModel>
+        where TModel : class
+    {
+        protected TModel BaseModel { get; }
+
+        protected ViewModelBase(TModel model)
+        {
+            this.BaseModel = model;
+        }
+
+        public abstract void LoadContext();
+
+        public abstract void SaveContext();
+    }
+}
