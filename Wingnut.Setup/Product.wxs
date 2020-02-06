@@ -83,6 +83,20 @@
             <File Id="Wingnut_Service_exe"
                   Source="$(var.ProjectDir)..\Wingnut.Service\bin\$(var.Configuration)\Wingnut.Service.exe"
                   KeyPath="yes" />
+            <ServiceInstall Id="Wingnut_Service_Install"
+                            Type="ownProcess"
+                            Description="The Windows GUI for NUT service"
+                            DisplayName="Wingnut Service"
+                            ErrorControl="normal"
+                            Start="auto"
+                            Name="Wingnut Service"
+                            Account="LocalSystem" />
+            <ServiceControl Id="Wingnut_Service_Control" 
+                            Name="Wingnut Service" 
+                            Remove="uninstall" 
+                            Start="install" 
+                            Stop="uninstall" 
+                            Wait="yes" />
           </Component>
           <Component Id="Wingnut_Service_exe_config_component"
                      Guid="6ffb67f7-760e-407a-abb7-0cae565938f9">
@@ -127,8 +141,8 @@
               <!--
                 This will handle the manifest registration
               -->
-              <util:EventManifest MessageFile="[Wingnut_Tracing_Wingnut_Tracing_etwManifest_dll]"
-                                  ResourceFile="[Wingnut_Tracing_Wingnut_Tracing_etwManifest_dll]" />
+              <util:EventManifest MessageFile="[WingnutAppDataFolder]Wingnut.Tracing.Wingnut-Tracing.etwManifest.dll"
+                                  ResourceFile="[WingnutAppDataFolder]Wingnut.Tracing.Wingnut-Tracing.etwManifest.dll" />
             </File>
           </Component>
         </Directory>
