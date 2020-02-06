@@ -106,13 +106,19 @@
                         "Using PowerShell notification script from path {0}",
                         notificationScriptPath);
 
-                    PowerShellNotifier psNotifier = new PowerShellNotifier(notificationScriptPath);
+                    INotificationHandler psNotifier = new PowerShellNotifier(notificationScriptPath);
                     this.OnNotify += psNotifier.HandleNotification;
                 }
                 else
                 {
                     Logger.Info("No PowerShell script found at path {0}", notificationScriptPath);
                 }
+            }
+
+            if (this.Configuration.ServiceConfiguration.SmtpConfiguration != null)
+            {
+                INotificationHandler smtpNotifier = new SmtpNotifier();
+                this.OnNotify += smtpNotifier.HandleNotification;
             }
 
             // Initialization is finished

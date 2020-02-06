@@ -5,7 +5,12 @@
 
     using Wingnut.Tracing;
 
-    public class PowerShellNotifier
+    public interface INotificationHandler
+    {
+        void HandleNotification(object sender, NotifyEventArgs eventArgs);
+    }
+
+    public class PowerShellNotifier : INotificationHandler
     {
         private readonly string scriptPath;
 
