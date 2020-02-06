@@ -18,7 +18,7 @@
 
             this.serviceProcessInstaller.Password = null;
             this.serviceProcessInstaller.Username = null;
-            this.serviceProcessInstaller.Account = ServiceAccount.LocalService;
+            this.serviceProcessInstaller.Account = ServiceAccount.LocalSystem;
 
             this.serviceInstaller.ServiceName = "Wingnut Service";
 

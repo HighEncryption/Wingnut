@@ -1,35 +1,138 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+     xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+
+  <?if $(var.Platform) = x64 ?>
+    <?define PlatformProgramFilesFolder = "ProgramFiles64Folder" ?>
+  <?else ?>
+    <?define PlatformProgramFilesFolder = "ProgramFilesFolder" ?>
+  <?endif ?>
+
   <Product Id="*"
            Name="Wingnut"
            Language="1033"
-           Version="1.0.0.0"
-           Manufacturer=""
+           Version="!(bind.FileVersion.Wingnut_Core_dll)"
+           Manufacturer="Ryan Sizemore"
            UpgradeCode="5fa166c5-67d8-481d-b715-78d64c67aadd">
-    <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
+    <Package InstallerVersion="200"
+             Compressed="yes"
+             InstallScope="perMachine" />
+
+    <UIRef Id="WixUI_Minimal" />
+
+    <WixVariable Id="WixUILicenseRtf"
+                 Value="$(var.ProjectDir)\EULA.rtf" />
+
+    <Icon Id="icon.ico" SourceFile="$(var.ProjectDir)..\Wingnut.UI\Resources\Graphics\battery_charge.ico"/>
+
+    <Property Id="ARPPRODUCTICON" Value="icon.ico" />
 
     <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
-    <MediaTemplate />
 
-    <Feature Id="ProductFeature" Title="Wingnut.Setup" Level="1">
-      <ComponentGroupRef Id="ProductComponents" />
+    <MediaTemplate EmbedCab="yes" />
+
+    <Feature Id="ProductFeature"
+             Title="Wingnut"
+             Level="1">
+      <ComponentRef Id="Wingnut_Channels_dll_component" />
+      <ComponentRef Id="Wingnut_Core_dll_component" />
+      <ComponentRef Id="Wingnut_Data_dll_component" />
+      <ComponentRef Id="Wingnut_PowerShell_dll_component" />
+      <ComponentRef Id="Wingnut_Service_exe_component" />
+      <ComponentRef Id="Wingnut_Service_exe_config_component" />
+      <ComponentRef Id="Wingnut_Tracing_dll_component" />
+
+      <ComponentRef Id="Wingnut_Notify_ps1_component" />
+
+      <ComponentRef Id="Wingnut_Tracing_Wingnut_Tracing_etwManifest_dll_component" />
+      <ComponentRef Id="Wingnut_Tracing_Wingnut_Tracing_etwManifest_man_component" />
     </Feature>
-  </Product>
 
-  <Fragment>
     <Directory Id="TARGETDIR" Name="SourceDir">
-      <Directory Id="ProgramFilesFolder">
-        <Directory Id="INSTALLFOLDER" Name="Wingnut.Setup" />
+      <Directory Id="$(var.PlatformProgramFilesFolder)">
+        <Directory Id="INSTALLFOLDER" Name="Wingnut">
+          <!-- 
+            Wingnut Components for each file installed in the ProgramFiles directory
+          -->
+          <Component Id="Wingnut_Channels_dll_component"
+                     Guid="ed7def38-ca0f-48b3-abe3-0d08b06ec892">
+            <File Id="Wingnut_Channels_dll"
+                  Source="$(var.ProjectDir)..\Wingnut.Channels\bin\$(var.Configuration)\Wingnut.Channels.dll"
+                  KeyPath="yes" />
+          </Component>
+          <Component Id="Wingnut_Core_dll_component"
+                     Guid="c0eb105b-e119-47a0-a8c6-9d6899f72df9">
+            <File Id="Wingnut_Core_dll"
+                  Source="$(var.ProjectDir)..\Wingnut.Core\bin\$(var.Configuration)\Wingnut.Core.dll"
+                  KeyPath="yes" />
+          </Component>
+          <Component Id="Wingnut_Data_dll_component"
+                     Guid="87ac253c-f325-46a7-9ec6-a3c0aad95ca0">
+            <File Id="Wingnut_Data_dll"
+                  Source="$(var.ProjectDir)..\Wingnut.Data\bin\$(var.Configuration)\Wingnut.Data.dll"
+                  KeyPath="yes" />
+          </Component>
+          <Component Id="Wingnut_PowerShell_dll_component"
+                     Guid="7f6f7741-3290-42fa-b62d-8fa07101f755">
+            <File Id="Wingnut_PowerShell_dll"
+                  Source="$(var.ProjectDir)..\Wingnut.PowerShell\bin\$(var.Configuration)\Wingnut.PowerShell.dll"
+                  KeyPath="yes" />
+          </Component>
+          <Component Id="Wingnut_Service_exe_component"
+                     Guid="951b686c-2322-4735-aaeb-a92570695714">
+            <File Id="Wingnut_Service_exe"
+                  Source="$(var.ProjectDir)..\Wingnut.Service\bin\$(var.Configuration)\Wingnut.Service.exe"
+                  KeyPath="yes" />
+          </Component>
+          <Component Id="Wingnut_Service_exe_config_component"
+                     Guid="6ffb67f7-760e-407a-abb7-0cae565938f9">
+            <File Id="Wingnut_Service_exe_config"
+                  Source="$(var.ProjectDir)..\Wingnut.Service\bin\$(var.Configuration)\Wingnut.Service.exe.config"
+                  KeyPath="yes" />
+          </Component>
+          <Component Id="Wingnut_Tracing_dll_component"
+                     Guid="c0970be4-8158-4051-aab9-a82ceedae13b">
+            <File Id="Wingnut_Tracing_dll"
+                  Source="$(var.ProjectDir)..\Wingnut.Tracing\bin\$(var.Configuration)\Wingnut.Tracing.dll"
+                  KeyPath="yes" />
+          </Component>
+
+          <Component Id="Wingnut_Notify_ps1_component"
+                     Guid="c9949b40-1caf-4c04-84a2-f4d993d69de1">
+            <File Id="Notify_ps1"
+                  Source="$(var.ProjectDir)..\Wingnut.Core\bin\$(var.Configuration)\Notify.ps1"
+                  KeyPath="yes" />
+          </Component>
+
+        </Directory>
+      </Directory>
+
+      <!--
+        Install the ETW files into a dedicated directory in C:\ProgramData
+      -->
+      <Directory Id="CommonAppDataFolder">
+        <Directory Id="WingnutAppDataFolder"
+                   Name="Wingnut">
+          <Component Id="Wingnut_Tracing_Wingnut_Tracing_etwManifest_dll_component"
+                     Guid="85fb6e93-2b88-4deb-b7af-6034d416cf0f">
+            <File Id="Wingnut_Tracing_Wingnut_Tracing_etwManifest_dll"
+                  Source="$(var.ProjectDir)..\Wingnut.Tracing\bin\$(var.Configuration)\Wingnut.Tracing.Wingnut-Tracing.etwManifest.dll"
+                  KeyPath="yes" />
+          </Component>
+          <Component Id="Wingnut_Tracing_Wingnut_Tracing_etwManifest_man_component"
+                     Guid="d590d9ba-3198-4631-b5cd-a9fc234480bf">
+            <File Id="Wingnut_Tracing_Wingnut_Tracing_etwManifest_man"
+                  Source="$(var.ProjectDir)..\Wingnut.Tracing\bin\$(var.Configuration)\Wingnut.Tracing.Wingnut-Tracing.etwManifest.man"
+                  KeyPath="yes">
+              <!--
+                This will handle the manifest registration
+              -->
+              <util:EventManifest MessageFile="[Wingnut_Tracing_Wingnut_Tracing_etwManifest_dll]"
+                                  ResourceFile="[Wingnut_Tracing_Wingnut_Tracing_etwManifest_dll]" />
+            </File>
+          </Component>
+        </Directory>
       </Directory>
     </Directory>
-  </Fragment>
-
-  <Fragment>
-    <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
-      <!-- TODO: Remove the comments around this Component element and the ComponentRef below in order to add resources to this installer. -->
-      <!-- <Component Id="ProductComponent"> -->
-      <!-- TODO: Insert files, registry keys, and other resources here. -->
-      <!-- </Component> -->
-    </ComponentGroup>
-  </Fragment>
+  </Product>
 </Wix>
