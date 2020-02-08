@@ -52,6 +52,8 @@
     <Compile Include="AsyncReaderWriterLock.cs" />
     <Compile Include="Configuration\SecureStringToProtectedDataConverter.cs" />
     <Compile Include="Configuration\ServerConfiguration.cs" />
+    <Compile Include="Configuration\ShutdownConfiguration.cs" />
+    <Compile Include="Configuration\SmtpConfiguration.cs" />
     <Compile Include="Configuration\UpsConfiguration.cs" />
     <Compile Include="Configuration\WingnutConfiguration.cs" />
     <Compile Include="Configuration\WingnutServiceConfiguration.cs" />

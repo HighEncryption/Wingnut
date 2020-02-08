@@ -57,6 +57,7 @@
     <Compile Include="PowerShellNotifier.cs" />
     <Compile Include="ServerConnection.cs" />
     <Compile Include="ServiceRuntime.cs" />
+    <Compile Include="SmtpNotifier.cs" />
     <Compile Include="UpsContext.cs" />
     <Compile Include="UpsMonitor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
