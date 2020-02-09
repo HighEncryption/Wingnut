@@ -1,12 +1,239 @@
-﻿<Window x:Class="Wingnut.UI.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Wingnut.UI"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+﻿<fluent:AcrylicWindow x:Class="Wingnut.UI.MainWindow"
+                      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                      xmlns:local="clr-namespace:Wingnut.UI"
+                      xmlns:fluent="clr-namespace:SourceChord.FluentWPF;assembly=FluentWPF"
+                      xmlns:system="clr-namespace:System;assembly=mscorlib"
+                      xmlns:navigation="clr-namespace:Wingnut.UI.Navigation"
+                      xmlns:viewModels="clr-namespace:Wingnut.UI.ViewModels"
+                      mc:Ignorable="d"
+                      d:DataContext="{d:DesignInstance viewModels:MainWindowViewModel}"
+                      ExtendViewIntoTitleBar="True"
+                      TintOpacity="0.8"
+                      TintColor="#eeeeee"
+                      Title="MainWindow" 
+                      Height="700" Width="1000">
+    <fluent:AcrylicWindow.Resources>
+        <ResourceDictionary>
+            <Style TargetType="{x:Type TextBlock}">
+                <Setter Property="FontFamily" Value="Segoe UI" />
+            </Style>
+
+            <Style TargetType="ListViewItem" x:Key="BareListViewStyle">
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="Margin" Value="0"/>
+                <Setter Property="Padding" Value="0"/>
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="ListViewItem">
+                            <Border BorderBrush="{TemplateBinding BorderThickness}"
+                                    BorderThickness="{TemplateBinding BorderThickness}">
+                                <ContentPresenter Content="{TemplateBinding Content}" 
+                                                  ContentTemplate="{TemplateBinding ContentTemplate}" />
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <DataTemplate DataType="{x:Type navigation:UpsDeviceNavigationViewModel}">
+                <StackPanel>
+                    <Border Height="48" Background="Transparent" BorderThickness="0"
+                            Padding="16,0,0,0">
+                        <TextBlock FontSize="16"
+                                   FontWeight="SemiBold"
+                                   Text="{Binding Path=DeviceViewModel.UpsName}"
+                                   VerticalAlignment="Center" />
+                    </Border>
+                    <ItemsControl ItemsSource="{Binding Path=NavigationSectionViewModels}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border d:DataContext="{d:DesignInstance navigation:NavigationSectionViewModel}"
+                                        Height="48" Padding="16,0,0,0" IsHitTestVisible="True" MouseDown="UIElement_OnMouseDown">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Setter Property="BorderThickness" Value="0" />
+                                            <Setter Property="Background" Value="Transparent" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Path=IsSelected}" Value="True">
+                                                    <Setter Property="Background" Value="White" />
+                                                </DataTrigger>
+                                                <MultiDataTrigger>
+                                                    <MultiDataTrigger.Conditions>
+                                                        <Condition Binding="{Binding IsSelected}" Value="False" />
+                                                        <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsMouseOver}" Value="True"></Condition>
+                                                    </MultiDataTrigger.Conditions>
+                                                    <Setter Property="Background" Value="#D4D4D4"/>
+                                                </MultiDataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock FontFamily="Segoe MDL2 Assets"
+                                                   Text="{Binding Path=Glyph}"
+                                                   FontSize="18" 
+                                                   VerticalAlignment="Center"/>
+                                        <TextBlock FontSize="15"
+                                                   Text="{Binding Path=Header}"
+                                                   Margin="12,0,0,0"
+                                                   VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+
+            </DataTemplate>
+
+        </ResourceDictionary>
+    </fluent:AcrylicWindow.Resources>
     <Grid>
-        
+        <Grid.ColumnDefinitions>
+            <!-- Left column to allow acrylic to show through -->
+            <ColumnDefinition Width="200" />
+            <!-- Remainder of the window is opaque white -->
+            <ColumnDefinition  />
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            <!-- First row for current area title, no scrolling -->
+            <RowDefinition Height="Auto" />
+            <!-- Remaining area for content with scrolling -->
+            <RowDefinition />
+        </Grid.RowDefinitions>
+
+        <!-- Top-left area -->
+        <Border Height="48" Margin="0,68,0,0" DataContext="{Binding Path=HomePageNavigationViewModel}"
+                Padding="16,0,0,0" IsHitTestVisible="True" MouseDown="UIElement_OnMouseDown">
+            <Border.Style>
+                <Style TargetType="Border">
+                    <Setter Property="BorderThickness" Value="0" />
+                    <Setter Property="Background" Value="Transparent" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Path=IsSelected}" Value="True">
+                            <Setter Property="Background" Value="White" />
+                        </DataTrigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding IsSelected}" Value="False" />
+                                <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsMouseOver}" Value="True"></Condition>
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Background" Value="#D4D4D4"/>
+                        </MultiDataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock FontFamily="Segoe MDL2 Assets"
+                           Text="&#xE80F;"
+                           FontSize="18" 
+                           VerticalAlignment="Center"/>
+                <TextBlock FontSize="15"
+                           Text="Home"
+                           Margin="12,0,0,0"
+                           VerticalAlignment="Center" />
+            </StackPanel>
+        </Border>
+
+        <!-- Bottom-left area for navigation -->
+        <Border Grid.Column="0" Grid.Row="1" Background="Transparent">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <ItemsControl ItemsSource="{Binding Path=NavigationItems}" />
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+        <Border Grid.Column="0" Grid.Row="1" Visibility="Collapsed">
+            <StackPanel Margin="0,0,0,0" VerticalAlignment="Top">
+                <StackPanel Orientation="Horizontal" Margin="16,32,0,16">
+                    <TextBlock FontFamily="Segoe UI"
+                               FontSize="16"
+                               FontWeight="SemiBold"
+                               Text="Smart-UPS 1500"
+                               VerticalAlignment="Center"></TextBlock>
+                </StackPanel>
+                <Border Padding="16,14" Background="White">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock FontFamily="Segoe MDL2 Assets"
+                                   Text="&#xEC4A;"
+                                   FontSize="18" 
+                                   VerticalAlignment="Center"/>
+                        <TextBlock FontFamily="Segoe UI"
+                                   FontSize="15"
+                                   Text="Status"
+                                   Margin="12,0,0,0"
+                                   VerticalAlignment="Center" />
+                    </StackPanel>
+                </Border>
+                <Border Padding="16,14">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock FontFamily="Segoe MDL2 Assets"
+                                   Text="&#xEC42;" 
+                                   FontSize="18" 
+                                   VerticalAlignment="Center"/>
+                        <TextBlock FontFamily="Segoe UI"
+                                   FontSize="15" 
+                                   Text="Notifications"
+                                   Margin="12,0,0,0"
+                                   VerticalAlignment="Center"></TextBlock>
+                    </StackPanel>
+                </Border>
+                <Border Padding="16,14">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock FontFamily="Segoe MDL2 Assets"
+                                   Text="&#xE9D2;"
+                                   FontSize="18" 
+                                   VerticalAlignment="Center"/>
+                        <TextBlock FontFamily="Segoe UI"
+                                   FontSize="15"
+                                   Text="Energy usage"
+                                   Margin="12,0,0,0"
+                                   VerticalAlignment="Center"></TextBlock>
+                    </StackPanel>
+                </Border>
+                <Border Padding="16,14">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock FontFamily="Segoe MDL2 Assets"
+                                   Text="&#xE713;"
+                                   FontSize="18" 
+                                   VerticalAlignment="Center"/>
+                        <TextBlock FontFamily="Segoe UI"
+                                   FontSize="15"
+                                   Text="Settings"
+                                   Margin="12,0,0,0"
+                                   VerticalAlignment="Center"></TextBlock>
+                    </StackPanel>
+                </Border>
+
+            </StackPanel>
+        </Border>
+
+        <!-- Top-right area for section title -->
+        <Border Grid.Column="1" Grid.Row="0" Background="White" Margin="0,0,0,-1">
+            <StackPanel Margin="24,0">
+                <TextBlock Text="{Binding Path=SelectedNavigationSection.Header}"
+                           Margin="0,60,0,0"
+                           FontFamily="Segoe UI Light"
+                           FontSize="30" />
+            </StackPanel>
+        </Border>
+
+        <ScrollViewer Grid.Column="1" Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <ScrollViewer.Resources>
+                <system:Double x:Key="{x:Static SystemParameters.VerticalScrollBarWidthKey}">12</system:Double>
+            </ScrollViewer.Resources>
+
+            <Grid Background="White">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="500" />
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="220" />
+                </Grid.ColumnDefinitions>
+            </Grid>
+        </ScrollViewer>
     </Grid>
-</Window>
+</fluent:AcrylicWindow>

@@ -1,28 +1,34 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-
-namespace Wingnut.UI
+﻿namespace Wingnut.UI
 {
+    using System.Windows.Controls;
+    using System.Windows.Input;
+
+    using Wingnut.UI.Navigation;
+
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow
     {
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+        private void UIElement_OnMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            var border = sender as Border;
+
+            var viewModel = border?.DataContext as NavigationSectionViewModel;
+            if (viewModel == null)
+            {
+                return;
+            }
+
+            if (e.ButtonState == MouseButtonState.Pressed)
+            {
+                viewModel.IsSelected = true;
+            }
         }
     }
 }

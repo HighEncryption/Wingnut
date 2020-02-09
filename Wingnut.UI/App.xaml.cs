@@ -5,6 +5,8 @@
     using System.Windows;
     using System.Windows.Threading;
 
+    using Wingnut.UI.ViewModels;
+
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
@@ -14,7 +16,7 @@
 
         internal new static App Current { get; private set; }
 
-        private MainWindowViewModel mainWindowViewModel;
+        public MainWindowViewModel MainWindowViewModel { get; private set; }
 
         internal static void Start()
         {
@@ -34,8 +36,12 @@
             };
 
             app.localDispatcher = Dispatcher.CurrentDispatcher;
-            using (app.mainWindowViewModel = new MainWindowViewModel())
+            using (app.MainWindowViewModel = new MainWindowViewModel())
             {
+                app.MainWindowViewModel.SetHomePage();
+
+                app.MainWindowViewModel.ConnectToService();
+
                 app.ShowMainWindow();
                 app.Run();
             }
@@ -45,7 +51,7 @@
         {
             if (this.MainWindow == null)
             {
-                this.MainWindow = new MainWindow { DataContext = this.mainWindowViewModel };
+                this.MainWindow = new MainWindow { DataContext = this.MainWindowViewModel };
                 this.MainWindow.Show();
             }
         }

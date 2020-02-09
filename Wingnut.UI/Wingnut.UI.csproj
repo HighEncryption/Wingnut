@@ -38,8 +38,12 @@
     <StartupObject>Wingnut.UI.Startup</StartupObject>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="FluentWPF, Version=0.8.0.6, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\FluentWPF.0.8.0\lib\net45\FluentWPF.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.ServiceModel" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -58,8 +62,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="MainWindowViewModel.cs" />
+    <Compile Include="ViewModels\MainWindowViewModel.cs" />
     <Compile Include="Startup.cs" />
+    <Compile Include="Navigation\NavigationItemViewModel.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -94,6 +99,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -104,6 +110,16 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\Graphics\battery_charge.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Wingnut.Channels\Wingnut.Channels.csproj">
+      <Project>{F1821A0D-B3E4-4515-B5E9-9EC063644BB5}</Project>
+      <Name>Wingnut.Channels</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Wingnut.Data\Wingnut.Data.csproj">
+      <Project>{1D0D7910-3762-48D5-B446-15903FF289F7}</Project>
+      <Name>Wingnut.Data</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

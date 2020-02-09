@@ -58,6 +58,7 @@
 
         private async Task UpsMonitorMain()
         {
+            // TODO: Call LOGIN to the server so that it knows we are listening
             try
             {
                 this.InitializeFromConfiguration();

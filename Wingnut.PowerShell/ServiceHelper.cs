@@ -3,10 +3,16 @@
     using System.ServiceModel;
 
     using Wingnut.Channels;
+    using Wingnut.Data.Models;
 
     public class CallbackClient : IManagementCallback
     {
         public void SendCallbackMessage(string message)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void UpsDeviceChanged(Ups ups)
         {
             throw new System.NotImplementedException();
         }

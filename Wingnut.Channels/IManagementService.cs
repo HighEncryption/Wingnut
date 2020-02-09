@@ -44,5 +44,8 @@
     {
         [OperationContract(IsOneWay = true)]
         void SendCallbackMessage(string message);
+
+        [OperationContract(IsOneWay = true)]
+        void UpsDeviceChanged(Ups ups);
     }
 }
