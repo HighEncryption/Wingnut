@@ -62,9 +62,21 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Controls\NavigationListItem.xaml.cs">
+      <DependentUpon>NavigationListItem.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Navigation\NavigationSectionGroupViewModel.cs" />
+    <Compile Include="Navigation\NavigationSectionViewModel.cs" />
+    <Compile Include="Navigation\UpsDeviceNavigationGroupViewModel.cs" />
+    <Compile Include="ViewModels\HomePageViewModel.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
     <Compile Include="Startup.cs" />
-    <Compile Include="Navigation\NavigationItemViewModel.cs" />
+    <Compile Include="Navigation\HomePageNavigationViewModel.cs" />
+    <Compile Include="ViewModels\UpsDeviceViewModel.cs" />
+    <Page Include="Controls\NavigationListItem.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

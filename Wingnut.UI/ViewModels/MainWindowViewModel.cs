@@ -6,7 +6,6 @@
     using System.Diagnostics;
     using System.ServiceModel;
     using System.Threading.Tasks;
-    using System.Windows.Input;
 
     using Wingnut.Channels;
     using Wingnut.Data.Models;
@@ -15,20 +14,10 @@
 
     public class MainWindowViewModel : ViewModelBase, IDisposable
     {
-        private ObservableCollection<NavigationItemViewModel> navigationItems;
+        private ObservableCollection<NavigationSectionViewModel> navigationSections;
 
-        public ObservableCollection<NavigationItemViewModel> NavigationItems =>
-            this.navigationItems ??
-            (this.navigationItems = new ObservableCollection<NavigationItemViewModel>());
-
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private NavigationItemViewModel selectedNavigationItem;
-
-        public NavigationItemViewModel SelectedNavigationItem
-        {
-            get => this.selectedNavigationItem;
-            set => this.SetProperty(ref this.selectedNavigationItem, value);
-        }
+        public ObservableCollection<NavigationSectionViewModel> NavigationSections =>
+            this.navigationSections ?? (this.navigationSections = new ObservableCollection<NavigationSectionViewModel>());
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private NavigationSectionViewModel selectedNavigationSection;
@@ -48,20 +37,10 @@
             } 
         }
 
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private NavigationSectionViewModel homePageNavigationViewModel;
-
-        public NavigationSectionViewModel HomePageNavigationViewModel
-        {
-            get => this.homePageNavigationViewModel;
-            set => this.SetProperty(ref this.homePageNavigationViewModel, value);
-        }
-
         private ObservableCollection<DeviceViewModel> deviceViewModels;
 
         public ObservableCollection<DeviceViewModel> DeviceViewModels =>
             this.deviceViewModels ?? (this.deviceViewModels = new ObservableCollection<DeviceViewModel>());
-
 
         private class CallbackClient : IManagementCallback
         {
@@ -123,7 +102,8 @@
                         App.DispatcherInvoke(() =>
                         {
                             this.DeviceViewModels.Add(deviceViewModel);
-                            this.NavigationItems.Add(new UpsDeviceNavigationViewModel(deviceViewModel));
+                            this.NavigationSections.Add(
+                                new UpsDeviceNavigationGroupViewModel(deviceViewModel));
                         });
                     }
                 }
@@ -139,61 +119,16 @@
         {
         }
 
-        public MainWindowViewModel()
+        public void Initialize()
         {
-        }
-
-        public void SetHomePage()
-        {
-            this.HomePageNavigationViewModel = new HomePageNavigationViewModel(new HomePageViewModel());
-            this.HomePageNavigationViewModel.IsSelected = true;
-            this.SelectedNavigationSection = this.HomePageNavigationViewModel;
+            var homePageSection = new HomePageNavigationViewModel(new HomePageViewModel());
+            this.NavigationSections.Add(homePageSection);
+            homePageSection.IsSelected = true;
         }
     }
 
     public abstract class DeviceViewModel : ViewModelBase
     {
 
-    }
-
-    public class UpsDeviceViewModel : DeviceViewModel
-    {
-        private readonly Ups ups;
-
-        public UpsDeviceViewModel(Ups ups)
-        {
-            this.ups = ups;
-        }
-
-        public string UpsName => this.ups.Name;
-    }
-
-    public class HomePageViewModel : ViewModelBase
-    {
-        public ICommand AddDeviceCommand { get; }
-
-        public HomePageViewModel()
-        {
-            this.AddDeviceCommand = new DelegatedCommand(this.AddDevice, this.CanAddDevice);
-        }
-
-        private void AddDevice(object obj)
-        {
-            throw new NotImplementedException();
-        }
-
-        private bool CanAddDevice(object obj)
-        {
-            return App.Current.MainWindowViewModel.IsConnectedToService;
-        }
-
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private bool showAddDeviceButton;
-
-        public bool ShowAddDeviceButton
-        {
-            get => this.showAddDeviceButton;
-            set => this.SetProperty(ref this.showAddDeviceButton, value);
-        }
     }
 }

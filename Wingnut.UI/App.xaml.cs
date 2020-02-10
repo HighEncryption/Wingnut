@@ -38,7 +38,7 @@
             app.localDispatcher = Dispatcher.CurrentDispatcher;
             using (app.MainWindowViewModel = new MainWindowViewModel())
             {
-                app.MainWindowViewModel.SetHomePage();
+                app.MainWindowViewModel.Initialize();
 
                 app.MainWindowViewModel.ConnectToService();
 
