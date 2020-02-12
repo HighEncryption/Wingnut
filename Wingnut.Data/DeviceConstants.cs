@@ -4,7 +4,6 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
-    using System.Runtime.CompilerServices;
 
     using Wingnut.Tracing;
 
@@ -44,6 +43,31 @@
         {
             this.DisplayName = displayName;
         }
+    }
+
+    public sealed class DevicePropertyAttribute : Attribute
+    {
+        public string PropertyName { get; set; }
+
+        public Type ConverterType { get; set; }
+
+        public DevicePropertyAttribute(string propertyName)
+        {
+            this.PropertyName = propertyName;
+        }
+    }
+
+    public class DeviceStatusConverter : IDeviceValueConverter
+    {
+        public object Convert(object source)
+        {
+            return Constants.Device.ParseStatusString(source as string);
+        }
+    }
+
+    public interface IDeviceValueConverter
+    {
+        object Convert(object source);
     }
 
     /// <summary>

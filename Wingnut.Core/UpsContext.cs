@@ -190,7 +190,7 @@
                     // do that now. Since this will be the first time pulling device state
                     // from the server, we won't have any previous state to compare it to,
                     // so don't bother comparing state.
-                    this.State = new Ups(this.Name, this.ServerState, deviceVars);
+                    this.State = Ups.Create(this.Name, this.ServerState, deviceVars);
 
                     // ReSharper disable once MethodSupportsCancellation
                     this.upsMonitor.Changes.Add(
@@ -208,7 +208,7 @@
                     var previousState = this.State.Clone();
 
                     // Update the state object is with the new variables from the server
-                    this.State.UpdateVariables(deviceVars);
+                    this.State.Update(deviceVars);
 
                     // The status has changed, so queue a status change notification
                     if (previousState.Status != this.State.Status)

@@ -7,28 +7,67 @@
     [DataContract]
     public class Ups : Device
     {
-        public double? BatteryCharge => this.GetDouble("battery.charge");
+        private double? batteryCharge;
 
-        public DateTime? BatteryLastReplacement => this.GetDateTime("battery.date");
+        [DeviceProperty("battery.charge")]
+        public double? BatteryCharge
+        {
+            get => this.batteryCharge;
+            set => this.SetProperty(ref this.batteryCharge, value);
+        }
 
-        public TimeSpan? BatteryRuntime => this.GetTimeSpan("battery.runtime", TimeSpanUnits.Seconds);
+        private DateTime? batteryLastReplacement;
 
-        public TimeSpan? BatteryRuntimeLow => this.GetTimeSpan("battery.runtime.low", TimeSpanUnits.Seconds);
+        [DeviceProperty("battery.date")]
+        public DateTime? BatteryLastReplacement
+        {
+            get => this.batteryLastReplacement;
+            set => this.SetProperty(ref this.batteryLastReplacement, value);
+        }
 
-        public double? InputFrequency => this.GetDouble("input.frequency");
+        private TimeSpan? batteryRuntime;
 
-        public double? InputVoltage => this.GetDouble("input.voltage");
+        [DeviceProperty("battery.runtime")]
+        public TimeSpan? BatteryRuntime
+        {
+            get => this.batteryRuntime;
+            set => this.SetProperty(ref this.batteryRuntime, value);
+        }
 
-        public double? OutputVoltage => this.GetDouble("output.voltage");
+        private TimeSpan? batteryRuntimeLow;
 
-        public double? OutputFrequency => this.GetDouble("output.frequency");
+        [DeviceProperty("battery.runtime.low")]
+        public TimeSpan? BatteryRuntimeLow
+        {
+            get => this.batteryRuntimeLow;
+            set => this.SetProperty(ref this.batteryRuntimeLow, value);
+        }
 
-        public double? OutputCurrent => this.GetDouble("output.current");
+        //public double? InputFrequency => this.GetDouble("input.frequency");
 
-        public double? LoadPercentage => this.GetDouble("ups.load");
+        //public double? InputVoltage => this.GetDouble("input.voltage");
 
-        public DeviceStatusType Status =>
-            Constants.Device.ParseStatusString(this.GetString("ups.status"));
+        //public double? OutputVoltage => this.GetDouble("output.voltage");
+
+        //public double? OutputFrequency => this.GetDouble("output.frequency");
+
+        //public double? OutputCurrent => this.GetDouble("output.current");
+
+        //public double? LoadPercentage => this.GetDouble("ups.load");
+
+        //public DeviceStatusType Status =>
+        //    Constants.Device.ParseStatusString(this.GetString("ups.status"));
+
+        //public DeviceStatusType Status { get; set; }
+
+        private DeviceStatusType status;
+
+        [DeviceProperty("ups.status", ConverterType = typeof(DeviceStatusConverter))]
+        public DeviceStatusType Status
+        {
+            get => this.status;
+            set => this.SetProperty(ref this.status, value);
+        }
 
         public bool NotResponding { get; set; }
 
@@ -36,42 +75,26 @@
 
         internal Ups Clone()
         {
-            return new Ups(
-                this.Name,
-                this.Server,
-                new Dictionary<string, string>(this.VariableDictionary));
+            Ups clone = new Ups(this.Name, this.Server);
+
+            clone.CloneFromMetadata(this);
+
+            return clone;
         }
 
-        internal List<string> UpdateVariables(Dictionary<string, string> vars)
+        public static Ups Create(
+            string name,
+            Server server,
+            Dictionary<string, string> variableDictionary)
         {
-            List<string> changedKeys = new List<string>();
-            foreach (string key in vars.Keys)
-            {
-                if (this.VariableDictionary.TryGetValue(key, out string existingValue))
-                {
-                    if (existingValue != vars[key])
-                    {
-                        changedKeys.Add(key);
-                        this.VariableDictionary[key] = vars[key];
-                    }
-                }
-                else
-                {
-                    changedKeys.Add(key);
-                    this.VariableDictionary[key] = vars[key];
-                }
-            }
-
-            return changedKeys;
+            Ups ups = new Ups(name, server);
+            ups.Update(variableDictionary);
+            return ups;
         }
 
-        public Ups(string name, Server server, Dictionary<string, string> variableDictionary)
+        private Ups(string name, Server server)
             : base(name, server)
         {
-            foreach (KeyValuePair<string, string> pair in variableDictionary)
-            {
-                this.VariableDictionary.Add(pair.Key, pair.Value);
-            }
         }
     }
 }

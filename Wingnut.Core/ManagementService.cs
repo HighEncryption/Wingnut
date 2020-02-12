@@ -68,7 +68,7 @@
                             .ListVarsAsync(thisUpsName, CancellationToken.None)
                             .ConfigureAwait(false);
 
-                    upsList.Add(new Ups(thisUpsName, server, upsVars));
+                    upsList.Add(Ups.Create(thisUpsName, server, upsVars));
                 }
 
                 return upsList;
@@ -118,7 +118,7 @@
                         .ListVarsAsync(upsName, CancellationToken.None)
                         .ConfigureAwait(false);
 
-                Ups ups = new Ups(upsName, server, upsVars);
+                Ups ups = Ups.Create(upsName, server, upsVars);
 
                 // Success. Add the configuration and save
                 ServiceRuntime.Instance.Configuration.UpsConfigurations.Add(
