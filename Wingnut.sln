@@ -33,6 +33,8 @@ Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "Wingnut.Setup", "Wingnut.Se
 		{319501E1-6B1C-4AE7-9279-963F7209F576} = {319501E1-6B1C-4AE7-9279-963F7209F576}
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wingnut.UpsdSim", "Wingnut.UpsdSim\Wingnut.UpsdSim.csproj", "{47789546-5FA2-4F9F-BACD-3501C72DCF96}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -118,6 +120,14 @@ Global
 		{8CBF7F97-580A-4091-A016-BE879457CF24}.Release|Any CPU.ActiveCfg = Release|x86
 		{8CBF7F97-580A-4091-A016-BE879457CF24}.Release|x86.ActiveCfg = Release|x86
 		{8CBF7F97-580A-4091-A016-BE879457CF24}.Release|x86.Build.0 = Release|x86
+		{47789546-5FA2-4F9F-BACD-3501C72DCF96}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{47789546-5FA2-4F9F-BACD-3501C72DCF96}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{47789546-5FA2-4F9F-BACD-3501C72DCF96}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{47789546-5FA2-4F9F-BACD-3501C72DCF96}.Debug|x86.Build.0 = Debug|Any CPU
+		{47789546-5FA2-4F9F-BACD-3501C72DCF96}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{47789546-5FA2-4F9F-BACD-3501C72DCF96}.Release|Any CPU.Build.0 = Release|Any CPU
+		{47789546-5FA2-4F9F-BACD-3501C72DCF96}.Release|x86.ActiveCfg = Release|Any CPU
+		{47789546-5FA2-4F9F-BACD-3501C72DCF96}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

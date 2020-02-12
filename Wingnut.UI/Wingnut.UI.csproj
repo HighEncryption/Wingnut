@@ -68,6 +68,9 @@
     <Compile Include="Navigation\NavigationSectionGroupViewModel.cs" />
     <Compile Include="Navigation\NavigationSectionViewModel.cs" />
     <Compile Include="Navigation\UpsDeviceNavigationGroupViewModel.cs" />
+    <Compile Include="Pages\UpsStatusPage.xaml.cs">
+      <DependentUpon>UpsStatusPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ViewModels\HomePageViewModel.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
     <Compile Include="Startup.cs" />
@@ -92,6 +95,14 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Pages\UpsStatusPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="XamlResources.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">

@@ -4,13 +4,25 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Wingnut.UI.Pages"
+             xmlns:navigation="clr-namespace:Wingnut.UI.Navigation"
              mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance navigation:UpsStatusNavigationViewModel}"
              d:DesignHeight="450" d:DesignWidth="800">
     <StackPanel>
         <TextBlock Style="{StaticResource TextHeader1Style}" 
                    Text="Overview" />
         <TextBlock Style="{StaticResource SubTextStyle}"
                    Text="This is a short little text block about the overall info about your device. It should be about two sentences in length." />
+        <StackPanel Orientation="Horizontal" Margin="0,16,0,0">
+            <TextBlock VerticalAlignment="Center" 
+                       Text="Device status:"
+                       FontFamily="Segoe UI" Margin="0,0,6,0"
+                       FontSize="15" />
+            <TextBlock VerticalAlignment="Center" FontWeight="SemiBold"
+                       Text="Online" Foreground="#03CE00"
+                       FontFamily="Segoe UI"
+                       FontSize="15" />
+        </StackPanel>
 
     </StackPanel>
 </UserControl>

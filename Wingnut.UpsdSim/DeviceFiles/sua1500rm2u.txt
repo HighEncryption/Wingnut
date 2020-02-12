@@ -1,0 +1,50 @@
+﻿ambient.1.humidity.alarm.high: 60.00
+ambient.1.humidity.alarm.low: 30.00
+ambient.1.temperature.alarm.high: 40.00
+ambient.1.temperature.alarm.low: 10.00
+battery.charge: 100.00
+battery.current: 0.00
+battery.current.total: 0.00
+battery.date: 09/15/2017
+battery.runtime: 3840.00
+battery.runtime.low: 120
+battery.voltage: 27.30
+device.mfr: APC
+device.model: Smart-UPS 1500
+device.serial: AS1136222037
+device.type: ups
+driver.name: snmp-ups
+driver.parameter.mibs: apcc
+driver.parameter.pollfreq: 8
+driver.parameter.pollinterval: 2
+driver.parameter.port: 192.168.1.200
+driver.parameter.snmp_version: v1
+driver.parameter.synchronous: no
+driver.version: 2.7.4
+driver.version.data: apcc MIB 1.2
+driver.version.internal: 0.97
+input.frequency: 60.00
+input.sensitivity: high
+input.transfer.high: 127
+input.transfer.low: 106
+input.transfer.reason: smallMomentarySpike
+input.voltage: 120.10
+input.voltage.maximum: 121.50
+input.voltage.minimum: 120.10
+output.current: 1.60
+output.frequency: 60.00
+output.voltage: 120.10
+output.voltage.nominal: 120
+ups.delay.shutdown: 20
+ups.delay.start: 10
+ups.firmware: UPS 06.5 (ID18)
+ups.id: APCUPS
+ups.load: 16.20
+ups.mfr: APC
+ups.mfr.date: 09/03/2011
+ups.model: Smart-UPS 1500
+ups.serial: AS1136222037
+ups.status: OL
+ups.temperature: 19.70
+ups.test.date: 01/12/2020
+ups.test.result: Ok
