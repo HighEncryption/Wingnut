@@ -30,11 +30,11 @@
 
     public class UpsStatusNavigationViewModel : NavigationSectionViewModel
     {
-        public UpsDeviceViewModel DeviceViewModel { get; }
+        public UpsDeviceViewModel Device { get; }
 
-        public UpsStatusNavigationViewModel(UpsDeviceViewModel deviceViewModel)
+        public UpsStatusNavigationViewModel(UpsDeviceViewModel device)
         {
-            this.DeviceViewModel = deviceViewModel;
+            this.Device = device;
             this.NavigationHeader = "Status";
             this.PageHeader = "Status";
             this.Glyph = "\uEC4A";

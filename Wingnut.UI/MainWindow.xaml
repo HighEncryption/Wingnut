@@ -59,7 +59,6 @@
                                         </ItemsControl>
                                     </StackPanel>
                                 </DataTemplate>
-
                             </ResourceDictionary>
                         </ItemsControl.Resources>
                     </ItemsControl>

@@ -3,8 +3,8 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Net.Configuration;
     using System.Reflection;
+    using System.Runtime.CompilerServices;
 
     using Wingnut.Tracing;
 
@@ -36,6 +36,16 @@
         }
     }
 
+    public sealed class DeviceStatusDisplayNameAttribute : Attribute
+    {
+        public string DisplayName { get; set; }
+
+        public DeviceStatusDisplayNameAttribute(string displayName)
+        {
+            this.DisplayName = displayName;
+        }
+    }
+
     /// <summary>
     /// The status of the device
     /// </summary>
@@ -49,42 +59,52 @@
 
         [DeviceStatusIdentifier("OFF")]
         [DeviceStatusSeverity(DeviceSeverityType.Warning)]
+        [DeviceStatusDisplayName("Off")]
         Off = 0x0001,
 
         [DeviceStatusIdentifier("OL")]
         [DeviceStatusSeverity(DeviceSeverityType.OK)]
+        [DeviceStatusDisplayName("Online")]
         Online = 0x0002,
 
         [DeviceStatusIdentifier("OB")]
         [DeviceStatusSeverity(DeviceSeverityType.Error)]
+        [DeviceStatusDisplayName("On Battery")]
         OnBattery = 0x0004,
 
         [DeviceStatusIdentifier("LB")]
         [DeviceStatusSeverity(DeviceSeverityType.Error)]
+        [DeviceStatusDisplayName("Low Battery")]
         LowBattery = 0x0008,
 
         [DeviceStatusIdentifier("RB")]
         [DeviceStatusSeverity(DeviceSeverityType.Error)]
+        [DeviceStatusDisplayName("Replace Battery")]
         ReplaceBattery = 0x0010,
 
         [DeviceStatusIdentifier("OVER")]
         [DeviceStatusSeverity(DeviceSeverityType.Error)]
+        [DeviceStatusDisplayName("Overload")]
         Overload = 0x0020,
 
         [DeviceStatusIdentifier("TRIM")]
         [DeviceStatusSeverity(DeviceSeverityType.Warning)]
+        [DeviceStatusDisplayName("Voltage Trim")]
         VoltageTrim = 0x0040,
 
         [DeviceStatusIdentifier("BOOST")]
         [DeviceStatusSeverity(DeviceSeverityType.Warning)]
+        [DeviceStatusDisplayName("Voltage Boost")]
         VoltageBoost = 0x0080,
 
         [DeviceStatusIdentifier("CAL")]
         [DeviceStatusSeverity(DeviceSeverityType.Warning)]
+        [DeviceStatusDisplayName("Calibrating")]
         Calibration = 0x0100,
 
         [DeviceStatusIdentifier("BYPASS")]
         [DeviceStatusSeverity(DeviceSeverityType.Error)]
+        [DeviceStatusDisplayName("Bypass")]
         Bypass = 0x0200
     }
 
@@ -118,14 +138,15 @@
 
         public static class Device
         {
-            private class DeviceStatusInfo
+            internal class DeviceStatusInfo
             {
                 public string Identifier;
+                public string DisplayName;
                 public DeviceStatusType StatusType;
                 public DeviceSeverityType Severity;
             }
 
-            private static readonly List<DeviceStatusInfo> statusInfos;
+            internal static readonly List<DeviceStatusInfo> statusInfos;
 
             static Device()
             {
@@ -137,7 +158,7 @@
                 foreach (FieldInfo enumValue in enumValues)
                 {
                     DeviceStatusIdentifierAttribute idAttribute =
-                        enumValue.GetCustomAttributes(typeof(DeviceStatusIdentifierAttribute))
+                        enumValue.GetCustomAttributes()
                             .OfType<DeviceStatusIdentifierAttribute>()
                             .FirstOrDefault();
 
@@ -146,8 +167,13 @@
                         continue;
                     }
 
+                    DeviceStatusDisplayNameAttribute displayNameAttribute =
+                        enumValue.GetCustomAttributes()
+                            .OfType<DeviceStatusDisplayNameAttribute>()
+                            .First();
+
                     DeviceStatusSeverityAttribute severityAttribute =
-                        enumValue.GetCustomAttributes(typeof(DeviceStatusSeverityAttribute))
+                        enumValue.GetCustomAttributes()
                             .OfType<DeviceStatusSeverityAttribute>()
                             .First();
 
@@ -155,6 +181,7 @@
                         new DeviceStatusInfo()
                         {
                             Identifier = idAttribute.Name,
+                            DisplayName = displayNameAttribute?.DisplayName,
                             Severity = severityAttribute.Severity,
                             StatusType = (DeviceStatusType)enumValue.GetRawConstantValue()
                         });
@@ -220,8 +247,27 @@
 
                 return severity;
             }
+
         }
     }
+
+    public static class DeviceStatusTypeExtensions
+    {
+        public static List<string> GetStatusDisplayName(this DeviceStatusType status)
+        {
+            List<string> result = new List<string>();
+            foreach (Constants.Device.DeviceStatusInfo info in Constants.Device.statusInfos)
+            {
+                if (status.HasFlag(info.StatusType))
+                {
+                    result.Add(info.DisplayName);
+                }
+            }
+
+            return result;
+        }
+    }
+
 
     public static class EnumExtensions
     {
