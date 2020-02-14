@@ -12,6 +12,12 @@
         CallbackContract = typeof(IManagementCallback))]
     public interface IManagementService
     {
+        [OperationContract(IsOneWay = true)]
+        void Register();
+
+        [OperationContract(IsOneWay = true)]
+        void Unregister();
+
         [OperationContract]
         WingnutServiceConfiguration GetServiceConfiguration();
 
@@ -42,9 +48,6 @@
 
     public interface IManagementCallback
     {
-        [OperationContract(IsOneWay = true)]
-        void SendCallbackMessage(string message);
-
         [OperationContract(IsOneWay = true)]
         void UpsDeviceChanged(Ups ups);
     }

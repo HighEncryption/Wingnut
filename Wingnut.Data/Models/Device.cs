@@ -31,13 +31,16 @@
 
         public Server Server => this.server;
 
-        private readonly Dictionary<string, DevicePropertyMetadata> propertyMetadata
-            = new Dictionary<string, DevicePropertyMetadata>();
+        private Dictionary<string, DevicePropertyMetadata> propertyMetadata;
 
-        protected Device(string name, Server server)
+        public void Initialize()
         {
-            this.deviceName = name;
-            this.server = server;
+            if (this.propertyMetadata != null)
+            {
+                return;
+            }
+
+            this.propertyMetadata = new Dictionary<string, DevicePropertyMetadata>();
 
             PropertyInfo[] allProperties =
                 this.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public);
@@ -65,6 +68,14 @@
                     this.propertyMetadata.Add(devPropAttribute.PropertyName, propertyData);
                 }
             }
+        }
+
+        protected Device(string name, Server server)
+        {
+            this.deviceName = name;
+            this.server = server;
+
+            this.Initialize();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -233,20 +244,29 @@
         /// </summary>
         public string Name => this.deviceName;
 
+        [DataMember]
         [DeviceProperty("device.mfr")]
         public string Manufacturer { get; set; }
 
+        [DataMember]
         [DeviceProperty("device.model")]
         public string Model { get; set; }
 
+        [DataMember]
         [DeviceProperty("device.serial")]
         public string Serial { get; set; }
 
+        [DataMember]
         [DeviceProperty("driver.name")]
         public string DriverName { get; set; }
 
+        [DataMember]
+        [DeviceProperty("driver.version")]
+        public string DriverVersion { get; set; }
+
         private DateTime lastPollTime;
 
+        [DataMember]
         public DateTime LastPollTime
         {
             get => this.lastPollTime;

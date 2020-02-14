@@ -16,6 +16,28 @@
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerSession)]
     public class ManagementService : IManagementService
     {
+        public void Register()
+        {
+            IManagementCallback callbackChannel =
+                OperationContext.Current.GetCallbackChannel<IManagementCallback>();
+
+            if (!ServiceRuntime.Instance.ClientCallbackChannels.Contains(callbackChannel))
+            {
+                ServiceRuntime.Instance.ClientCallbackChannels.Add(callbackChannel);
+            }
+        }
+
+        public void Unregister()
+        {
+            IManagementCallback callbackChannel =
+                OperationContext.Current.GetCallbackChannel<IManagementCallback>();
+
+            if (ServiceRuntime.Instance.ClientCallbackChannels.Contains(callbackChannel))
+            {
+                ServiceRuntime.Instance.ClientCallbackChannels.Remove(callbackChannel);
+            }
+        }
+
         public WingnutServiceConfiguration GetServiceConfiguration()
         {
             return ServiceRuntime.Instance.Configuration.ServiceConfiguration;

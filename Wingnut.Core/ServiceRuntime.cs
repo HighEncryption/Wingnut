@@ -19,9 +19,10 @@
         private ServiceRuntime()
         {
             this.UpsContexts = new List<UpsContext>();
+            this.ClientCallbackChannels = new List<IManagementCallback>();
         }
 
-        private static object initLock = new object();
+        private static readonly object initLock = new object();
         private static ServiceRuntime instance;
 
         public static ServiceRuntime Instance
@@ -51,6 +52,8 @@
         public WingnutConfiguration Configuration { get; internal set; }
 
         public List<UpsContext> UpsContexts { get; }
+
+        public List<IManagementCallback> ClientCallbackChannels { get; }
 
         public void Initialize()
         {

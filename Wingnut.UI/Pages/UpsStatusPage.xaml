@@ -5,10 +5,45 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Wingnut.UI.Pages"
              xmlns:navigation="clr-namespace:Wingnut.UI.Navigation"
+             xmlns:converters="clr-namespace:Wingnut.UI.Converters"
+             xmlns:viewModels="clr-namespace:Wingnut.UI.ViewModels"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance navigation:UpsStatusNavigationViewModel}"
              d:DesignHeight="450" d:DesignWidth="800">
-    <StackPanel>
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/XamlResources.xaml" />
+                <ResourceDictionary Source="/Converters.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <DataTemplate DataType="{x:Type viewModels:DevicePropertyViewModel}" >
+                <StackPanel Orientation="Horizontal">
+                    <StackPanel.Style>
+                        <Style TargetType="StackPanel">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Path=Value}" Value="{x:Null}">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </StackPanel.Style>
+                    <TextBlock VerticalAlignment="Center" 
+                               Text="{Binding Path=Header}"
+                               FontFamily="Segoe UI" 
+                               Margin="0,0,6,0"
+                               FontSize="15" />
+                    <TextBlock VerticalAlignment="Center" 
+                               FontWeight="SemiBold"
+                               Text="{Binding Path=Value}" 
+                               FontFamily="Segoe UI"
+                               FontSize="15" />
+                </StackPanel>
+            </DataTemplate>
+
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <StackPanel Margin="24,16">
         <TextBlock Style="{StaticResource TextHeader1Style}" 
                    Text="Overview" />
         <TextBlock Style="{StaticResource SubTextStyle}"
@@ -19,10 +54,87 @@
                        FontFamily="Segoe UI" Margin="0,0,6,0"
                        FontSize="15" />
             <TextBlock VerticalAlignment="Center" FontWeight="SemiBold"
-                       Text="Online" Foreground="#03CE00"
+                       Text="{Binding Path=Device.StatusDisplayString}" 
+                       Foreground="{Binding Path=Device.StatusSeverity, Converter={StaticResource DeviceSeverityToColor}}"
                        FontFamily="Segoe UI"
                        FontSize="15" />
         </StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <TextBlock VerticalAlignment="Center" 
+                       Text="Estimated runtime:"
+                       FontFamily="Segoe UI" Margin="0,0,6,0"
+                       FontSize="15" />
+            <TextBlock VerticalAlignment="Center" FontWeight="SemiBold"
+                       Text="{Binding Path=Device.EstimatedRuntimeDisplayString}" 
+                       Foreground="{Binding Path=Device.EstimatedRuntimeSeverity, Converter={StaticResource DeviceSeverityToColor}}"
+                       FontFamily="Segoe UI"
+                       FontSize="15" />
+        </StackPanel>
+        <TextBlock Text="Your device is online and operating normally"
+                   FontFamily="Segoe UI" Foreground="#888"
+                   FontSize="15" />
 
+        <Grid Height="200"></Grid>
+        
+        <StackPanel>
+            <TextBlock Text="Power status"
+                       FontFamily="Segoe UI"
+                       FontSize="21" />
+            <Grid Margin="0,8,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+
+                <ItemsControl ItemsSource="{Binding Path=Device.PowerStatusLeftProperties}" 
+                              Focusable="False" />
+
+                <ItemsControl Grid.Column="1" 
+                              ItemsSource="{Binding Path=Device.PowerStatusRightProperties}"
+                              Focusable="False" />
+            </Grid>
+        </StackPanel>
+
+        <StackPanel Margin="0,32,0,0">
+            <TextBlock Text="Battery status"
+                               FontFamily="Segoe UI"
+                               FontSize="21" />
+            <Grid Margin="0,8,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+
+                <ItemsControl ItemsSource="{Binding Path=Device.BatteryStatusLeftProperties}" 
+                              Focusable="False" />
+
+                <ItemsControl Grid.Column="1" 
+                              ItemsSource="{Binding Path=Device.BatteryStatusRightProperties}"
+                              Focusable="False" />
+            </Grid>
+        </StackPanel>
+
+        <StackPanel Margin="0,32,0,0">
+            <TextBlock Text="Device information"
+                               FontFamily="Segoe UI"
+                               FontSize="20" />
+            <TextBlock Text="This is a short little text block about the overall info."
+                               TextWrapping="Wrap" HorizontalAlignment="Left"
+                               FontFamily="Segoe UI" Foreground="#888" Margin="0,0,0,16"
+                               FontSize="15"></TextBlock>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+
+                <ItemsControl ItemsSource="{Binding Path=Device.DeviceInfoLeftProperties}" 
+                              Focusable="False" />
+
+                <ItemsControl Grid.Column="1" 
+                              ItemsSource="{Binding Path=Device.DeviceInfoRightProperties}"
+                              Focusable="False" />
+            </Grid>
+        </StackPanel>
     </StackPanel>
 </UserControl>

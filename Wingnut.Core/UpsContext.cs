@@ -5,6 +5,7 @@
     using System.Threading;
     using System.Threading.Tasks;
 
+    using Wingnut.Channels;
     using Wingnut.Data;
     using Wingnut.Data.Configuration;
     using Wingnut.Data.Models;
@@ -222,6 +223,25 @@
                                 UpsContext = this
                             });
                     }
+
+#pragma warning disable 4014
+                    Task.Run(() =>
+                    {
+                        foreach (IManagementCallback callbackChannel in 
+                            ServiceRuntime.Instance.ClientCallbackChannels)
+                        {
+                            try
+                            {
+                                callbackChannel.UpsDeviceChanged(this.State);
+                            }
+                            catch (Exception e)
+                            {
+                                Logger.Error("Caught exception while updating device. " + e.Message);
+                                ServiceRuntime.Instance.ClientCallbackChannels.Remove(callbackChannel);
+                            }
+                        }
+                    }, cancellationToken);
+#pragma warning restore 4014
                 }
 
                 // We successfully queried the server, so update the property for this

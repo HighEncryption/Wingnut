@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Diagnostics;
+    using System.Linq;
     using System.ServiceModel;
     using System.Threading.Tasks;
 
@@ -44,14 +45,19 @@
 
         private class CallbackClient : IManagementCallback
         {
-            public void SendCallbackMessage(string message)
-            {
-                throw new System.NotImplementedException();
-            }
-
             public void UpsDeviceChanged(Ups ups)
             {
-                throw new NotImplementedException();
+                ups.Initialize();
+
+                foreach (UpsDeviceViewModel viewModel in App.Current.MainWindowViewModel.DeviceViewModels.OfType<UpsDeviceViewModel>())
+                {
+                    if (viewModel.Ups.QualifiedName == ups.QualifiedName)
+                    {
+                        //viewModel.Update(ups);
+                        viewModel.Ups.UpdateVariables(ups);
+                        return;
+                    }
+                }
             }
         }
 
@@ -97,7 +103,10 @@
 
                     foreach (Ups ups in upsList)
                     {
+                        ups.Initialize();
                         UpsDeviceViewModel deviceViewModel = new UpsDeviceViewModel(ups);
+
+                        Console.WriteLine(ups.Status + "," + ups.BatteryVoltage + "," + ups.BatteryCharge);
 
                         App.DispatcherInvoke(() =>
                         {
@@ -106,6 +115,8 @@
                                 new UpsDeviceNavigationGroupViewModel(deviceViewModel));
                         });
                     }
+
+                    this.Channel.Register();
                 }
                 catch (Exception exception)
                 {

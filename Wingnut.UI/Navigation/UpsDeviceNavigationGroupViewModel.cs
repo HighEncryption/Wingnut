@@ -1,5 +1,7 @@
 ﻿namespace Wingnut.UI.Navigation
 {
+    using System.Collections.ObjectModel;
+
     using Wingnut.UI.ViewModels;
 
     public class UpsDeviceNavigationGroupViewModel : NavigationSectionGroupViewModel
@@ -10,14 +12,14 @@
         {
             this.DeviceViewModel = deviceViewModel;
 
-            this.NavigationHeader = deviceViewModel.UpsName;
-            this.PageHeader = deviceViewModel.UpsName;
+            this.NavigationHeader = deviceViewModel.Ups.Name;
+            this.PageHeader = deviceViewModel.Ups.Name;
 
             this.DeviceViewModel.PropertyChanged += (sender, args) =>
             {
-                if (args.PropertyName == nameof(UpsDeviceViewModel.UpsName))
+                if (args.PropertyName == nameof(UpsDeviceViewModel.Ups.Name))
                 {
-                    this.NavigationHeader = deviceViewModel.UpsName;
+                    this.NavigationHeader = deviceViewModel.Ups.Name;
                 }
             };
 

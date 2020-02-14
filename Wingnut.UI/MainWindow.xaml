@@ -8,6 +8,7 @@
                       xmlns:navigation="clr-namespace:Wingnut.UI.Navigation"
                       xmlns:viewModels="clr-namespace:Wingnut.UI.ViewModels"
                       xmlns:controls="clr-namespace:Wingnut.UI.Controls"
+                      xmlns:pages="clr-namespace:Wingnut.UI.Pages"
                       mc:Ignorable="d"
                       d:DataContext="{d:DesignInstance viewModels:MainWindowViewModel}"
                       ExtendViewIntoTitleBar="True"
@@ -30,10 +31,10 @@
             <ColumnDefinition  />
         </Grid.ColumnDefinitions>
 
-        <Border Grid.Column="0" Margin="0,68,0,0" Background="Transparent">
+        <Border Grid.Column="0" Margin="0,50,-1,0" Background="Transparent">
             <ScrollViewer VerticalScrollBarVisibility="Auto">
                 <StackPanel>
-                    <ItemsControl ItemsSource="{Binding Path=NavigationSections}">
+                    <ItemsControl ItemsSource="{Binding Path=NavigationSections}" Focusable="False">
                         <ItemsControl.Resources>
                             <ResourceDictionary>
                                 <DataTemplate DataType="{x:Type navigation:NavigationSectionViewModel}">
@@ -50,7 +51,7 @@
                                                        Text="{Binding Path=NavigationHeader}"
                                                        VerticalAlignment="Center" />
                                         </Border>
-                                        <ItemsControl ItemsSource="{Binding Path=Sections}">
+                                        <ItemsControl ItemsSource="{Binding Path=Sections}" Focusable="False">
                                             <ItemsControl.ItemTemplate>
                                                 <DataTemplate>
                                                     <controls:NavigationListItem DataContext="{Binding}" />
@@ -66,17 +67,22 @@
             </ScrollViewer>
         </Border>
 
-        <StackPanel Grid.Column="1" Background="White">
+        <Grid Grid.Column="1" Background="White">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+
             <Border Margin="0,0,0,-1">
                 <StackPanel Margin="24,0" VerticalAlignment="Bottom">
                     <TextBlock Text="{Binding Path=SelectedNavigationSection.PageHeader}"
-                               Margin="0,60,0,0"
+                               Margin="0,48,0,0"
                                FontFamily="Segoe UI Light"
                                FontSize="30" />
                 </StackPanel>
             </Border>
 
-            <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Row="1" Focusable="False">
                 <ScrollViewer.Resources>
                     <system:Double x:Key="{x:Static SystemParameters.VerticalScrollBarWidthKey}">12</system:Double>
                 </ScrollViewer.Resources>
@@ -87,8 +93,18 @@
                         <ColumnDefinition />
                         <ColumnDefinition Width="220" />
                     </Grid.ColumnDefinitions>
+
+                    <ContentControl Grid.Column="0" Content="{Binding Path=SelectedNavigationSection}">
+                        <ContentControl.Resources>
+                            <ResourceDictionary>
+                                <DataTemplate DataType="{x:Type navigation:UpsStatusNavigationViewModel}">
+                                    <pages:UpsStatusPage DataContext="{Binding}" />
+                                </DataTemplate>
+                            </ResourceDictionary>
+                        </ContentControl.Resources>
+                    </ContentControl>
                 </Grid>
             </ScrollViewer>
-        </StackPanel>
+        </Grid>
     </Grid>
 </fluent:AcrylicWindow>

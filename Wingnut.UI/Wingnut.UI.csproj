@@ -65,6 +65,7 @@
     <Compile Include="Controls\NavigationListItem.xaml.cs">
       <DependentUpon>NavigationListItem.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Converters\DeviceSeverityToColorConverter.cs" />
     <Compile Include="Navigation\NavigationSectionGroupViewModel.cs" />
     <Compile Include="Navigation\NavigationSectionViewModel.cs" />
     <Compile Include="Navigation\UpsDeviceNavigationGroupViewModel.cs" />
@@ -77,6 +78,10 @@
     <Compile Include="Navigation\HomePageNavigationViewModel.cs" />
     <Compile Include="ViewModels\UpsDeviceViewModel.cs" />
     <Page Include="Controls\NavigationListItem.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Converters.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

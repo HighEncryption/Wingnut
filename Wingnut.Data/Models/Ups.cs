@@ -4,11 +4,22 @@
     using System.Collections.Generic;
     using System.Runtime.Serialization;
 
+    public enum SensitivityType
+    {
+        Undefined,
+        Low,
+        Medium,
+        High
+    }
+
     [DataContract]
     public class Ups : Device
     {
+        #region Device Properties
+
         private double? batteryCharge;
 
+        [DataMember]
         [DeviceProperty("battery.charge")]
         public double? BatteryCharge
         {
@@ -16,8 +27,19 @@
             set => this.SetProperty(ref this.batteryCharge, value);
         }
 
+        private double? batteryCurrent;
+
+        [DataMember]
+        [DeviceProperty("battery.current")]
+        public double? BatteryCurrent
+        {
+            get => this.batteryCurrent;
+            set => this.SetProperty(ref this.batteryCurrent, value);
+        }
+
         private DateTime? batteryLastReplacement;
 
+        [DataMember]
         [DeviceProperty("battery.date")]
         public DateTime? BatteryLastReplacement
         {
@@ -27,6 +49,7 @@
 
         private TimeSpan? batteryRuntime;
 
+        [DataMember]
         [DeviceProperty("battery.runtime")]
         public TimeSpan? BatteryRuntime
         {
@@ -34,8 +57,19 @@
             set => this.SetProperty(ref this.batteryRuntime, value);
         }
 
+        private double? batteryVoltage;
+
+        [DataMember]
+        [DeviceProperty("battery.voltage")]
+        public double? BatteryVoltage
+        {
+            get => this.batteryVoltage;
+            set => this.SetProperty(ref this.batteryVoltage, value);
+        }
+
         private TimeSpan? batteryRuntimeLow;
 
+        [DataMember]
         [DeviceProperty("battery.runtime.low")]
         public TimeSpan? BatteryRuntimeLow
         {
@@ -43,31 +77,115 @@
             set => this.SetProperty(ref this.batteryRuntimeLow, value);
         }
 
-        //public double? InputFrequency => this.GetDouble("input.frequency");
+        private double? inputFrequency;
 
-        //public double? InputVoltage => this.GetDouble("input.voltage");
+        [DataMember]
+        [DeviceProperty("input.frequency")]
+        public double? InputFrequency
+        {
+            get => this.inputFrequency;
+            set => this.SetProperty(ref this.inputFrequency, value);
+        }
 
-        //public double? OutputVoltage => this.GetDouble("output.voltage");
+        private double? inputVoltage;
 
-        //public double? OutputFrequency => this.GetDouble("output.frequency");
+        [DataMember]
+        [DeviceProperty("input.voltage")]
+        public double? InputVoltage
+        {
+            get => this.inputVoltage;
+            set => this.SetProperty(ref this.inputVoltage, value);
+        }
 
-        //public double? OutputCurrent => this.GetDouble("output.current");
+        private SensitivityType? inputSensitivity;
 
-        //public double? LoadPercentage => this.GetDouble("ups.load");
+        public SensitivityType? InputSensitivity
+        {
+            get => this.inputSensitivity;
+            set => this.SetProperty(ref this.inputSensitivity, value);
+        }
 
-        //public DeviceStatusType Status =>
-        //    Constants.Device.ParseStatusString(this.GetString("ups.status"));
+        private double? outputFrequency;
 
-        //public DeviceStatusType Status { get; set; }
+        [DataMember]
+        [DeviceProperty("output.frequency")]
+        public double? OutputFrequency
+        {
+            get => this.outputFrequency;
+            set => this.SetProperty(ref this.outputFrequency, value);
+        }
+
+        private double? outputVoltage;
+
+        [DataMember]
+        [DeviceProperty("output.voltage")]
+        public double? OutputVoltage
+        {
+            get => this.outputVoltage;
+            set => this.SetProperty(ref this.outputVoltage, value);
+        }
+
+        private double? outputCurrent;
+
+        [DataMember]
+        [DeviceProperty("output.current")]
+        public double? OutputCurrent
+        {
+            get => this.outputCurrent;
+            set => this.SetProperty(ref this.outputCurrent, value);
+        }
+
+        private double? loadPercentage;
+
+        [DataMember]
+        [DeviceProperty("ups.load")]
+        public double? LoadPercentage
+        {
+            get => this.loadPercentage;
+            set => this.SetProperty(ref this.loadPercentage, value);
+        }
 
         private DeviceStatusType status;
 
+        [DataMember]
         [DeviceProperty("ups.status", ConverterType = typeof(DeviceStatusConverter))]
         public DeviceStatusType Status
         {
             get => this.status;
             set => this.SetProperty(ref this.status, value);
         }
+
+        private double? temperature;
+
+        [DataMember]
+        [DeviceProperty("ups.temperature")]
+        public double? Temperature
+        {
+            get => this.temperature;
+            set => this.SetProperty(ref this.temperature, value);
+        }
+
+        private string firmware;
+
+        [DataMember]
+        [DeviceProperty("ups.firmware")]
+        public string Firmware
+        {
+            get => this.firmware;
+            set => this.SetProperty(ref this.firmware, value);
+        }
+
+        private DateTime? manufactureDate;
+
+        [DataMember]
+        [DeviceProperty("ups.mfr.date")]
+        public DateTime? ManufactureDate
+        {
+            get => this.manufactureDate;
+            set => this.SetProperty(ref this.manufactureDate, value);
+        }
+
+        #endregion
 
         public bool NotResponding { get; set; }
 
@@ -76,9 +194,7 @@
         internal Ups Clone()
         {
             Ups clone = new Ups(this.Name, this.Server);
-
-            clone.CloneFromMetadata(this);
-
+            clone.UpdateVariables(this);
             return clone;
         }
 
@@ -90,6 +206,11 @@
             Ups ups = new Ups(name, server);
             ups.Update(variableDictionary);
             return ups;
+        }
+
+        public void UpdateVariables(Ups ups)
+        {
+            base.CloneFromMetadata(ups);
         }
 
         private Ups(string name, Server server)
