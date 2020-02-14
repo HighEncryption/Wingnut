@@ -3,4 +3,5 @@
                     xmlns:local="clr-namespace:Wingnut.UI"
                     xmlns:converters="clr-namespace:Wingnut.UI.Converters">
     <converters:DeviceSeverityToColorConverter x:Key="DeviceSeverityToColor" />
+    <converters:DoubleToPercentageStringConverter x:Key="DoubleToPercentageString" />
 </ResourceDictionary>

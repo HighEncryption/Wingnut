@@ -37,6 +37,27 @@
         }
     }
 
+    [ValueConversion(typeof(double), typeof(string))]
+    public class DoubleToPercentageStringConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (!(value is double))
+            {
+                return DependencyProperty.UnsetValue;
+            }
+
+            double d = (double) value;
+
+            return d.ToString("###.0") + " %";
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     public static class ColorExtensions
     {
         public static Color FromHex(string hex)

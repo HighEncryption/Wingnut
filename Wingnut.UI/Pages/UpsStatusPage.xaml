@@ -7,6 +7,7 @@
              xmlns:navigation="clr-namespace:Wingnut.UI.Navigation"
              xmlns:converters="clr-namespace:Wingnut.UI.Converters"
              xmlns:viewModels="clr-namespace:Wingnut.UI.ViewModels"
+             xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance navigation:UpsStatusNavigationViewModel}"
              d:DesignHeight="450" d:DesignWidth="800">
@@ -74,8 +75,60 @@
                    FontFamily="Segoe UI" Foreground="#888"
                    FontSize="15" />
 
-        <Grid Height="200"></Grid>
-        
+        <Grid HorizontalAlignment="Stretch">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Column="0" Margin="0,24,0,0">
+                <TextBlock Text="Load" HorizontalAlignment="Center"
+                                   FontFamily="Segoe UI" Margin="0,0,0,10"
+                                   FontSize="16" />
+                <Grid>
+                    <lvc:AngularGauge Value="{Binding Path=Device.Ups.LoadPercentage}" 
+                                      FromValue="0" ToValue="100" 
+                                      Margin="0" Height="160"
+                                      LabelsStep="20" TicksStep="10" 
+                                      Wedge="220" TicksStrokeThickness="1"
+                                      TicksForeground="Black" Foreground="Black" 
+                                      FontFamily="Segoe UI" LabelsEffect="{x:Null}"
+                                      FontWeight="Bold" FontSize="14" 
+                                      NeedleFill="Black" SectionsInnerRadius=".85">
+                        <lvc:AngularGauge.Sections>
+                            <lvc:AngularSection FromValue="0" ToValue="80" Fill="#03CE00"/>
+                            <lvc:AngularSection FromValue="80" ToValue="100" Fill="#FF3939"/>
+                        </lvc:AngularGauge.Sections>
+                    </lvc:AngularGauge>
+                    <TextBlock Text="{Binding Path=Device.Ups.LoadPercentage, Converter={StaticResource DoubleToPercentageString}}" 
+                               HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,32"
+                               FontFamily="Segoe UI" FontSize="18" />
+                </Grid>
+            </StackPanel>
+            <StackPanel Grid.Column="1" Margin="0,24,0,0">
+                <TextBlock Text="Battery Charge" HorizontalAlignment="Center"
+                           FontFamily="Segoe UI" Margin="0,0,0,10"
+                           FontSize="16" />
+                <Grid>
+                    <lvc:AngularGauge Value="{Binding Path=Device.Ups.BatteryCharge}" 
+                                      FromValue="0" ToValue="100"  Margin="0" Height="160"
+                                      LabelsStep="20" TicksStep="10" Wedge="220"  TicksStrokeThickness="1"
+                                      TicksForeground="Black" Foreground="Black" FontFamily="Segoe UI" LabelsEffect="{x:Null}"
+                                      FontWeight="Bold" FontSize="14" NeedleFill="Black"
+                                      SectionsInnerRadius=".85">
+
+                        <lvc:AngularGauge.Sections>
+                            <lvc:AngularSection FromValue="0" ToValue="20" Fill="#FF3939"/>
+                            <lvc:AngularSection FromValue="20" ToValue="100" Fill="#03CE00"/>
+                        </lvc:AngularGauge.Sections>
+                    </lvc:AngularGauge>
+                    <TextBlock Text="{Binding Path=Device.Ups.BatteryCharge, Converter={StaticResource DoubleToPercentageString}}" 
+                               HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,32"
+                               FontFamily="Segoe UI" FontSize="18" />
+                </Grid>
+            </StackPanel>
+        </Grid>
+
         <StackPanel>
             <TextBlock Text="Power status"
                        FontFamily="Segoe UI"
