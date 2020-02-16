@@ -75,6 +75,18 @@
     <Compile Include="Navigation\NavigationSectionGroupViewModel.cs" />
     <Compile Include="Navigation\NavigationSectionViewModel.cs" />
     <Compile Include="Navigation\UpsDeviceNavigationGroupViewModel.cs" />
+    <Compile Include="Pages\DeviceEnergyUsagePage.xaml.cs">
+      <DependentUpon>DeviceEnergyUsagePage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\HomePage.xaml.cs">
+      <DependentUpon>HomePage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\UpsNotificationsPage.xaml.cs">
+      <DependentUpon>UpsNotificationsPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\UpsSettingsPage.xaml.cs">
+      <DependentUpon>UpsSettingsPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Pages\UpsStatusPage.xaml.cs">
       <DependentUpon>UpsStatusPage.xaml</DependentUpon>
     </Compile>
@@ -106,6 +118,22 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Pages\DeviceEnergyUsagePage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\HomePage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\UpsNotificationsPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\UpsSettingsPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Pages\UpsStatusPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

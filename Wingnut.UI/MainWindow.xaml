@@ -97,8 +97,20 @@
                     <ContentControl Grid.Column="0" Content="{Binding Path=SelectedNavigationSection}">
                         <ContentControl.Resources>
                             <ResourceDictionary>
+                                <DataTemplate DataType="{x:Type navigation:HomePageNavigationViewModel}">
+                                    <pages:HomePage DataContext="{Binding}" />
+                                </DataTemplate>
                                 <DataTemplate DataType="{x:Type navigation:UpsStatusNavigationViewModel}">
                                     <pages:UpsStatusPage DataContext="{Binding}" />
+                                </DataTemplate>
+                                <DataTemplate DataType="{x:Type navigation:UpsNotificationsNavigationViewModel}">
+                                    <pages:UpsNotificationsPage DataContext="{Binding}" />
+                                </DataTemplate>
+                                <DataTemplate DataType="{x:Type navigation:UpsEnergyUsageNavigationViewModel}">
+                                    <pages:DeviceEnergyUsagePage DataContext="{Binding}" />
+                                </DataTemplate>
+                                <DataTemplate DataType="{x:Type navigation:UpsSettingsNavigationViewModel}">
+                                    <pages:UpsSettingsPage DataContext="{Binding}" />
                                 </DataTemplate>
                             </ResourceDictionary>
                         </ContentControl.Resources>
