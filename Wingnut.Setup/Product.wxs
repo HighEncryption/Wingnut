@@ -46,8 +46,10 @@
 
       <ComponentRef Id="Wingnut_Notify_ps1_component" />
 
-      <ComponentRef Id="Wingnut_Tracing_Wingnut_Tracing_etwManifest_dll_component" />
-      <ComponentRef Id="Wingnut_Tracing_Wingnut_Tracing_etwManifest_man_component" />
+      <ComponentRef Id="Wingnut_Tracing_Wingnut_Service_etwManifest_dll_component" />
+      <ComponentRef Id="Wingnut_Tracing_Wingnut_Service_etwManifest_man_component" />
+      <ComponentRef Id="Wingnut_Tracing_Wingnut_App_etwManifest_dll_component" />
+      <ComponentRef Id="Wingnut_Tracing_Wingnut_App_etwManifest_man_component" />
     </Feature>
 
     <Directory Id="TARGETDIR" Name="SourceDir">
@@ -141,22 +143,40 @@
       <Directory Id="CommonAppDataFolder">
         <Directory Id="WingnutAppDataFolder"
                    Name="Wingnut">
-          <Component Id="Wingnut_Tracing_Wingnut_Tracing_etwManifest_dll_component"
-                     Guid="85fb6e93-2b88-4deb-b7af-6034d416cf0f">
-            <File Id="Wingnut_Tracing_Wingnut_Tracing_etwManifest_dll"
-                  Source="$(var.ProjectDir)..\Wingnut.Tracing\bin\$(var.Configuration)\Wingnut.Tracing.Wingnut-Tracing.etwManifest.dll"
+          <Component Id="Wingnut_Tracing_Wingnut_Service_etwManifest_dll_component"
+                     Guid="4993227c-79ac-4c5f-a291-ca1ca988b747">
+            <File Id="Wingnut_Tracing_Wingnut_Service_etwManifest_dll"
+                  Source="$(var.ProjectDir)..\Wingnut.Tracing\bin\$(var.Configuration)\Wingnut.Tracing.Wingnut-Service.etwManifest.dll"
                   KeyPath="yes" />
           </Component>
-          <Component Id="Wingnut_Tracing_Wingnut_Tracing_etwManifest_man_component"
-                     Guid="d590d9ba-3198-4631-b5cd-a9fc234480bf">
-            <File Id="Wingnut_Tracing_Wingnut_Tracing_etwManifest_man"
+          <Component Id="Wingnut_Tracing_Wingnut_Service_etwManifest_man_component"
+                     Guid="32477e81-c609-4f06-8c33-a6e33a5bf0fd">
+            <File Id="Wingnut_Tracing_Wingnut_Service_etwManifest_man"
                   Source="$(var.ProjectDir)..\Wingnut.Tracing\bin\$(var.Configuration)\Wingnut.Tracing.Wingnut-Tracing.etwManifest.man"
                   KeyPath="yes">
               <!--
-                This will handle the manifest registration
+                This will handle the manifest registration for the Wingnut-Service manifest
               -->
-              <util:EventManifest MessageFile="[WingnutAppDataFolder]Wingnut.Tracing.Wingnut-Tracing.etwManifest.dll"
-                                  ResourceFile="[WingnutAppDataFolder]Wingnut.Tracing.Wingnut-Tracing.etwManifest.dll" />
+              <util:EventManifest MessageFile="[WingnutAppDataFolder]Wingnut.Tracing.Wingnut-Service.etwManifest.dll"
+                                  ResourceFile="[WingnutAppDataFolder]Wingnut.Tracing.Wingnut-Service.etwManifest.dll" />
+            </File>
+          </Component>
+          <Component Id="Wingnut_Tracing_Wingnut_App_etwManifest_dll_component"
+                     Guid="5ef9e85a-d7e4-4a06-824b-9fd78100a44d">
+            <File Id="Wingnut_Tracing_Wingnut_App_etwManifest_dll"
+                  Source="$(var.ProjectDir)..\Wingnut.Tracing\bin\$(var.Configuration)\Wingnut.Tracing.Wingnut-App.etwManifest.dll"
+                  KeyPath="yes" />
+          </Component>
+          <Component Id="Wingnut_Tracing_Wingnut_App_etwManifest_man_component"
+                     Guid="b669f150-bada-4d21-a017-af86534f8c4f">
+            <File Id="Wingnut_Tracing_Wingnut_App_etwManifest_man"
+                  Source="$(var.ProjectDir)..\Wingnut.Tracing\bin\$(var.Configuration)\Wingnut.Tracing.Wingnut-App.etwManifest.man"
+                  KeyPath="yes">
+              <!--
+                This will handle the manifest registration for the Wingnut-App manifest
+              -->
+              <util:EventManifest MessageFile="[WingnutAppDataFolder]Wingnut.Tracing.Wingnut-App.etwManifest.dll"
+                                  ResourceFile="[WingnutAppDataFolder]Wingnut.Tracing.Wingnut-App.etwManifest.dll" />
             </File>
           </Component>
         </Directory>

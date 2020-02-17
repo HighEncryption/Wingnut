@@ -52,7 +52,8 @@
   <ItemGroup>
     <Compile Include="Logger.cs" />
     <Compile Include="Properties\SharedAssemblyInfo.cs" />
-    <Compile Include="WingnutEventSource.cs" />
+    <Compile Include="WingnutAppEventSource.cs" />
+    <Compile Include="WingnutServiceEventSource.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -15,13 +15,22 @@
 
         public enum LogLevel
         {
+            Critical,
             Error,
             Warning,
             Info,
             Debug
         }
 
+        public enum EtwLog
+        {
+            Service,
+            App
+        }
+
         public static LogLevel OutputLogLevel = LogLevel.Info;
+
+        public static EtwLog EtwLogDestination = EtwLog.Service;
 
         private static OutputType outputType = OutputType.ETW;
 
@@ -37,6 +46,12 @@
             Logger.outputType = type;
 
             isOutputTypeSet = true;
+        }
+
+        [StringFormatMethod("message")]
+        public static void Critical(string message, params object[] args)
+        {
+            Log(LogLevel.Critical, message, args);
         }
 
         [StringFormatMethod("message")]
@@ -74,7 +89,7 @@
                 return;
             }
 
-            WingnutEventSource.Log.LogError(
+            WingnutServiceEventSource.Log.LogError(
                 string.Format("{0}\n\n{1}", formattedMessage, exception));
         }
 
@@ -92,38 +107,83 @@
                 return;
             }
 
+            switch (EtwLogDestination)
+            {
+                case EtwLog.Service:
+                    LogEtwService(level, message, args);
+                    break;
+                case EtwLog.App:
+                    LogEtwApp(level, message, args);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+        }
+
+        private static void LogEtwService(LogLevel level, string message, params object[] args)
+        {
             switch (level)
             {
+                case LogLevel.Critical:
+                    WingnutServiceEventSource.Log.LogCritical(string.Format(message, args));
+                    break;
                 case LogLevel.Debug:
-                    WingnutEventSource.Log.LogDebug(string.Format(message, args));
+                    WingnutServiceEventSource.Log.LogDebug(string.Format(message, args));
                     break;
                 case LogLevel.Info:
-                    WingnutEventSource.Log.LogInformational(string.Format(message, args));
+                    WingnutServiceEventSource.Log.LogInformational(string.Format(message, args));
                     break;
                 case LogLevel.Warning:
-                    WingnutEventSource.Log.LogWarning(string.Format(message, args));
+                    WingnutServiceEventSource.Log.LogWarning(string.Format(message, args));
                     break;
                 case LogLevel.Error:
-                    WingnutEventSource.Log.LogError(string.Format(message, args));
+                    WingnutServiceEventSource.Log.LogError(string.Format(message, args));
                     break;
                 default:
                     throw new NotImplementedException();
             }
         }
 
+        private static void LogEtwApp(LogLevel level, string message, params object[] args)
+        {
+            switch (level)
+            {
+                case LogLevel.Critical:
+                    WingnutAppEventSource.Log.LogCritical(string.Format(message, args));
+                    break;
+                case LogLevel.Debug:
+                    WingnutAppEventSource.Log.LogDebug(string.Format(message, args));
+                    break;
+                case LogLevel.Info:
+                    WingnutAppEventSource.Log.LogInformational(string.Format(message, args));
+                    break;
+                case LogLevel.Warning:
+                    WingnutAppEventSource.Log.LogWarning(string.Format(message, args));
+                    break;
+                case LogLevel.Error:
+                    WingnutAppEventSource.Log.LogError(string.Format(message, args));
+                    break;
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        #region Service ETW event
+
         public static void UpsOnline(string upsName, string serverName)
         {
-            WingnutEventSource.Log.UpsOnline(upsName, serverName);
+            WingnutServiceEventSource.Log.UpsOnline(upsName, serverName);
         }
 
         public static void UpsOnBattery(string upsName, string serverName)
         {
-            WingnutEventSource.Log.UpsOnBattery(upsName, serverName);
+            WingnutServiceEventSource.Log.UpsOnBattery(upsName, serverName);
         }
 
         public static void UpsLowBattery(string upsName, string serverName)
         {
-            WingnutEventSource.Log.UpsLowBattery(upsName, serverName);
+            WingnutServiceEventSource.Log.UpsLowBattery(upsName, serverName);
         }
 
         public static void UpsReplaceBattery(string upsName, string serverName, DateTime? lastReplaceDate)
@@ -135,58 +195,60 @@
                 replacementDate = lastReplaceDate.Value.ToString("d", CultureInfo.CurrentCulture);
             }
 
-            WingnutEventSource.Log.UpsBatteryNeedsReplaced(upsName, serverName, replacementDate);
+            WingnutServiceEventSource.Log.UpsBatteryNeedsReplaced(upsName, serverName, replacementDate);
         }
 
         public static void CommunicationLost(string upsName, string serverName, string error)
         {
-            WingnutEventSource.Log.CommunicationLost(upsName, serverName, error);
+            WingnutServiceEventSource.Log.CommunicationLost(upsName, serverName, error);
         }
 
         public static void NoCommunication(string upsName, string serverName, string error)
         {
-            WingnutEventSource.Log.NoCommunication(upsName, serverName, error);
+            WingnutServiceEventSource.Log.NoCommunication(upsName, serverName, error);
         }
 
         public static void CommunicationRestored(string upsName, string serverName)
         {
-            WingnutEventSource.Log.CommunicationRestored(upsName, serverName);
+            WingnutServiceEventSource.Log.CommunicationRestored(upsName, serverName);
         }
 
         public static void ConnectedToServer(string serverName)
         {
-            WingnutEventSource.Log.ConnectedToServer(serverName);
+            WingnutServiceEventSource.Log.ConnectedToServer(serverName);
         }
 
         public static void FailedToQueryServer(string serverName, string error)
         {
-            WingnutEventSource.Log.FailedToQueryServer(serverName, error);
+            WingnutServiceEventSource.Log.FailedToQueryServer(serverName, error);
         }
 
         public static void PowerValueBelowThreshold(int powerValue, int threshold)
         {
-            WingnutEventSource.Log.PowerValueBelowThreshold(powerValue, threshold);
+            WingnutServiceEventSource.Log.PowerValueBelowThreshold(powerValue, threshold);
         }
 
         public static void InitiatingShutdown()
         {
-            WingnutEventSource.Log.InitiatingShutdown();
+            WingnutServiceEventSource.Log.InitiatingShutdown();
         }
 
         public static void NotificationScriptNotFound(string scriptPath)
         {
-            WingnutEventSource.Log.NotificationScriptNotFound(scriptPath);
+            WingnutServiceEventSource.Log.NotificationScriptNotFound(scriptPath);
         }
 
         public static void ServiceStarting(string version)
         {
-            WingnutEventSource.Log.ServiceStarting(version);
+            WingnutServiceEventSource.Log.ServiceStarting(version);
         }
 
         public static void ServiceStarted()
         {
-            WingnutEventSource.Log.ServiceStarted();
+            WingnutServiceEventSource.Log.ServiceStarted();
         }
+
+        #endregion
 
         private static void WriteToConsole(LogLevel level, string message, object[] args)
         {
@@ -196,6 +258,10 @@
 
                 switch (level)
                 {
+                    case LogLevel.Critical:
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        strLevel = "CRT";
+                        break;
                     case LogLevel.Error:
                         Console.ForegroundColor = ConsoleColor.Red;
                         strLevel = "ERR";

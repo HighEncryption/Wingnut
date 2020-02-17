@@ -2,10 +2,10 @@
 {
     using System.Diagnostics.Tracing;
 
-    [EventSource(Name = "Wingnut-Tracing")]
-    public sealed class WingnutEventSource : EventSource
+    [EventSource(Name = "Wingnut-Service")]
+    public sealed class WingnutServiceEventSource : EventSource
     {
-        public static WingnutEventSource Log = new WingnutEventSource();
+        public static WingnutServiceEventSource Log = new WingnutServiceEventSource();
 
         #region Generic Events
 
