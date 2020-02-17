@@ -5,6 +5,7 @@
     using System.Windows.Input;
 
     using Wingnut.UI.Framework;
+    using Wingnut.UI.Windows;
 
     public class HomePageViewModel : ViewModelBase
     {
@@ -17,12 +18,23 @@
 
         private void AddDevice(object obj)
         {
-            throw new NotImplementedException();
+            AddDeviceWindowViewModel windowViewModel = new AddDeviceWindowViewModel();
+            AddDeviceWindow window = new AddDeviceWindow
+            {
+                DataContext = windowViewModel
+            };
+
+            bool? result = window.ShowDialog();
+            if (result == true)
+            {
+                // Add the device
+            }
         }
 
         private bool CanAddDevice(object obj)
         {
-            return App.Current.MainWindowViewModel.IsConnectedToService;
+            return true;
+            //return App.Current.MainWindowViewModel.IsConnectedToService;
         }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]

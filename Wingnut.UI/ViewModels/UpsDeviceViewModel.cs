@@ -12,6 +12,8 @@
     {
         public Ups Ups { get; }
 
+        public override Device Device => this.Ups;
+
         private ObservableCollection<DevicePropertyViewModel> powerStatusLeftProperties;
 
         public ObservableCollection<DevicePropertyViewModel> PowerStatusLeftProperties =>
@@ -387,6 +389,10 @@
             get => this.estimatedRuntimeSeverity;
             set => this.SetProperty(ref this.estimatedRuntimeSeverity, value);
         }
+
+        public override string DeviceName => this.Ups.Name;
+
+        public override string MakeAndModel => $"{this.Ups.Manufacturer} {this.Ups.Model}";
     }
 
     public class DevicePropertyViewModel : ViewModelBase

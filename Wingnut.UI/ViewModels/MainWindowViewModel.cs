@@ -140,6 +140,10 @@
 
     public abstract class DeviceViewModel : ViewModelBase
     {
+        public abstract string DeviceName { get; }
 
+        public abstract string MakeAndModel { get; }
+
+        public abstract Device Device { get; }
     }
 }

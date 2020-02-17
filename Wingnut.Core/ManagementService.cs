@@ -16,6 +16,9 @@
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerSession)]
     public class ManagementService : IManagementService
     {
+        /// <summary>
+        /// Register a client for a callback notification when one or more Ups properties change
+        /// </summary>
         public void Register()
         {
             IManagementCallback callbackChannel =
@@ -27,6 +30,9 @@
             }
         }
 
+        /// <summary>
+        /// Unregister a client for a callback notification when one or more Ups properties change
+        /// </summary>
         public void Unregister()
         {
             IManagementCallback callbackChannel =
@@ -38,6 +44,9 @@
             }
         }
 
+        /// <summary>
+        /// Get the service configuration
+        /// </summary>
         public WingnutServiceConfiguration GetServiceConfiguration()
         {
             return ServiceRuntime.Instance.Configuration.ServiceConfiguration;

@@ -16,4 +16,87 @@
             <Setter Property="HorizontalAlignment" Value="Left" />
         </Style.Setters>
     </Style>
+
+    <Style TargetType="Button" x:Key="CommonButtonStyle">
+        <Setter Property="Height" Value="32" />
+        <Setter Property="Background" Value="#cccccc" />
+        <Setter Property="BorderBrush" Value="#cccccc" />
+        <Setter Property="BorderThickness" Value="2" />
+        <Setter Property="Padding" Value="30,0" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border x:Name="buttonBorder"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            Background="{TemplateBinding Background}">
+                        <ContentPresenter x:Name="buttonContentPresenter" 
+                                          Margin="{TemplateBinding Padding}"
+                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsMouseOver" Value="true" />
+                                <Condition Property="IsEnabled" Value="true" />
+                            </MultiTrigger.Conditions>
+                            <!--<Setter Property="Background" TargetName="buttonBorder" Value="#F2F2F2"/>-->
+                            <Setter Property="BorderBrush" TargetName="buttonBorder" Value="#999999"/>
+                        </MultiTrigger>
+
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsPressed" Value="true" />
+                                <Condition Property="IsEnabled" Value="true" />
+                            </MultiTrigger.Conditions>
+                            <Setter Property="Background" TargetName="buttonBorder" Value="#999999"/>
+                            <Setter Property="BorderBrush" TargetName="buttonBorder" Value="#999999"/>
+                        </MultiTrigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>    </Style>
+
+    <Style TargetType="Button" x:Key="FluentPageButton">
+        <Setter Property="Height" Value="60" />
+        <Setter Property="Width" Value="460" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="10,0" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border x:Name="buttonBorder"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            Background="{TemplateBinding Background}">
+                        <ContentPresenter x:Name="buttonContentPresenter" 
+                                          Margin="{TemplateBinding Padding}"
+                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsMouseOver" Value="true" />
+                                <Condition Property="IsEnabled" Value="true" />
+                            </MultiTrigger.Conditions>
+                            <Setter Property="Background" TargetName="buttonBorder" Value="#F2F2F2"/>
+                            <!--<Setter Property="BorderBrush" TargetName="buttonBorder" Value="#7d7d7d"/>-->
+                        </MultiTrigger>
+
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsPressed" Value="true" />
+                                <Condition Property="IsEnabled" Value="true" />
+                            </MultiTrigger.Conditions>
+                            <Setter Property="Background" TargetName="buttonBorder" Value="#e0e0e0"/>
+                            <!--<Setter Property="BorderBrush" TargetName="buttonBorder" Value="#7d7d7d"/>-->
+                        </MultiTrigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
 </ResourceDictionary>

@@ -27,6 +27,9 @@
         private string deviceName;
 
         [DataMember]
+        public string Description { get; set; }
+
+        [DataMember]
         private Server server;
 
         public Server Server => this.server;
@@ -168,76 +171,6 @@
                 this.Name,
                 this.server.Address,
                 this.server.Port);
-
-        //internal List<string> UpdateVariables(Dictionary<string, string> vars)
-        //{
-        //    List<string> changedKeys = new List<string>();
-        //    foreach (string key in vars.Keys)
-        //    {
-        //        if (this.VariableDictionary.TryGetValue(key, out string existingValue))
-        //        {
-        //            if (existingValue != vars[key])
-        //            {
-        //                changedKeys.Add(key);
-        //                this.VariableDictionary[key] = vars[key];
-        //            }
-        //        }
-        //        else
-        //        {
-        //            changedKeys.Add(key);
-        //            this.VariableDictionary[key] = vars[key];
-        //        }
-        //    }
-
-        //    return changedKeys;
-        //}
-
-        //public string GetString(string name)
-        //{
-        //    return this.VariableDictionary[name];
-        //}
-
-        //public double? GetDouble(string name)
-        //{
-        //    if (this.VariableDictionary.TryGetValue(name, out string value))
-        //    {
-        //        return double.Parse(value);
-        //    }
-
-        //    return null;
-        //    //return double.Parse(this.VariableDictionary[name]);
-        //}
-
-        //public DateTime? GetDateTime(string name)
-        //{
-        //    if (this.VariableDictionary.TryGetValue(name, out string value) &&
-        //        !string.IsNullOrWhiteSpace(value))
-        //    {
-        //        return DateTime.Parse(value);
-        //    }
-
-        //    return null;
-        //}
-
-        //public TimeSpan GetTimeSpan(string name, TimeSpanUnits units)
-        //{
-        //    double? value = this.GetDouble(name);
-
-        //    if (value == null)
-        //    {
-        //        return TimeSpan.Zero;
-        //    }
-
-        //    switch (units)
-        //    {
-        //        case TimeSpanUnits.Seconds:
-        //            return TimeSpan.FromSeconds(value.Value);
-        //        case TimeSpanUnits.Minutes:
-        //            return TimeSpan.FromMinutes(value.Value);
-        //        default:
-        //            throw new NotImplementedException("Unknown units " + units);
-        //    }
-        //}
 
         /// <summary>
         /// The name of the device as defined in the server's configuration

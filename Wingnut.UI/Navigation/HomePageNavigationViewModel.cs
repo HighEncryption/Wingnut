@@ -4,11 +4,11 @@
 
     public class HomePageNavigationViewModel : NavigationSectionViewModel
     {
-        public HomePageViewModel HomePageViewModel { get; }
+        public HomePageViewModel HomePage { get; }
 
         public HomePageNavigationViewModel(HomePageViewModel homePageViewModel)
         {
-            this.HomePageViewModel = homePageViewModel;
+            this.HomePage = homePageViewModel;
 
             this.Glyph = "\uE80F";
             this.NavigationHeader = "Home";
