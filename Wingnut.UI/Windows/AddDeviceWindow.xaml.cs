@@ -2,6 +2,7 @@
 {
     using System;
     using System.Windows;
+    using System.Windows.Controls;
     using System.Windows.Threading;
 
     using Wingnut.UI.ViewModels;
@@ -20,7 +21,10 @@
 
         private void PasswordBox_OnPasswordChanged(object sender, RoutedEventArgs e)
         {
-            
+            if (this.DataContext is AddDeviceWindowViewModel viewModel)
+            {
+                viewModel.Password = ((PasswordBox) sender).SecurePassword;
+            }
         }
 
         private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)

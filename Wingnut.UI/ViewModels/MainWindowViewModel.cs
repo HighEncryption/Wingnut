@@ -103,17 +103,7 @@
 
                     foreach (Ups ups in upsList)
                     {
-                        ups.Initialize();
-                        UpsDeviceViewModel deviceViewModel = new UpsDeviceViewModel(ups);
-
-                        Console.WriteLine(ups.Status + "," + ups.BatteryVoltage + "," + ups.BatteryCharge);
-
-                        App.DispatcherInvoke(() =>
-                        {
-                            this.DeviceViewModels.Add(deviceViewModel);
-                            this.NavigationSections.Add(
-                                new UpsDeviceNavigationGroupViewModel(deviceViewModel));
-                        });
+                        AddDeviceToService(ups);
                     }
 
                     this.Channel.Register();
@@ -123,6 +113,19 @@
                     this.ConnectToServiceException = exception;
                     this.IsConnectedToService = false;
                 }
+            });
+        }
+
+        public void AddDeviceToService(Ups ups)
+        {
+            ups.Initialize();
+            UpsDeviceViewModel deviceViewModel = new UpsDeviceViewModel(ups);
+
+            App.DispatcherInvoke(() =>
+            {
+                this.DeviceViewModels.Add(deviceViewModel);
+                this.NavigationSections.Add(
+                    new UpsDeviceNavigationGroupViewModel(deviceViewModel));
             });
         }
 

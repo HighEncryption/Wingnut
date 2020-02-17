@@ -63,19 +63,19 @@
                        Text="Server address" />
 
             <TextBox Style="{StaticResource PropertyTextBoxStyle}"
-                     Text="{Binding Path=ServerAddress}"/>
+                     Text="{Binding Path=ServerAddress, UpdateSourceTrigger=PropertyChanged}"/>
 
             <TextBlock Style="{StaticResource PropertyHeaderStyle}" 
                        Text="Server port" />
 
             <TextBox Style="{StaticResource PropertyTextBoxStyle}"
-                     Text="{Binding Path=ServerPort}"/>
+                     Text="{Binding Path=ServerPort, UpdateSourceTrigger=PropertyChanged}"/>
 
             <TextBlock Style="{StaticResource PropertyHeaderStyle}" 
                        Text="Username" />
 
             <TextBox Style="{StaticResource PropertyTextBoxStyle}"
-                     Text="{Binding Path=Username}"/>
+                     Text="{Binding Path=Username, UpdateSourceTrigger=PropertyChanged}"/>
 
             <TextBlock Style="{StaticResource PropertyHeaderStyle}" 
                        Text="Username" />
@@ -87,7 +87,7 @@
                 <Button Style="{StaticResource CommonButtonStyle}"
                         Margin="16,0,0,0"
                         Command="{Binding Path=GetDevicesCommand}">
-                    <TextBlock Text="Get Devices" 
+                    <TextBlock Text="Get Devices"
                                VerticalAlignment="Center"
                                FontFamily="Segoe UI"
                                FontSize="15"/>

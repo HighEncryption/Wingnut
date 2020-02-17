@@ -53,6 +53,9 @@
                             <Setter Property="Background" TargetName="buttonBorder" Value="#999999"/>
                             <Setter Property="BorderBrush" TargetName="buttonBorder" Value="#999999"/>
                         </MultiTrigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Foreground" Value="#7A7A7A" />
+                        </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>

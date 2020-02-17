@@ -5,6 +5,7 @@
     using System.Windows;
     using System.Windows.Threading;
 
+    using Wingnut.Tracing;
     using Wingnut.UI.ViewModels;
 
     /// <summary>
@@ -23,16 +24,26 @@
             App app = new App();
             Current = app;
 
+            // Configure the logger to send Debug/Info/Warn/Error message to the ETW log
+            // specific to the app (as opposed to the service).
+            Logger.EtwLogDestination = Logger.EtwLog.App;
+
             AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
             {
                 Exception e = args.ExceptionObject as Exception;
                 string message = e?.ToString() ?? "(null)";
 
-                File.WriteAllText(
+                string exceptionFilePath =
                     Path.Combine(
                         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                        string.Format("wingnut.exception.{0:yyyyMMddHHmmss}.txt", DateTime.Now)),
-                    message);
+                        string.Format("wingnut.exception.{0:yyyyMMddHHmmss}.txt", DateTime.Now));
+
+                File.WriteAllText(exceptionFilePath, message);
+
+                Logger.Critical(
+                    "An unhandled exception was throw. The error was: '{0}'. The exception details were written to '{1}'.",
+                    message,
+                    exceptionFilePath);
             };
 
             app.localDispatcher = Dispatcher.CurrentDispatcher;
