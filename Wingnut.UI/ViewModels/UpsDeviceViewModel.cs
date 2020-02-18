@@ -5,14 +5,18 @@
     using System.ComponentModel;
 
     using Wingnut.Data;
+    using Wingnut.Data.Configuration;
     using Wingnut.Data.Models;
-    using Wingnut.UI.Framework;
 
     public class UpsDeviceViewModel : DeviceViewModel
     {
+        private UpsConfiguration configuration;
+
         public Ups Ups { get; }
 
         public override Device Device => this.Ups;
+
+        #region Status Page Properties
 
         private ObservableCollection<DevicePropertyViewModel> powerStatusLeftProperties;
 
@@ -44,9 +48,35 @@
         public ObservableCollection<DevicePropertyViewModel> DeviceInfoRightProperties =>
             this.deviceInfoRightProperties ?? (this.deviceInfoRightProperties = new ObservableCollection<DevicePropertyViewModel>());
 
-        public UpsDeviceViewModel(Ups ups)
+        #endregion
+
+        #region Notification Page Properties
+
+        private bool emailNotificationEnabled;
+
+        public bool EmailNotificationEnabled
+        {
+            get => this.emailNotificationEnabled;
+            set => this.SetProperty(ref this.emailNotificationEnabled, value);
+        }
+
+        private bool powerShellNotificationEnabled;
+
+        public bool PowerShellNotificationEnabled
+        {
+            get => this.powerShellNotificationEnabled;
+            set => this.SetProperty(ref this.powerShellNotificationEnabled, value);
+        }
+
+        #endregion
+
+        public UpsDeviceViewModel(Ups ups, UpsConfiguration configuration)
         {
             this.Ups = ups;
+            this.configuration = configuration;
+
+            this.EmailNotificationEnabled = configuration.EnableEmailNotification;
+            this.PowerShellNotificationEnabled = configuration.EnablePowerShellNotification;
 
             this.UpdateStatusDisplayString();
             this.UpdateStatusSeverity();
@@ -68,21 +98,21 @@
                     "Input voltage:",
                     this.Ups,
                     nameof(this.Ups.InputVoltage),
-                    () => FormatVoltage(this.Ups.InputVoltage)));
+                    () => FormatHelpers.FormatVoltage(this.Ups.InputVoltage)));
 
             this.PowerStatusLeftProperties.Add(
                 new DevicePropertyViewModel(
                     "Input frequency:",
                     this.Ups,
                     nameof(this.Ups.InputFrequency),
-                    () => FormatFrequency(this.Ups.InputFrequency)));
+                    () => FormatHelpers.FormatFrequency(this.Ups.InputFrequency)));
 
             this.PowerStatusLeftProperties.Add(
                 new DevicePropertyViewModel(
                     "Input sensitivity:",
                     this.Ups,
                     nameof(this.Ups.InputSensitivity),
-                    () => FormatEnum(this.Ups.InputSensitivity)));
+                    () => FormatHelpers.FormatEnum(this.Ups.InputSensitivity)));
 
             //
             // Power Status Right Column
@@ -92,14 +122,14 @@
                     "Output voltage:",
                     this.Ups,
                     nameof(this.Ups.OutputVoltage),
-                    () => FormatVoltage(this.Ups.OutputVoltage)));
+                    () => FormatHelpers.FormatVoltage(this.Ups.OutputVoltage)));
 
             this.PowerStatusRightProperties.Add(
                 new DevicePropertyViewModel(
                     "Output frequency:",
                     this.Ups,
                     nameof(this.Ups.OutputFrequency),
-                    () => FormatFrequency(this.Ups.OutputFrequency)));
+                    () => FormatHelpers.FormatFrequency(this.Ups.OutputFrequency)));
 
             //
             // Battery Status Left Column
@@ -109,21 +139,21 @@
                     "Battery charge:",
                     this.Ups,
                     nameof(this.Ups.BatteryCharge),
-                    () => FormatPercentage(this.Ups.BatteryCharge)));
+                    () => FormatHelpers.FormatPercentage(this.Ups.BatteryCharge)));
 
             this.BatteryStatusLeftProperties.Add(
                 new DevicePropertyViewModel(
                     "Battery current:",
                     this.Ups,
                     nameof(this.Ups.BatteryCurrent),
-                    () => FormatCurrent(this.Ups.BatteryCurrent)));
+                    () => FormatHelpers.FormatCurrent(this.Ups.BatteryCurrent)));
 
             this.BatteryStatusLeftProperties.Add(
                 new DevicePropertyViewModel(
                     "Battery replacement:",
                     this.Ups,
                     nameof(this.Ups.BatteryLastReplacement),
-                    () => FormatDate(this.Ups.BatteryLastReplacement, "d")));
+                    () => FormatHelpers.FormatDate(this.Ups.BatteryLastReplacement, "d")));
 
             //
             // Battery Status Left Column
@@ -133,14 +163,14 @@
                     "Battery runtime:",
                     this.Ups,
                     nameof(this.Ups.BatteryRuntime),
-                    () => FormatMinutes(this.Ups.BatteryRuntime)));
+                    () => FormatHelpers.FormatMinutes(this.Ups.BatteryRuntime)));
 
             this.BatteryStatusRightProperties.Add(
                 new DevicePropertyViewModel(
                     "Battery voltage:",
                     this.Ups,
                     nameof(this.Ups.BatteryVoltage),
-                    () => FormatVoltage(this.Ups.BatteryVoltage)));
+                    () => FormatHelpers.FormatVoltage(this.Ups.BatteryVoltage)));
 
             //
             // Device Information Left Column
@@ -164,7 +194,7 @@
                     "Device temperature:",
                     this.Ups,
                     nameof(this.Ups.Temperature),
-                    () => FormatTemperature(this.Ups.Temperature, true)));
+                    () => FormatHelpers.FormatTemperature(this.Ups.Temperature, true)));
 
             this.DeviceInfoLeftProperties.Add(
                 new DevicePropertyViewModel(
@@ -209,7 +239,7 @@
                     "Manufacture date:",
                     this.Ups,
                     nameof(this.Ups.ManufactureDate),
-                    () => FormatDate(this.Ups.ManufactureDate, "d")));
+                    () => FormatHelpers.FormatDate(this.Ups.ManufactureDate, "d")));
 
             this.DeviceInfoRightProperties.Add(
                 new DevicePropertyViewModel(
@@ -219,82 +249,7 @@
                     () => this.Ups.DriverName));
         }
 
-        private string FormatVoltage(double? value)
-        {
-            if (value == null)
-            {
-                return null;
-            }
 
-            return $"{value.Value:###.0} V";
-        }
-
-        private string FormatCurrent(double? value)
-        {
-            if (value == null)
-            {
-                return null;
-            }
-
-            return $"{value.Value:##0.0} A";
-        }
-
-        private string FormatFrequency(double? value)
-        {
-            if (value == null)
-            {
-                return null;
-            }
-
-            return $"{value.Value:###.0} Hz";
-        }
-
-        private string FormatPercentage(double? value)
-        {
-            if (value == null)
-            {
-                return null;
-            }
-
-            return $"{value.Value:##0.0} %";
-        }
-
-        private string FormatDate(DateTime? value, string format)
-        {
-            return value?.ToString(format);
-        }
-
-        private string FormatMinutes(TimeSpan? value)
-        {
-            if (value == null)
-            {
-                return null;
-            }
-
-            return $"{value.Value.TotalMinutes} minutes";
-        }
-
-        private string FormatTemperature(double? value, bool convertCtoF)
-        {
-            if (value == null)
-            {
-                return null;
-            }
-
-            var temp = value.Value;
-
-            if (convertCtoF)
-            {
-                temp = (temp * 9) / 5 + 32;
-            }
-
-            return $"{temp:###.0}\u00B0 F";
-        }
-
-        private string FormatEnum(Enum value)
-        {
-            return value?.ToString();
-        }
 
         private void UpsOnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
@@ -393,37 +348,5 @@
         public override string DeviceName => this.Ups.Name;
 
         public override string MakeAndModel => $"{this.Ups.Manufacturer} {this.Ups.Model}";
-    }
-
-    public class DevicePropertyViewModel : ViewModelBase
-    {
-        public string Header { get; }
-
-        public DevicePropertyViewModel(
-            string header, 
-            Ups ups, 
-            string propertyName,
-            Func<string> converter)
-        {
-            this.Header = header;
-
-            this.Value = converter();
-
-            ups.PropertyChanged += (sender, args) =>
-            {
-                if (args.PropertyName == propertyName)
-                {
-                    this.Value = converter();
-                }
-            };
-        }
-
-        private string value;
-
-        public string Value
-        {
-            get => this.value;
-            set => this.SetProperty(ref this.value, value);
-        }
     }
 }

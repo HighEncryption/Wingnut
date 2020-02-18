@@ -3,10 +3,66 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:Wingnut.UI.Pages"
+             xmlns:navigation="clr-namespace:Wingnut.UI.Navigation"
              mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance navigation:UpsNotificationsNavigationViewModel}"
              d:DesignHeight="450" d:DesignWidth="800">
-    <StackPanel Margin="24,16">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/XamlResources.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
 
+    <StackPanel Margin="24,16">
+        <TextBlock Style="{StaticResource TextHeader1Style}" 
+                   Text="{Binding Path=PageHeader}" />
+        <TextBlock Style="{StaticResource SubTextStyle}"
+                   Text="Notifications can be sent when the UPS goes on batter, or when the computer is shutting down." />
+
+        <TextBlock Text="Email notifications"
+                   FontFamily="Segoe UI"
+                   FontSize="21" />
+        <StackPanel Orientation="Horizontal">
+            <ToggleButton Style="{StaticResource FluentToggleSwitchStyle}"
+                          IsChecked="{Binding Path=DeviceViewModel.EmailNotificationEnabled}"/>
+            <TextBlock FontFamily="Segoe UI"
+                       FontSize="15">
+                <TextBlock.Style>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="Text" Value="Off" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Path=DeviceViewModel.EmailNotificationEnabled}" 
+                                         Value="True">
+                                <Setter Property="Text" Value="On" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
+        </StackPanel>
+
+        <TextBlock Text="PowerShell notifications"
+                   FontFamily="Segoe UI"
+                   FontSize="21" />
+        <StackPanel Orientation="Horizontal">
+            <ToggleButton Style="{StaticResource FluentToggleSwitchStyle}"
+                          IsChecked="{Binding Path=DeviceViewModel.PowerShellNotificationEnabled}"/>
+            <TextBlock FontFamily="Segoe UI"
+                       FontSize="15">
+                <TextBlock.Style>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="Text" Value="Off" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Path=DeviceViewModel.PowerShellNotificationEnabled}" 
+                                         Value="True">
+                                <Setter Property="Text" Value="On" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
+        </StackPanel>
     </StackPanel>
 </UserControl>

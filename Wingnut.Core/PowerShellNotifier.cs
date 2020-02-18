@@ -39,6 +39,15 @@
                 eventArgs.UpsContext.QualifiedName,
                 this.scriptPath);
 
+            if (eventArgs.UpsContext.UpsConfiguration.EnablePowerShellNotification == false)
+            {
+                Logger.Info(
+                    "PowerShellNotifier: PowerShell notifications are disabled for UPS {0}",
+                    eventArgs.UpsContext.QualifiedName);
+
+                return;
+            }
+
             // Reference: https://docs.microsoft.com/en-us/archive/blogs/kebab/executing-powershell-scripts-from-c
             using (PowerShell pipeline = PowerShell.Create())
             {

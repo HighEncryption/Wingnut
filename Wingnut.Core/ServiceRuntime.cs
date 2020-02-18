@@ -212,9 +212,6 @@
                     {
                         EventHandler<NotifyEventArgs> thisDelegate = (EventHandler<NotifyEventArgs>) ar.AsyncState;
                         thisDelegate.EndInvoke(ar);
-
-                        //ServiceRuntime runtime = (ServiceRuntime)ar.AsyncState;
-                        //runtime.OnNotify.EndInvoke(ar);
                     },
                     notifyDelegate);
             }

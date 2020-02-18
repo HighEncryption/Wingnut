@@ -26,6 +26,15 @@
             WingnutServiceConfiguration configuration);
 
         [OperationContract]
+        UpsConfiguration GetUpsConfiguration(
+            string serverName,
+            string upsName);
+
+        [OperationContract]
+        void UpdateUpsConfiguration(
+            UpsConfiguration configuration);
+
+        [OperationContract]
         Task<List<Ups>> GetUpsFromServer(
             Server server,
             string password,

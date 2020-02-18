@@ -60,6 +60,39 @@
             ServiceRuntime.Instance.SaveConfiguration();
         }
 
+        public UpsConfiguration GetUpsConfiguration(string serverName, string upsName)
+        {
+            var upsContext =
+                ServiceRuntime.Instance.UpsContexts.FirstOrDefault(
+                    ctx => ctx.Name == upsName &&
+                           ctx.UpsConfiguration.ServerConfiguration.Address == serverName);
+
+            if (upsContext == null)
+            {
+                throw new Exception("Failed to find a UPS with that name");
+            }
+
+            return upsContext.UpsConfiguration;
+        }
+
+        public void UpdateUpsConfiguration(UpsConfiguration configuration)
+        {
+            var upsContext =
+                ServiceRuntime.Instance.UpsContexts.FirstOrDefault(
+                    ctx => ctx.QualifiedName == configuration.GetQualifiedName());
+
+            if (upsContext == null)
+            {
+                throw new Exception("Failed to find a UPS with that name");
+            }
+
+            // Only update properties that support changing like this
+            upsContext.UpsConfiguration.EnableEmailNotification = configuration.EnableEmailNotification;
+            upsContext.UpsConfiguration.EnablePowerShellNotification = configuration.EnablePowerShellNotification;
+
+            ServiceRuntime.Instance.SaveConfiguration();
+        }
+
         public async Task<List<Ups>> GetUpsFromServer(Server server, string password, string upsName)
         {
             // Update the password on the server object since it can't be passed as a SecureString

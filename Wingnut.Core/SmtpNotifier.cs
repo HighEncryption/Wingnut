@@ -21,6 +21,15 @@
                 return;
             }
 
+            if (eventArgs.UpsContext.UpsConfiguration.EnableEmailNotification == false)
+            {
+                Logger.Info(
+                    "SmtpNotifier: Notifications are disabled for UPS {0}",
+                    eventArgs.UpsContext.QualifiedName);
+
+                return;
+            }
+
             string[] notificationTypes = config.NotificationTypes.Split(',');
 
             if (!notificationTypes.Any(

@@ -134,11 +134,17 @@
 
                     foreach (Ups device in devices)
                     {
+                        UpsConfiguration upsConfiguration =
+                            App.Current.MainWindowViewModel.Channel
+                                .GetUpsConfiguration(device.Name, device.Server.Name);
+
                         groupViewModel.Devices.Add(
                             new AddDeviceViewModel(
                                 this,
                                 "\uF607",
-                                new UpsDeviceViewModel(device))
+                                new UpsDeviceViewModel(
+                                    device,
+                                    upsConfiguration))
                         );
                     }
 

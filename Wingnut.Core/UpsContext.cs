@@ -238,6 +238,7 @@
                             {
                                 Logger.Error("Caught exception while updating device. " + e.Message);
                                 ServiceRuntime.Instance.ClientCallbackChannels.Remove(callbackChannel);
+                                break;
                             }
                         }
                     }, cancellationToken);

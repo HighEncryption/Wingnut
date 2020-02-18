@@ -10,6 +10,10 @@
 
         public bool MonitorOnly { get; set; }
 
+        public bool EnableEmailNotification { get; set; }
+
+        public bool EnablePowerShellNotification { get; set; }
+
         /// <summary>
         /// The number of power supplies on this device being powered by this UPS. This is
         /// equivalent to the 'power value' settings in ups.conf.
@@ -33,6 +37,8 @@
                     PreferredAddressFamily = ups.Server.PreferredAddressFamily,
                 },
                 DeviceName = ups.Name,
+                EnableEmailNotification = true,
+                EnablePowerShellNotification = true
             };
         }
 

@@ -95,6 +95,8 @@
     </Compile>
     <Compile Include="ViewModels\AddDeviceViewModel.cs" />
     <Compile Include="ViewModels\AddDeviceWindowViewModel.cs" />
+    <Compile Include="ViewModels\DevicePropertyViewModel.cs" />
+    <Compile Include="ViewModels\FormatHelpers.cs" />
     <Compile Include="ViewModels\HomePageViewModel.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
     <Compile Include="Startup.cs" />
