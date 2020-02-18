@@ -22,12 +22,14 @@
                    Text="Notifications can be sent when the UPS goes on batter, or when the computer is shutting down." />
 
         <TextBlock Text="Email notifications"
+                   Margin="0,16,0,8"
                    FontFamily="Segoe UI"
-                   FontSize="21" />
+                   FontSize="16" />
         <StackPanel Orientation="Horizontal">
             <ToggleButton Style="{StaticResource FluentToggleSwitchStyle}"
                           IsChecked="{Binding Path=DeviceViewModel.EmailNotificationEnabled}"/>
             <TextBlock FontFamily="Segoe UI"
+                       Margin="8,0,0,0"
                        FontSize="15">
                 <TextBlock.Style>
                     <Style TargetType="TextBlock">
@@ -44,12 +46,14 @@
         </StackPanel>
 
         <TextBlock Text="PowerShell notifications"
+                   Margin="0,16,0,8"
                    FontFamily="Segoe UI"
-                   FontSize="21" />
+                   FontSize="16" />
         <StackPanel Orientation="Horizontal">
             <ToggleButton Style="{StaticResource FluentToggleSwitchStyle}"
                           IsChecked="{Binding Path=DeviceViewModel.PowerShellNotificationEnabled}"/>
             <TextBlock FontFamily="Segoe UI"
+                       Margin="8,0,0,0"
                        FontSize="15">
                 <TextBlock.Style>
                     <Style TargetType="TextBlock">
