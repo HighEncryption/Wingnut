@@ -21,7 +21,7 @@
         [OperationContract]
         WingnutServiceConfiguration GetServiceConfiguration();
 
-        [OperationContract]
+        [OperationContract(IsOneWay = true)]
         void UpdateServiceConfiguration(
             WingnutServiceConfiguration configuration);
 
@@ -30,18 +30,18 @@
             string serverName,
             string upsName);
 
-        [OperationContract]
+        [OperationContract(IsOneWay = true)]
         void UpdateUpsConfiguration(
             UpsConfiguration configuration);
 
         [OperationContract]
-        Task<List<Ups>> GetUpsFromServer(
+        List<Ups> GetUpsFromServer(
             Server server,
             string password,
             string upsName);
 
         [OperationContract]
-        Task<Ups> AddUps(
+        Ups AddUps(
             Server server,
             string password,
             string upsName, 
@@ -50,7 +50,7 @@
             bool force);
 
         [OperationContract]
-        Task<List<Ups>> GetUps(
+        List<Ups> GetUps(
             string serverName, 
             string upsName);
     }

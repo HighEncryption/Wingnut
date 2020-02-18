@@ -56,7 +56,7 @@
             {
                 if (windowViewModel.SelectedDevice is Ups ups)
                 {
-                    Task<Ups> addUpsTask =
+                    Ups addedUps =
                         App.Current.MainWindowViewModel.Channel.AddUps(
                             ups.Server,
                             windowViewModel.Password.GetDecrypted(),
@@ -64,10 +64,6 @@
                             Constants.DefaultNumPowerSupplies,
                             false,
                             false);
-
-                    addUpsTask.Wait();
-
-                    Ups addedUps = addUpsTask.Result;
 
                     App.Current.MainWindowViewModel.AddDeviceToService(addedUps);
                 }

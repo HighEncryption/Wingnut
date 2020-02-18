@@ -18,7 +18,7 @@
         {
             ServiceHelper helper = ServiceHelper.Create();
 
-            List<Ups> ups = helper.Channel.GetUps(this.ServerName, this.UpsName).Result;
+            List<Ups> ups = helper.Channel.GetUps(this.ServerName, this.UpsName);
 
             this.WriteObject(ups, true);
         }

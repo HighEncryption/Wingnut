@@ -9,6 +9,7 @@
     using System.Threading.Tasks;
 
     using Wingnut.Channels;
+    using Wingnut.Data.Configuration;
     using Wingnut.Data.Models;
     using Wingnut.UI.Framework;
     using Wingnut.UI.Navigation;
@@ -97,7 +98,7 @@
                     this.IsConnectedToService = true;
 
                     List<Ups> upsList =
-                        await this.Channel.GetUps(null, null).ConfigureAwait(false);
+                        this.Channel.GetUps(null, null);
 
                     this.DeviceViewModels.Clear();
 
@@ -118,8 +119,13 @@
 
         public void AddDeviceToService(Ups ups)
         {
+            UpsConfiguration upsConfiguration =
+                App.Current.MainWindowViewModel.Channel
+                    .GetUpsConfiguration(ups.Server.Name, ups.Name);
+
+
             ups.Initialize();
-            UpsDeviceViewModel deviceViewModel = new UpsDeviceViewModel(ups);
+            UpsDeviceViewModel deviceViewModel = new UpsDeviceViewModel(ups, upsConfiguration);
 
             App.DispatcherInvoke(() =>
             {

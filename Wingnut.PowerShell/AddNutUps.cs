@@ -63,8 +63,7 @@
                         this.UpsName,
                         this.NumPowerSupplies,
                         this.MonitorOnly,
-                        this.Force.ToBool())
-                    .Result;
+                        this.Force.ToBool());
 
                 this.WriteObject(ups);
             }

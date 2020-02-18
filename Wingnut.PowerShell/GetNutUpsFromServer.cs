@@ -36,7 +36,7 @@
                 helper.Channel.GetUpsFromServer(
                     server, 
                     this.Credential.Password.GetDecrypted(),
-                    this.UpsName).Result;
+                    this.UpsName);
 
             this.WriteObject(upsList, true);
         }

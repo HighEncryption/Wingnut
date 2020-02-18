@@ -11,6 +11,7 @@
 
     using Wingnut.Channels;
     using Wingnut.Data;
+    using Wingnut.Data.Configuration;
     using Wingnut.Data.Models;
     using Wingnut.UI.Framework;
 
@@ -117,10 +118,14 @@
                     Username = this.Username,
                 };
 
+                // TESTING
+                server.Address = "192.168.0.117";
+                server.Username = "testuser";
+                this.Password = SecureStringExtensions.FromString("testpass");
+
                 List<Ups> devices =
-                    await App.Current.MainWindowViewModel.Channel
-                        .GetUpsFromServer(server, this.Password.GetDecrypted(), null)
-                        .ConfigureAwait(false);
+                    App.Current.MainWindowViewModel.Channel
+                        .GetUpsFromServer(server, this.Password.GetDecrypted(), null);
 
                 App.DispatcherInvoke(() =>
                 {

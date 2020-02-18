@@ -64,8 +64,7 @@
         {
             var upsContext =
                 ServiceRuntime.Instance.UpsContexts.FirstOrDefault(
-                    ctx => ctx.Name == upsName &&
-                           ctx.UpsConfiguration.ServerConfiguration.Address == serverName);
+                    ctx => ctx.Name == upsName && ctx.ServerState.Name == serverName);
 
             if (upsContext == null)
             {
@@ -93,7 +92,7 @@
             ServiceRuntime.Instance.SaveConfiguration();
         }
 
-        public async Task<List<Ups>> GetUpsFromServer(Server server, string password, string upsName)
+        public List<Ups> GetUpsFromServer(Server server, string password, string upsName)
         {
             // Update the password on the server object since it can't be passed as a SecureString
             // over the WCF channel
@@ -108,15 +107,13 @@
 
             ServerConnection serverConnection = new ServerConnection(server);
 
-            await serverConnection.ConnectAsync(CancellationToken.None)
-                .ConfigureAwait(false);
+            serverConnection.ConnectAsync(CancellationToken.None).Wait();
 
             try
             {
                 Dictionary<string, string> listResponse =
-                    await serverConnection
-                        .ListUpsAsync(CancellationToken.None)
-                        .ConfigureAwait(false);
+                    serverConnection
+                        .ListUpsAsync(CancellationToken.None).Result;
 
                 List<Ups> upsList = new List<Ups>();
 
@@ -128,9 +125,8 @@
                     }
 
                     Dictionary<string, string> upsVars =
-                        await serverConnection
-                            .ListVarsAsync(thisUpsName, CancellationToken.None)
-                            .ConfigureAwait(false);
+                        serverConnection
+                            .ListVarsAsync(thisUpsName, CancellationToken.None).Result;
 
                     upsList.Add(Ups.Create(thisUpsName, server, upsVars));
                 }
@@ -143,7 +139,7 @@
             }
         }
 
-        public async Task<Ups> AddUps(
+        public Ups AddUps(
             Server server, 
             string password, 
             string upsName, 
@@ -174,13 +170,11 @@
             {
                 ServerConnection serverConnection = new ServerConnection(server);
 
-                await serverConnection.ConnectAsync(CancellationToken.None)
-                    .ConfigureAwait(false);
+                serverConnection.ConnectAsync(CancellationToken.None).Wait();
 
                 Dictionary<string, string> upsVars =
-                    await serverConnection
-                        .ListVarsAsync(upsName, CancellationToken.None)
-                        .ConfigureAwait(false);
+                    serverConnection
+                        .ListVarsAsync(upsName, CancellationToken.None).Result;
 
                 Ups ups = Ups.Create(upsName, server, upsVars);
 
@@ -219,7 +213,7 @@
             }
         }
 
-        public Task<List<Ups>> GetUps(string serverName, string upsName)
+        public List<Ups> GetUps(string serverName, string upsName)
         {
             List<Ups> upsList = new List<Ups>();
 
@@ -251,7 +245,7 @@
                 upsList.Add(upsContext.State);
             }
 
-            return Task.FromResult(upsList);
+            return upsList;
         }
     }
 }
