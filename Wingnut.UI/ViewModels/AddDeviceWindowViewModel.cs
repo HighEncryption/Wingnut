@@ -94,7 +94,7 @@
 
         private void GetDevicesOnExecute(object obj)
         {
-            Task.Run(async () => await this.GetDevicesAsync());
+            Task.Run(() => this.GetDevices());
         }
 
         public void CloseWindow(bool dialogResult)
@@ -102,7 +102,7 @@
             this.RequestClose?.Invoke(this, new RequestCloseEventArgs(dialogResult));
         }
 
-        private async Task GetDevicesAsync()
+        private void GetDevices()
         {
             this.ConnectionError = null;
             this.IsConnecting = true;
@@ -132,18 +132,11 @@
 
                     foreach (Ups device in devices)
                     {
-                        UpsConfiguration upsConfiguration =
-                            App.Current.MainWindowViewModel.Channel
-                                .GetUpsConfiguration(device.Name, device.Server.Name);
-
                         groupViewModel.Devices.Add(
                             new AddDeviceViewModel(
                                 this,
                                 "\uF607",
-                                new UpsDeviceViewModel(
-                                    device,
-                                    upsConfiguration))
-                        );
+                                device));
                     }
 
                     App.DispatcherInvoke(() =>

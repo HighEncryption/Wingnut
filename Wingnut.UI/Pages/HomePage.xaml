@@ -32,7 +32,5 @@
                            FontSize="16" />
             </StackPanel>
         </Button>
-
-        <ToggleButton Style="{StaticResource FluentToggleSwitchStyle}"/>
     </StackPanel>
 </UserControl>

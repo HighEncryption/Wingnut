@@ -5,7 +5,6 @@
     using System.Linq;
     using System.ServiceModel;
     using System.Threading;
-    using System.Threading.Tasks;
 
     using Wingnut.Channels;
     using Wingnut.Data;

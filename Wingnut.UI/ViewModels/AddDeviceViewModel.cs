@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Windows.Input;
 
+    using Wingnut.Data.Models;
     using Wingnut.UI.Framework;
 
     public class AddDeviceGroupViewModel : ViewModelBase
@@ -23,9 +24,14 @@
     {
         private readonly AddDeviceWindowViewModel windowViewModel;
 
-        public DeviceViewModel Device { get; }
+        //public DeviceViewModel Device { get; }
+        private readonly Device device;
 
         public ICommand AddDeviceCommand { get; }
+
+        public string DeviceName { get; }
+
+        public string MakeAndModel { get; }
 
         private string glyph;
 
@@ -46,18 +52,22 @@
         public AddDeviceViewModel(
             AddDeviceWindowViewModel windowViewModel, 
             string glyph, 
-            DeviceViewModel deviceViewModel)
+            Device device)
         {
             this.windowViewModel = windowViewModel;
             this.Glyph = glyph;
-            this.Device = deviceViewModel;
+            this.device = device;
+
+            this.DeviceName = device.Name;
+            this.MakeAndModel = $"{device.Manufacturer} {device.Model}";
 
             this.AddDeviceCommand = new DelegatedCommand(this.AddDeviceOnExecute);
         }
 
         private void AddDeviceOnExecute(object obj)
         {
-            this.windowViewModel.SelectedDevice = this.Device.Device;
+            //this.windowViewModel.SelectedDevice = this.Device.Device;
+            this.windowViewModel.SelectedDevice = this.device;
             this.windowViewModel.CloseWindow(true);
         }
     }

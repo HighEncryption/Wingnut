@@ -26,7 +26,7 @@
                    FontSize="16" />
         <TextBlock Style="{StaticResource SubTextStyle}"
                    Text="Monitor the UPS and send notification, but do not shut down the computer when the UPS is low." />
-        <StackPanel Orientation="Horizontal" Margin="0,16,0,0">
+        <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
             <ToggleButton Style="{StaticResource FluentToggleSwitchStyle}"
                           IsChecked="{Binding Path=DeviceViewModel.MonitorOnly}"/>
             <TextBlock FontFamily="Segoe UI"
