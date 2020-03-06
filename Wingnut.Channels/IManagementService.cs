@@ -2,11 +2,17 @@
 {
     using System.Collections.Generic;
     using System.ServiceModel;
-    using System.Threading.Tasks;
 
     using Wingnut.Data.Configuration;
     using Wingnut.Data.Models;
 
+    /// <summary>
+    /// Management interface for controlling the Wingnut service.
+    /// </summary>
+    /// <remarks>
+    /// All calls in this interface need to be synchronous. See:
+    /// https://aloiskraus.wordpress.com/2018/07/01/why-does-my-synchronous-wcf-call-hang/
+    /// </remarks>
     [ServiceContract(
         SessionMode = SessionMode.Required,
         CallbackContract = typeof(IManagementCallback))]

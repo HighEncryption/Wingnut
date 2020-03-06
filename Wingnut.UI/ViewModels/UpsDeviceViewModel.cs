@@ -70,6 +70,18 @@
 
         #endregion
 
+        #region Settings Page Properties
+
+        private bool monitorOnly;
+
+        public bool MonitorOnly
+        {
+            get => this.monitorOnly;
+            set => this.SetProperty(ref this.monitorOnly, value);
+        }
+
+        #endregion
+
         public UpsDeviceViewModel(Ups ups, UpsConfiguration configuration)
         {
             this.Ups = ups;

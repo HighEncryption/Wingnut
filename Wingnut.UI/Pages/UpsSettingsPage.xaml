@@ -4,9 +4,47 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Wingnut.UI.Pages"
+             xmlns:navigation="clr-namespace:Wingnut.UI.Navigation"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="450" d:DesignWidth="800" 
+             d:DataContext="{d:DesignInstance navigation:UpsSettingsNavigationViewModel}">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/XamlResources.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
     <StackPanel Margin="24,16">
+        <TextBlock Style="{StaticResource TextHeader1Style}" 
+                   Text="{Binding Path=PageHeader}" />
+
+        <TextBlock Text="Monitor only"
+                   Margin="0,16,0,8"
+                   FontFamily="Segoe UI"
+                   FontSize="16" />
+        <TextBlock Style="{StaticResource SubTextStyle}"
+                   Text="Monitor the UPS and send notification, but do not shut down the computer when the UPS is low." />
+        <StackPanel Orientation="Horizontal" Margin="0,16,0,0">
+            <ToggleButton Style="{StaticResource FluentToggleSwitchStyle}"
+                          IsChecked="{Binding Path=DeviceViewModel.MonitorOnly}"/>
+            <TextBlock FontFamily="Segoe UI"
+                       Margin="8,0,0,0"
+                       FontSize="15">
+                <TextBlock.Style>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="Text" Value="Off" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Path=DeviceViewModel.EmailNotificationEnabled}" 
+                                         Value="True">
+                                <Setter Property="Text" Value="On" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
+        </StackPanel>
 
     </StackPanel>
 </UserControl>

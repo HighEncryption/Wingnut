@@ -57,11 +57,11 @@
                         Grid.Row="0"
                         VerticalAlignment="Center">
                 <TextBlock FontSize="15"
-                           Text="{Binding Path=Device.DeviceName}"
+                           Text="{Binding Path=DeviceName}"
                            Margin="12,0,0,0"
                            VerticalAlignment="Center" />
                 <TextBlock FontSize="15"
-                           Text="{Binding Path=Device.MakeAndModel}"
+                           Text="{Binding Path=MakeAndModel}"
                            Margin="12,0,0,0"
                            VerticalAlignment="Center" />
             </StackPanel>

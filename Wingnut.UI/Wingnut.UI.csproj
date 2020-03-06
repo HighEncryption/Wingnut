@@ -78,6 +78,10 @@
     <Compile Include="Navigation\NavigationSectionGroupViewModel.cs" />
     <Compile Include="Navigation\NavigationSectionViewModel.cs" />
     <Compile Include="Navigation\UpsDeviceNavigationGroupViewModel.cs" />
+    <Compile Include="Navigation\UpsEnergyUsageNavigationViewModel.cs" />
+    <Compile Include="Navigation\UpsNotificationsNavigationViewModel.cs" />
+    <Compile Include="Navigation\UpsSettingsNavigationViewModel.cs" />
+    <Compile Include="Navigation\UpsStatusNavigationViewModel.cs" />
     <Compile Include="Pages\DeviceEnergyUsagePage.xaml.cs">
       <DependentUpon>DeviceEnergyUsagePage.xaml</DependentUpon>
     </Compile>

@@ -5,11 +5,9 @@
     using System.Collections.ObjectModel;
     using System.Linq;
     using System.Security;
-    using System.ServiceModel;
     using System.Threading.Tasks;
     using System.Windows.Input;
 
-    using Wingnut.Channels;
     using Wingnut.Data;
     using Wingnut.Data.Configuration;
     using Wingnut.Data.Models;
@@ -117,11 +115,6 @@
                     Port = 3493,
                     Username = this.Username,
                 };
-
-                // TESTING
-                server.Address = "192.168.0.117";
-                server.Username = "testuser";
-                this.Password = SecureStringExtensions.FromString("testpass");
 
                 List<Ups> devices =
                     App.Current.MainWindowViewModel.Channel
