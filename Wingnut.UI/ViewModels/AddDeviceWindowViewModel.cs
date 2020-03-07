@@ -9,7 +9,6 @@
     using System.Windows.Input;
 
     using Wingnut.Data;
-    using Wingnut.Data.Configuration;
     using Wingnut.Data.Models;
     using Wingnut.UI.Framework;
 

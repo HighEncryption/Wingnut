@@ -26,11 +26,22 @@
         [DataMember]
         private string deviceName;
 
+        /// <summary>
+        /// The name of the device as defined in the server's configuration
+        /// </summary>
+        public string Name => this.deviceName;
+
         [DataMember]
         public string Description { get; set; }
 
         [DataMember]
         private Server server;
+
+        /// <summary>
+        /// Indicates whether the device is actively being managed by Wingnut.
+        /// </summary>
+        [DataMember]
+        public bool IsManaged { get; set; }
 
         public Server Server => this.server;
 
@@ -171,11 +182,6 @@
                 this.Name,
                 this.server.Address,
                 this.server.Port);
-
-        /// <summary>
-        /// The name of the device as defined in the server's configuration
-        /// </summary>
-        public string Name => this.deviceName;
 
         [DataMember]
         [DeviceProperty("device.mfr")]

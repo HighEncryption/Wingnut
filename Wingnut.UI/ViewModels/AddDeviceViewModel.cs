@@ -1,6 +1,5 @@
 ﻿namespace Wingnut.UI.ViewModels
 {
-    using System;
     using System.Collections.Generic;
     using System.Windows.Input;
 
@@ -24,14 +23,17 @@
     {
         private readonly AddDeviceWindowViewModel windowViewModel;
 
-        //public DeviceViewModel Device { get; }
         private readonly Device device;
 
         public ICommand AddDeviceCommand { get; }
 
-        public string DeviceName { get; }
+        public string DeviceName => this.device.Name;
 
-        public string MakeAndModel { get; }
+        public string MakeAndModel =>
+            $"{device.Manufacturer} {device.Model}";
+
+        public bool IsManaged =>
+            this.device.IsManaged;
 
         private string glyph;
 
@@ -58,34 +60,15 @@
             this.Glyph = glyph;
             this.device = device;
 
-            this.DeviceName = device.Name;
-            this.MakeAndModel = $"{device.Manufacturer} {device.Model}";
-
-            this.AddDeviceCommand = new DelegatedCommand(this.AddDeviceOnExecute);
+            this.AddDeviceCommand = new DelegatedCommand(
+                this.AddDeviceOnExecute,
+                (o) => !this.device.IsManaged);
         }
 
         private void AddDeviceOnExecute(object obj)
         {
-            //this.windowViewModel.SelectedDevice = this.Device.Device;
             this.windowViewModel.SelectedDevice = this.device;
             this.windowViewModel.CloseWindow(true);
         }
     }
-
-    public delegate void RequestCloseEventHandler(object sender, RequestCloseEventArgs e);
-
-    public class RequestCloseEventArgs : EventArgs
-    {
-        public RequestCloseEventArgs()
-        {
-        }
-
-        public RequestCloseEventArgs(bool dialogResult)
-        {
-            this.DialogResult = dialogResult;
-        }
-
-        public bool? DialogResult { get; set; }
-    }
-
 }

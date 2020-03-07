@@ -127,7 +127,15 @@
                         serverConnection
                             .ListVarsAsync(thisUpsName, CancellationToken.None).Result;
 
-                    upsList.Add(Ups.Create(thisUpsName, server, upsVars));
+                    var ups = Ups.Create(thisUpsName, server, upsVars);
+
+                    var upsContext =
+                        ServiceRuntime.Instance.UpsContexts.FirstOrDefault(
+                            ctx => ctx.Name == thisUpsName && ctx.ServerState.Name == server.Name);
+
+                    ups.IsManaged = upsContext != null;
+
+                    upsList.Add(ups);
                 }
 
                 return upsList;
