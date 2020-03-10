@@ -98,7 +98,7 @@
                 <ItemsControl ItemsSource="{Binding Path=DeviceGroups}" Focusable="False">
                     <ItemsControl.Resources>
                         <ResourceDictionary>
-                            <DataTemplate DataType="{x:Type viewModels:AddDeviceGroupViewModel}">
+                            <DataTemplate DataType="{x:Type viewModels:DeviceReferenceGroupViewModel}">
                                 <StackPanel>
                                     <Border Height="48" 
                                             Background="Transparent" 
@@ -111,7 +111,8 @@
                                     <ItemsControl ItemsSource="{Binding Path=Devices}" Focusable="False">
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
-                                                <controls:AddDeviceTile DataContext="{Binding}" />
+                                                <controls:DeviceTile DataContext="{Binding}"
+                                                                     DisplayMode="AddDevice"/>
                                             </DataTemplate>
                                         </ItemsControl.ItemTemplate>
                                     </ItemsControl>

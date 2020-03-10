@@ -68,8 +68,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Controls\AddDeviceTile.xaml.cs">
-      <DependentUpon>AddDeviceTile.xaml</DependentUpon>
+    <Compile Include="Controls\DeviceTile.xaml.cs">
+      <DependentUpon>DeviceTile.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\NavigationListItem.xaml.cs">
       <DependentUpon>NavigationListItem.xaml</DependentUpon>
@@ -97,7 +97,7 @@
     <Compile Include="Pages\UpsStatusPage.xaml.cs">
       <DependentUpon>UpsStatusPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ViewModels\AddDeviceViewModel.cs" />
+    <Compile Include="ViewModels\DeviceReferenceViewModel.cs" />
     <Compile Include="ViewModels\AddDeviceWindowViewModel.cs" />
     <Compile Include="ViewModels\DevicePropertyViewModel.cs" />
     <Compile Include="ViewModels\FormatHelpers.cs" />
@@ -110,7 +110,7 @@
     <Compile Include="Windows\AddDeviceWindow.xaml.cs">
       <DependentUpon>AddDeviceWindow.xaml</DependentUpon>
     </Compile>
-    <Page Include="Controls\AddDeviceTile.xaml">
+    <Page Include="Controls\DeviceTile.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

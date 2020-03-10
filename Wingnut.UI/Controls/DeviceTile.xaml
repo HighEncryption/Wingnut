@@ -1,12 +1,13 @@
-﻿<UserControl x:Class="Wingnut.UI.Controls.AddDeviceTile"
+﻿<UserControl x:Class="Wingnut.UI.Controls.DeviceTile"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:viewModels="clr-namespace:Wingnut.UI.ViewModels"
+             xmlns:controls="clr-namespace:Wingnut.UI.Controls"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="460" 
-             d:DataContext="{d:DesignInstance viewModels:AddDeviceViewModel}">
+             d:DataContext="{d:DesignInstance viewModels:DeviceReferenceViewModel}">
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -78,6 +79,8 @@
                                 <MultiDataTrigger.Conditions>
                                     <Condition Binding="{Binding Path=IsSelected}" Value="True" />
                                     <Condition Binding="{Binding Path=IsManaged}" Value="True" />
+                                    <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType=controls:DeviceTile}, Path=DisplayMode}" 
+                                               Value="{x:Static controls:DeviceTileMode.AddDevice}" />
                                 </MultiDataTrigger.Conditions>
                                 <Setter Property="Visibility" Value="Visible" />
                             </MultiDataTrigger>
@@ -96,7 +99,8 @@
                             <MultiDataTrigger>
                                 <MultiDataTrigger.Conditions>
                                     <Condition Binding="{Binding Path=IsSelected}" Value="True" />
-                                    <!--<Condition Binding="{Binding Path=IsManaged}" Value="False" />-->
+                                    <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType=controls:DeviceTile}, Path=DisplayMode}" 
+                                               Value="{x:Static controls:DeviceTileMode.AddDevice}" />
                                 </MultiDataTrigger.Conditions>
                                 <Setter Property="Visibility" Value="Visible" />
                             </MultiDataTrigger>
@@ -114,8 +118,8 @@
                 </Button>
             </Border>
 
-            <!--<Border Grid.Column="0" Grid.ColumnSpan="2"
-                    Grid.Row="1" Height="60"
+            <Border Grid.Column="0" Grid.ColumnSpan="2"
+                    Grid.Row="2" Height="60"
                     BorderThickness="0">
                 <Border.Style>
                     <Style TargetType="Border">
@@ -124,7 +128,8 @@
                             <MultiDataTrigger>
                                 <MultiDataTrigger.Conditions>
                                     <Condition Binding="{Binding Path=IsSelected}" Value="True" />
-                                    <Condition Binding="{Binding Path=IsManaged}" Value="True" />
+                                    <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType=controls:DeviceTile}, Path=DisplayMode}" 
+                                               Value="{x:Static controls:DeviceTileMode.RemoveDevice}" />
                                 </MultiDataTrigger.Conditions>
                                 <Setter Property="Visibility" Value="Visible" />
                             </MultiDataTrigger>
@@ -132,13 +137,15 @@
                     </Style>
                 </Border.Style>
 
-                <TextBlock HorizontalAlignment="Left"
-                           VerticalAlignment="Bottom"
-                           Margin="16"
-                           Text="This device is already being managed."
-                           FontFamily="Segoe UI"
-                           FontSize="15"/>
-            </Border>-->
+                <Button Style="{StaticResource CommonButtonStyle}" HorizontalAlignment="Right"
+                        Margin="0,0,16,0"
+                        Command="{Binding Path=RemoveDeviceCommand}">
+                    <TextBlock Text="Remove Device" 
+                               VerticalAlignment="Center"
+                               FontFamily="Segoe UI"
+                               FontSize="15"/>
+                </Button>
+            </Border>
         </Grid>
     </Border>
 

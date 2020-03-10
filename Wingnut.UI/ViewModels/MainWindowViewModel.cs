@@ -108,6 +108,8 @@
                     }
 
                     this.Channel.Register();
+
+                    // TODO: Now switch the view to the first UPS device that is not being monitored
                 }
                 catch (Exception exception)
                 {

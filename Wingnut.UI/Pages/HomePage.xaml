@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:viewModels="clr-namespace:Wingnut.UI.ViewModels"
              xmlns:navigation="clr-namespace:Wingnut.UI.Navigation"
+             xmlns:controls="clr-namespace:Wingnut.UI.Controls"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800" 
              d:DataContext="{d:DesignInstance navigation:HomePageNavigationViewModel}">
@@ -32,5 +33,34 @@
                            FontSize="16" />
             </StackPanel>
         </Button>
+
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalAlignment="Left" Margin="0,16,0,0">
+            <ItemsControl ItemsSource="{Binding Path=HomePage.DeviceGroups}" Focusable="False">
+                <ItemsControl.Resources>
+                    <ResourceDictionary>
+                        <DataTemplate DataType="{x:Type viewModels:DeviceReferenceGroupViewModel}">
+                            <StackPanel>
+                                <Border Height="48" 
+                                        Background="Transparent" 
+                                        BorderThickness="0"
+                                        Padding="0">
+                                    <TextBlock Style="{StaticResource TextHeader1Style}"
+                                               Text="{Binding Path=Header}"
+                                               VerticalAlignment="Center" />
+                                </Border>
+                                <ItemsControl ItemsSource="{Binding Path=Devices}" Focusable="False">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <controls:DeviceTile DataContext="{Binding}"
+                                                                 DisplayMode="RemoveDevice"/>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ResourceDictionary>
+                </ItemsControl.Resources>
+            </ItemsControl>
+        </ScrollViewer>
     </StackPanel>
 </UserControl>

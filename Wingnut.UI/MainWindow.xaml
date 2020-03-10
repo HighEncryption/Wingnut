@@ -41,8 +41,8 @@
                                     <controls:NavigationListItem DataContext="{Binding}" />
                                 </DataTemplate>
                                 <DataTemplate DataType="{x:Type navigation:NavigationSectionGroupViewModel}">
-                                    <StackPanel>
-                                        <Border Height="48" 
+                                    <StackPanel Margin="0,0,0,0">
+                                        <Border Height="42" 
                                                 Background="Transparent" 
                                                 BorderThickness="0"
                                                 Padding="16,0,0,0">

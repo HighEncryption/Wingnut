@@ -12,11 +12,11 @@
     using Wingnut.Data.Models;
     using Wingnut.UI.Framework;
 
-    public class AddDeviceWindowViewModel : ViewModelBase
+    public class AddDeviceWindowViewModel : ViewModelBase, IDeviceReferenceContainer
     {
         public event RequestCloseEventHandler RequestClose;
 
-        public Device SelectedDevice { get; set; }
+        public Device DeviceToAdd { get; set; }
 
         private string serverAddress;
 
@@ -66,12 +66,29 @@
             set => this.SetProperty(ref this.isConnecting, value);
         }
 
+        private DeviceReferenceViewModel selectedDevice;
+
+        public DeviceReferenceViewModel SelectedDevice
+        {
+            get => this.selectedDevice;
+            set
+            {
+                DeviceReferenceViewModel previousValue = this.selectedDevice;
+                if (this.SetProperty(ref this.selectedDevice, value) && 
+                    previousValue != null &&
+                    previousValue != value)
+                {
+                    previousValue.IsSelected = false;
+                }
+            }
+        }
+
         public ICommand GetDevicesCommand { get; set; }
 
-        private ObservableCollection<AddDeviceGroupViewModel> deviceGroups;
+        private ObservableCollection<DeviceReferenceGroupViewModel> deviceGroups;
 
-        public ObservableCollection<AddDeviceGroupViewModel> DeviceGroups =>
-            this.deviceGroups ?? (this.deviceGroups = new ObservableCollection<AddDeviceGroupViewModel>());
+        public ObservableCollection<DeviceReferenceGroupViewModel> DeviceGroups =>
+            this.deviceGroups ?? (this.deviceGroups = new ObservableCollection<DeviceReferenceGroupViewModel>());
 
         public AddDeviceWindowViewModel()
         {
@@ -126,21 +143,28 @@
 
                 if (devices.Any())
                 {
-                    AddDeviceGroupViewModel groupViewModel = new AddDeviceGroupViewModel(
+                    DeviceReferenceGroupViewModel referenceGroupViewModel = new DeviceReferenceGroupViewModel(
                         "Uninterruptible power supply");
 
                     foreach (Ups device in devices)
                     {
-                        groupViewModel.Devices.Add(
-                            new AddDeviceViewModel(
-                                this,
-                                "\uF607",
-                                device));
+                        var deviceReference = new DeviceReferenceViewModel(
+                            this,
+                            "\uF607",
+                            device);
+
+                        deviceReference.OnDeviceAdded += (sender, args) =>
+                        {
+                            this.DeviceToAdd = ((DeviceReferenceViewModel) sender).Device;
+                            this.CloseWindow(true);
+                        };
+
+                        referenceGroupViewModel.Devices.Add(deviceReference);
                     }
 
                     App.DispatcherInvoke(() =>
                     {
-                        this.DeviceGroups.Add(groupViewModel);
+                        this.DeviceGroups.Add(referenceGroupViewModel);
                     });
                 }
             }

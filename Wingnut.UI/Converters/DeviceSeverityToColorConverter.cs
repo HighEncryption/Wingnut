@@ -49,6 +49,16 @@
 
             double d = (double) value;
 
+            if (Math.Abs(d) < double.Epsilon)
+            {
+                return "0 %";
+            }
+
+            if (Math.Abs(Math.Abs(d) - 100) < double.Epsilon)
+            {
+                return "100 %";
+            }
+
             return d.ToString("###.0") + " %";
         }
 

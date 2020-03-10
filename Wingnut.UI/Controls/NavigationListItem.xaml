@@ -7,7 +7,7 @@
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance navigation:NavigationSectionViewModel}"
              d:DesignHeight="48" d:DesignWidth="200">
-    <Border Height="48" 
+    <Border Height="42" 
             Padding="16,0,0,0" 
             IsHitTestVisible="True" 
             MouseDown="HandleOnMouseDown">
