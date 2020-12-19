@@ -181,6 +181,26 @@
                         .ListVarsAsync(this.Name, cancellationToken)
                         .ConfigureAwait(false);
 
+                Dictionary<string, string> deviceRw = 
+                    await this.Connection
+                        .ListRwAsync(this.Name, cancellationToken)
+                        .ConfigureAwait(false);
+
+                List<string> deviceCmd = 
+                    await this.Connection
+                        .ListCmdAsync(this.Name, cancellationToken)
+                        .ConfigureAwait(false);
+
+                Dictionary<string, string> deviceEnum =
+                    await this.Connection
+                        .ListEnumAsync(this.Name + " input.transfer.low", cancellationToken)
+                        .ConfigureAwait(false);
+
+                Dictionary<string, string> deviceRange =
+                    await this.Connection
+                        .ListRangeAsync(this.Name + " input.transfer.low", cancellationToken)
+                        .ConfigureAwait(false);
+
                 Logger.Debug(
                     "UpdateStatusAsync[Ups={0}]: Successfully queried server",
                     this.QualifiedName);

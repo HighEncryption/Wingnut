@@ -262,6 +262,99 @@
             return varDictionary;
         }
 
+        public async Task<Dictionary<string, string>> ListRwAsync(
+            string request,
+            CancellationToken cancellationToken)
+        {
+            List<string> listResponse = 
+                await this.ListWith4TokensAsync($"RW {request}", cancellationToken).ConfigureAwait(false);
+
+            Dictionary<string, string> varDictionary = new Dictionary<string, string>();
+
+            foreach (string varLine in listResponse)
+            {
+                // Each line will have the format: <upsname> <varname> "<value>"
+                // For example: su700 ups.mfr "APC"
+                // Split the line into 3 tokens
+                string[] lineTokens = varLine.Split(this.tokenSplitChar, 4);
+
+                varDictionary.Add(
+                    lineTokens[2],
+                    lineTokens[3].Trim(this.tokenTrimChar));
+            }
+
+            return varDictionary;
+        }
+
+        public async Task<List<string>> ListCmdAsync(
+            string request,
+            CancellationToken cancellationToken)
+        {
+            List<string> listResponse = 
+                await this.ListWith3TokensAsync($"CMD {request}", cancellationToken).ConfigureAwait(false);
+
+            List<string> cmdList = new List<string>();
+
+            foreach (string varLine in listResponse)
+            {
+                // Each line will have the format: <upsname> <cmdname>
+                // For example: su700 load.on
+                // Split the line into 3 tokens
+                string[] lineTokens = varLine.Split(this.tokenSplitChar, 3);
+                cmdList.Add(lineTokens[2]);
+            }
+
+            return cmdList;
+        }
+
+        public async Task<Dictionary<string, string>> ListEnumAsync(
+            string request,
+            CancellationToken cancellationToken)
+        {
+            List<string> listResponse =
+                await this.ListWith4TokensAsync($"ENUM {request}", cancellationToken).ConfigureAwait(false);
+
+            Dictionary<string, string> varDictionary = new Dictionary<string, string>();
+
+            foreach (string varLine in listResponse)
+            {
+                // Each line will have the format: <upsname> <varname> "<value>"
+                // For example: su700 input.transfer.low "103"
+                // Split the line into 3 tokens
+                string[] lineTokens = varLine.Split(this.tokenSplitChar, 4);
+
+                varDictionary.Add(
+                    lineTokens[2],
+                    lineTokens[3].Trim(this.tokenTrimChar));
+            }
+
+            return varDictionary;
+        }
+
+        public async Task<Dictionary<string, string>> ListRangeAsync(
+            string request,
+            CancellationToken cancellationToken)
+        {
+            List<string> listResponse =
+                await this.ListWith5TokensAsync($"RANGE {request}", cancellationToken).ConfigureAwait(false);
+
+            Dictionary<string, string> varDictionary = new Dictionary<string, string>();
+
+            foreach (string varLine in listResponse)
+            {
+                // Each line will have the format: <upsname> <varname> "<value>"
+                // For example: su700 input.transfer.low "103"
+                // Split the line into 3 tokens
+                string[] lineTokens = varLine.Split(this.tokenSplitChar, 4);
+
+                varDictionary.Add(
+                    lineTokens[2],
+                    lineTokens[3].Trim(this.tokenTrimChar));
+            }
+
+            return varDictionary;
+        }
+
         public async Task<Dictionary<string, string>> ListUpsAsync(
             CancellationToken cancellationToken)
         {
@@ -365,6 +458,52 @@
                         strResponse.Length - (prefix.Length + postfix.Length));
 
                 Regex regex = new Regex(@"(\w+ \w+ \S+ "".*?"")");
+                MatchCollection matches = regex.Matches(innerResponse);
+
+                List<string> list = new List<string>();
+                foreach (Match match in matches)
+                {
+                    list.Add(match.Value);
+                }
+
+                return list;
+            }
+        }
+
+        public async Task<List<string>> ListWith5TokensAsync(
+            string request,
+            CancellationToken cancellationToken)
+        {
+            {
+                await this.WriteToStreamAsync($"LIST {request}", cancellationToken).ConfigureAwait(false);
+
+                StringBuilder stringBuilder = new StringBuilder();
+
+                while (true)
+                {
+                    string readResponse =
+                        await this.ReadFromStreamAsync(cancellationToken).ConfigureAwait(false);
+
+                    ValidateResponse(readResponse, request);
+
+                    stringBuilder.Append(readResponse);
+
+                    if (stringBuilder.ToString().EndsWith("END LIST " + request))
+                    {
+                        break;
+                    }
+                }
+
+                string strResponse = stringBuilder.ToString();
+
+                string prefix = $"BEGIN LIST {request}";
+                string postfix = $"END LIST {request}";
+                string innerResponse =
+                    strResponse.Substring(
+                        prefix.Length,
+                        strResponse.Length - (prefix.Length + postfix.Length));
+
+                Regex regex = new Regex(@"(\w+ \w+ \S+ "".*?"" "".*?"")");
                 MatchCollection matches = regex.Matches(innerResponse);
 
                 List<string> list = new List<string>();

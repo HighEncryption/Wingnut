@@ -3,7 +3,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:Wingnut.UI.Pages"
              xmlns:navigation="clr-namespace:Wingnut.UI.Navigation"
              xmlns:converters="clr-namespace:Wingnut.UI.Converters"
              xmlns:viewModels="clr-namespace:Wingnut.UI.ViewModels"

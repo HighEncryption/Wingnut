@@ -268,7 +268,7 @@
                         break;
                     case LogLevel.Warning:
                         Console.ForegroundColor = ConsoleColor.Yellow;
-                        strLevel = "WRN";
+                        strLevel = "WRN"; 
                         break;
                     case LogLevel.Info:
                         Console.ResetColor();

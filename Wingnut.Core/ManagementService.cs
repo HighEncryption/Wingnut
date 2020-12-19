@@ -228,14 +228,14 @@
             {
                 upsList.AddRange(
                     ServiceRuntime.Instance.UpsContexts
-                        .Select(ctx => ctx.State));
+                        .Select(GetOrCreateState));
             }
-            if (string.IsNullOrWhiteSpace(upsName))
+            else if (string.IsNullOrWhiteSpace(upsName))
             {
                 upsList.AddRange(
                     ServiceRuntime.Instance.UpsContexts
                         .Where(ctx => ctx.UpsConfiguration.ServerConfiguration.Address == serverName)
-                        .Select(ctx => ctx.State));
+                        .Select(GetOrCreateState));
             }
             else
             {
@@ -249,10 +249,23 @@
                     throw new Exception("Failed to find a UPS with that name");
                 }
 
-                upsList.Add(upsContext.State);
+                upsList.Add(GetOrCreateState(upsContext));
             }
 
             return upsList;
+        }
+
+        private static Ups GetOrCreateState(UpsContext ctx)
+        {
+            if (ctx.State != null)
+            {
+                return ctx.State;
+            }
+
+            return Ups.Create(
+                ctx.Name,
+                ctx.ServerState,
+                new Dictionary<string, string>());
         }
     }
 }

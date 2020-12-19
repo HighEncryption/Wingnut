@@ -118,6 +118,12 @@
             {
                 Logger.Debug($"Calculating power value for UPS {upsContext.QualifiedName}");
 
+                if (upsContext.State == null)
+                {
+                    Logger.Debug($"Skipping UPS {upsContext.QualifiedName} since context has not yet been initialized");
+                    continue;
+                }
+
                 if (upsContext.UpsConfiguration.MonitorOnly)
                 {
                     Logger.Debug("Skipping UPS. Ups is configured as MonitorOnly");

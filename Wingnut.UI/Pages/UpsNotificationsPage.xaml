@@ -45,6 +45,15 @@
             </TextBlock>
         </StackPanel>
 
+        <Button Style="{StaticResource CommonButtonStyle}" HorizontalAlignment="Left"
+                Margin="0,24,0,32"
+                Command="{Binding Path=ConfigureEmailSettings}">
+            <TextBlock Text="Email settings" 
+                       VerticalAlignment="Center"
+                       FontFamily="Segoe UI"
+                       FontSize="15"/>
+        </Button>
+
         <TextBlock Text="PowerShell notifications"
                    Margin="0,16,0,8"
                    FontFamily="Segoe UI"
@@ -68,5 +77,14 @@
                 </TextBlock.Style>
             </TextBlock>
         </StackPanel>
+
+        <Button Style="{StaticResource CommonButtonStyle}" HorizontalAlignment="Left"
+                Margin="0,24,0,32"
+                Command="{Binding Path=ConfigurePowerShellSettings}">
+            <TextBlock Text="PowerShell settings" 
+                       VerticalAlignment="Center"
+                       FontFamily="Segoe UI"
+                       FontSize="15"/>
+        </Button>
     </StackPanel>
 </UserControl>
