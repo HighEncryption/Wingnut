@@ -75,13 +75,6 @@
       <DependentUpon>NavigationListItem.xaml</DependentUpon>
     </Compile>
     <Compile Include="Converters\DeviceSeverityToColorConverter.cs" />
-    <Compile Include="Navigation\NavigationSectionGroupViewModel.cs" />
-    <Compile Include="Navigation\NavigationSectionViewModel.cs" />
-    <Compile Include="Navigation\UpsDeviceNavigationGroupViewModel.cs" />
-    <Compile Include="Navigation\UpsEnergyUsageNavigationViewModel.cs" />
-    <Compile Include="Navigation\UpsNotificationsNavigationViewModel.cs" />
-    <Compile Include="Navigation\UpsSettingsNavigationViewModel.cs" />
-    <Compile Include="Navigation\UpsStatusNavigationViewModel.cs" />
     <Compile Include="Pages\DeviceEnergyUsagePage.xaml.cs">
       <DependentUpon>DeviceEnergyUsagePage.xaml</DependentUpon>
     </Compile>
@@ -100,15 +93,18 @@
     <Compile Include="ViewModels\DeviceReferenceViewModel.cs" />
     <Compile Include="ViewModels\AddDeviceWindowViewModel.cs" />
     <Compile Include="ViewModels\DevicePropertyViewModel.cs" />
+    <Compile Include="ViewModels\DeviceViewModel.cs" />
     <Compile Include="ViewModels\FormatHelpers.cs" />
     <Compile Include="ViewModels\HomePageViewModel.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
     <Compile Include="Startup.cs" />
-    <Compile Include="Navigation\HomePageNavigationViewModel.cs" />
     <Compile Include="ViewModels\RequestClose.cs" />
     <Compile Include="ViewModels\UpsDeviceViewModel.cs" />
     <Compile Include="Windows\AddDeviceWindow.xaml.cs">
       <DependentUpon>AddDeviceWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\SelectDeviceWindow.xaml.cs">
+      <DependentUpon>SelectDeviceWindow.xaml</DependentUpon>
     </Compile>
     <Page Include="Controls\DeviceTile.xaml">
       <SubType>Designer</SubType>
@@ -161,6 +157,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Windows\SelectDeviceWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="XamlResources.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -209,6 +209,9 @@
       <Project>{91AE0118-1692-4A7C-90BF-53B27F91AA38}</Project>
       <Name>Wingnut.Tracing</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Graphics\ups_header.jpg" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

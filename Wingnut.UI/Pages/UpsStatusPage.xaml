@@ -3,12 +3,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:navigation="clr-namespace:Wingnut.UI.Navigation"
-             xmlns:converters="clr-namespace:Wingnut.UI.Converters"
              xmlns:viewModels="clr-namespace:Wingnut.UI.ViewModels"
              xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
              mc:Ignorable="d" 
-             d:DataContext="{d:DesignInstance navigation:UpsStatusNavigationViewModel}"
+             d:DataContext="{d:DesignInstance viewModels:StatusPageViewModel}"
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <ResourceDictionary>
@@ -54,8 +52,8 @@
                        FontFamily="Segoe UI" Margin="0,0,6,0"
                        FontSize="15" />
             <TextBlock VerticalAlignment="Center" FontWeight="SemiBold"
-                       Text="{Binding Path=Device.StatusDisplayString}" 
-                       Foreground="{Binding Path=Device.StatusSeverity, Converter={StaticResource DeviceSeverityToColor}}"
+                       Text="{Binding Path=ActiveDevice.StatusDisplayString}" 
+                       Foreground="{Binding Path=ActiveDevice.StatusSeverity, Converter={StaticResource DeviceSeverityToColor}}"
                        FontFamily="Segoe UI"
                        FontSize="15" />
         </StackPanel>
@@ -65,8 +63,8 @@
                        FontFamily="Segoe UI" Margin="0,0,6,0"
                        FontSize="15" />
             <TextBlock VerticalAlignment="Center" FontWeight="SemiBold"
-                       Text="{Binding Path=Device.EstimatedRuntimeDisplayString}" 
-                       Foreground="{Binding Path=Device.EstimatedRuntimeSeverity, Converter={StaticResource DeviceSeverityToColor}}"
+                       Text="{Binding Path=ActiveDevice.EstimatedRuntimeDisplayString}" 
+                       Foreground="{Binding Path=ActiveDevice.EstimatedRuntimeSeverity, Converter={StaticResource DeviceSeverityToColor}}"
                        FontFamily="Segoe UI"
                        FontSize="15" />
         </StackPanel>
@@ -85,7 +83,7 @@
                                    FontFamily="Segoe UI" Margin="0,0,0,10"
                                    FontSize="16" />
                 <Grid>
-                    <lvc:AngularGauge Value="{Binding Path=Device.Ups.LoadPercentage}" 
+                    <lvc:AngularGauge Value="{Binding Path=ActiveDevice.Ups.LoadPercentage}" 
                                       FromValue="0" ToValue="100" 
                                       Margin="0" Height="160"
                                       LabelsStep="20" TicksStep="10" 
@@ -99,7 +97,7 @@
                             <lvc:AngularSection FromValue="80" ToValue="100" Fill="#FF3939"/>
                         </lvc:AngularGauge.Sections>
                     </lvc:AngularGauge>
-                    <TextBlock Text="{Binding Path=Device.Ups.LoadPercentage, Converter={StaticResource DoubleToPercentageString}}" 
+                    <TextBlock Text="{Binding Path=ActiveDevice.Ups.LoadPercentage, Converter={StaticResource DoubleToPercentageString}}" 
                                HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,32"
                                FontFamily="Segoe UI" FontSize="18" />
                 </Grid>
@@ -109,7 +107,7 @@
                            FontFamily="Segoe UI" Margin="0,0,0,10"
                            FontSize="16" />
                 <Grid>
-                    <lvc:AngularGauge Value="{Binding Path=Device.Ups.BatteryCharge}" 
+                    <lvc:AngularGauge Value="{Binding Path=ActiveDevice.Ups.BatteryCharge}" 
                                       FromValue="0" ToValue="100"  Margin="0" Height="160"
                                       LabelsStep="20" TicksStep="10" Wedge="220"  TicksStrokeThickness="1"
                                       TicksForeground="Black" Foreground="Black" FontFamily="Segoe UI" LabelsEffect="{x:Null}"
@@ -121,7 +119,7 @@
                             <lvc:AngularSection FromValue="20" ToValue="100" Fill="#03CE00"/>
                         </lvc:AngularGauge.Sections>
                     </lvc:AngularGauge>
-                    <TextBlock Text="{Binding Path=Device.Ups.BatteryCharge, Converter={StaticResource DoubleToPercentageString}}" 
+                    <TextBlock Text="{Binding Path=ActiveDevice.Ups.BatteryCharge, Converter={StaticResource DoubleToPercentageString}}" 
                                HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,32"
                                FontFamily="Segoe UI" FontSize="18" />
                 </Grid>
@@ -138,11 +136,11 @@
                     <ColumnDefinition />
                 </Grid.ColumnDefinitions>
 
-                <ItemsControl ItemsSource="{Binding Path=Device.PowerStatusLeftProperties}" 
+                <ItemsControl ItemsSource="{Binding Path=ActiveDevice.PowerStatusLeftProperties}" 
                               Focusable="False" />
 
                 <ItemsControl Grid.Column="1" 
-                              ItemsSource="{Binding Path=Device.PowerStatusRightProperties}"
+                              ItemsSource="{Binding Path=ActiveDevice.PowerStatusRightProperties}"
                               Focusable="False" />
             </Grid>
         </StackPanel>
@@ -157,11 +155,11 @@
                     <ColumnDefinition />
                 </Grid.ColumnDefinitions>
 
-                <ItemsControl ItemsSource="{Binding Path=Device.BatteryStatusLeftProperties}" 
+                <ItemsControl ItemsSource="{Binding Path=ActiveDevice.BatteryStatusLeftProperties}" 
                               Focusable="False" />
 
                 <ItemsControl Grid.Column="1" 
-                              ItemsSource="{Binding Path=Device.BatteryStatusRightProperties}"
+                              ItemsSource="{Binding Path=ActiveDevice.BatteryStatusRightProperties}"
                               Focusable="False" />
             </Grid>
         </StackPanel>
@@ -180,11 +178,11 @@
                     <ColumnDefinition />
                 </Grid.ColumnDefinitions>
 
-                <ItemsControl ItemsSource="{Binding Path=Device.DeviceInfoLeftProperties}" 
+                <ItemsControl ItemsSource="{Binding Path=ActiveDevice.DeviceInfoLeftProperties}" 
                               Focusable="False" />
 
                 <ItemsControl Grid.Column="1" 
-                              ItemsSource="{Binding Path=Device.DeviceInfoRightProperties}"
+                              ItemsSource="{Binding Path=ActiveDevice.DeviceInfoRightProperties}"
                               Focusable="False" />
             </Grid>
         </StackPanel>

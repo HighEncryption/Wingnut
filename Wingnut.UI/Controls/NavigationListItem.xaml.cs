@@ -3,7 +3,8 @@
     using System.Windows.Controls;
     using System.Windows.Input;
 
-    using Wingnut.UI.Navigation;
+    using Wingnut.UI.ViewModels;
+
 
     /// <summary>
     /// Interaction logic for NavigationListItem.xaml
@@ -17,7 +18,7 @@
 
         private void HandleOnMouseDown(object sender, MouseButtonEventArgs e)
         {
-            var viewModel = (sender as Border)?.DataContext as NavigationSectionViewModel;
+            var viewModel = (sender as Border)?.DataContext as PageViewModel;
             if (viewModel == null)
             {
                 return;

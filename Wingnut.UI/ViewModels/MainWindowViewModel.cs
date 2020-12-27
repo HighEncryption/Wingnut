@@ -7,42 +7,103 @@
     using System.Linq;
     using System.ServiceModel;
     using System.Threading.Tasks;
+    using System.Windows.Input;
 
     using Wingnut.Channels;
     using Wingnut.Data.Configuration;
     using Wingnut.Data.Models;
     using Wingnut.UI.Framework;
-    using Wingnut.UI.Navigation;
 
     public class MainWindowViewModel : ViewModelBase, IDisposable
     {
-        private ObservableCollection<NavigationSectionViewModel> navigationSections;
+        //private ObservableCollection<NavigationSectionViewModel> navigationSections;
 
-        public ObservableCollection<NavigationSectionViewModel> NavigationSections =>
-            this.navigationSections ?? (this.navigationSections = new ObservableCollection<NavigationSectionViewModel>());
+        //public ObservableCollection<NavigationSectionViewModel> NavigationSections =>
+        //    this.navigationSections ?? (this.navigationSections = new ObservableCollection<NavigationSectionViewModel>());
 
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private NavigationSectionViewModel selectedNavigationSection;
+        //[DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        //private NavigationSectionViewModel selectedNavigationSection;
 
-        public NavigationSectionViewModel SelectedNavigationSection
+        //public NavigationSectionViewModel SelectedNavigationSection
+        //{
+        //    get => this.selectedNavigationSection;
+        //    set
+        //    {
+        //        var previousNavSection = this.selectedNavigationSection;
+
+        //        if (this.SetProperty(ref this.selectedNavigationSection, value) &&
+        //            previousNavSection != null)
+        //        {
+        //            previousNavSection.IsSelected = false;
+        //        }
+        //    } 
+        //}
+
+        private ObservableCollection<PageViewModel> pages;
+
+        public ObservableCollection<PageViewModel> Pages =>
+            this.pages ?? (this.pages = new ObservableCollection<PageViewModel>());
+
+        private PageViewModel selectedPage;
+
+        public PageViewModel SelectedPage
         {
-            get => this.selectedNavigationSection;
+            get => this.selectedPage;
             set
             {
-                var previousNavSection = this.selectedNavigationSection;
+                var previousPath = this.selectedPage;
 
-                if (this.SetProperty(ref this.selectedNavigationSection, value) &&
-                    previousNavSection != null)
+                if (this.SetProperty(ref this.selectedPage, value) && previousPath != null)
                 {
-                    previousNavSection.IsSelected = false;
+                    previousPath.IsSelected = false;
                 }
-            } 
+            }
         }
+
+        private bool isNavigationCollapsed;
+
+        public bool IsNavigationCollapsed
+        {
+            get => this.isNavigationCollapsed;
+            set => this.SetProperty(ref this.isNavigationCollapsed, value);
+        }
+
+        public ICommand ToggleNavigationPane { get; }
 
         private ObservableCollection<DeviceViewModel> deviceViewModels;
 
         public ObservableCollection<DeviceViewModel> DeviceViewModels =>
             this.deviceViewModels ?? (this.deviceViewModels = new ObservableCollection<DeviceViewModel>());
+
+        private bool hasDevices;
+
+        public bool HasDevices
+        {
+            get => this.hasDevices;
+            set => this.SetProperty(ref this.hasDevices, value);
+        }
+
+        private DeviceViewModel selectedDevice;
+
+        public DeviceViewModel SelectedDevice
+        {
+            get => this.selectedDevice;
+            set => this.SetProperty(ref this.selectedDevice, value);
+        }
+
+        public MainWindowViewModel()
+        {
+            this.ToggleNavigationPane = new DelegatedCommand(
+                this.ToggleNavigationPaneOnExecute);
+
+            this.DeviceViewModels.CollectionChanged += 
+                (s, a) => this.HasDevices = DeviceViewModels.Any();
+        }
+
+        private void ToggleNavigationPaneOnExecute(object obj)
+        {
+            this.IsNavigationCollapsed = !this.IsNavigationCollapsed;
+        }
 
         private class CallbackClient : IManagementCallback
         {
@@ -50,7 +111,8 @@
             {
                 ups.Initialize();
 
-                foreach (UpsDeviceViewModel viewModel in App.Current.MainWindowViewModel.DeviceViewModels.OfType<UpsDeviceViewModel>())
+                foreach (UpsDeviceViewModel viewModel in 
+                    App.Current.MainWindowViewModel.DeviceViewModels.OfType<UpsDeviceViewModel>())
                 {
                     if (viewModel.Ups.QualifiedName == ups.QualifiedName)
                     {
@@ -84,7 +146,7 @@
 
                 try
                 {
-                    await Task.Delay(2000).ConfigureAwait(false);
+                    await Task.Delay(1000).ConfigureAwait(false);
 
                     DuplexChannelFactory<IManagementService> factory =
                         new DuplexChannelFactory<IManagementService>(
@@ -97,6 +159,8 @@
                     // Connection was successful
                     this.IsConnectedToService = true;
 
+                    // Get the list of all UPS devices from all servers (aka every UPS device being
+                    // monitored by the service).
                     List<Ups> upsList =
                         this.Channel.GetUps(null, null);
 
@@ -125,15 +189,17 @@
                 App.Current.MainWindowViewModel.Channel
                     .GetUpsConfiguration(ups.Server.Name, ups.Name);
 
-
             ups.Initialize();
             UpsDeviceViewModel deviceViewModel = new UpsDeviceViewModel(ups, upsConfiguration);
 
             App.DispatcherInvoke(() =>
             {
                 this.DeviceViewModels.Add(deviceViewModel);
-                this.NavigationSections.Add(
-                    new UpsDeviceNavigationGroupViewModel(deviceViewModel));
+
+                if (SelectedDevice == null)
+                {
+                    this.SelectedDevice = deviceViewModel;
+                }
             });
         }
 
@@ -143,18 +209,26 @@
 
         public void Initialize()
         {
-            var homePageSection = new HomePageNavigationViewModel(new HomePageViewModel());
-            this.NavigationSections.Add(homePageSection);
-            homePageSection.IsSelected = true;
+            var homePage = new HomePageViewModel();
+            this.Pages.Add(homePage);
+            homePage.IsSelected = true;
+
+            this.Pages.Add(new StatusPageViewModel());
+            this.Pages.Add(new NotificationsPageViewModel());
+            this.Pages.Add(new EnergyUsagePageViewModel());
+            this.Pages.Add(new SettingsPageViewModel());
         }
-    }
 
-    public abstract class DeviceViewModel : ViewModelBase
-    {
-        public abstract string DeviceName { get; }
+        //public void Initialize()
+        //{
+        //    var homePageSection = new HomePageNavigationViewModel(new HomePageViewModel());
+        //    this.NavigationSections.Add(homePageSection);
+        //    homePageSection.IsSelected = true;
 
-        public abstract string MakeAndModel { get; }
-
-        public abstract Device Device { get; }
+        //    this.NavigationSections.Add(new UpsStatusNavigationViewModel());
+        //    this.NavigationSections.Add(new UpsNotificationsNavigationViewModel());
+        //    this.NavigationSections.Add(new UpsEnergyUsageNavigationViewModel());
+        //    this.NavigationSections.Add(new UpsSettingsNavigationViewModel());
+        //}
     }
 }

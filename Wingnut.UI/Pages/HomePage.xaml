@@ -4,38 +4,152 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:viewModels="clr-namespace:Wingnut.UI.ViewModels"
-             xmlns:navigation="clr-namespace:Wingnut.UI.Navigation"
-             xmlns:controls="clr-namespace:Wingnut.UI.Controls"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800" 
-             d:DataContext="{d:DesignInstance navigation:HomePageNavigationViewModel}">
+             d:DataContext="{d:DesignInstance viewModels:HomePageViewModel}">
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/XamlResources.xaml" />
+                <ResourceDictionary Source="/Converters.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
     <StackPanel Margin="24,16">
-        <Button Style="{StaticResource FluentPageButton}" Command="{Binding Path=HomePage.AddDeviceCommand}">
-            <StackPanel  Orientation="Horizontal">
-                <Border Background="#ccc" Width="40" Height="40" BorderThickness="1" BorderBrush="#C2C2C2">
-                    <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center"
-                               FontFamily="Segoe MDL2 Assets"
-                               Text="&#xE109;"
-                               FontSize="18" />
-                </Border>
+        <StackPanel>
+            <StackPanel.Style>
+                <Style TargetType="StackPanel">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Path=ShowStatusMessage}" Value="True" />
+                    </Style.Triggers>
+                </Style>
+            </StackPanel.Style>
+        </StackPanel>
 
+        <StackPanel>
+            <StackPanel.Style>
+                <Style TargetType="StackPanel">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                    <Style.Triggers>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding Path=MainWindow.IsConnectedToService}" Value="True" />
+                                <Condition Binding="{Binding Path=MainWindow.HasDevices}" Value="False" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Visibility" Value="Visible" />
+                        </MultiDataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </StackPanel.Style>
+
+            <TextBlock Style="{StaticResource SubTextStyle}"
+                       Text="There are no devices current being monitored. Use the button below to add a device to monitor." />
+
+            <Button Style="{StaticResource FluentPageButton}"
+                    Margin="0,8,0,0"
+                    HorizontalAlignment="Left"
+                    Command="{Binding Path=AddDeviceCommand}">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock FontFamily="Segoe MDL2 Assets"
+                               Text="&#xE836;"
+                               FontSize="16" 
+                               VerticalAlignment="Center"/>
+
+                    <TextBlock VerticalAlignment="Center" 
+                               Margin="8,0,0,0"
+                               Text="Add UPS or other device"
+                               FontFamily="Segoe UI"
+                               FontSize="14" />
+                </StackPanel>
+            </Button>
+        </StackPanel>
+
+        <StackPanel>
+            <StackPanel.Style>
+                <Style TargetType="StackPanel">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                    <Style.Triggers>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding Path=MainWindow.IsConnectedToService}" Value="True" />
+                                <Condition Binding="{Binding Path=MainWindow.HasDevices}" Value="True" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Visibility" Value="Visible"></Setter>
+                        </MultiDataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </StackPanel.Style>
+
+            <TextBlock Style="{StaticResource SubTextStyle}"
+                       Text="This is a short little text block about the overall info about your device. It should be about two sentences in length." />
+
+            <StackPanel Orientation="Horizontal" Margin="0,16,0,0">
                 <TextBlock VerticalAlignment="Center" 
-                           Margin="16,0,0,0"
-                           Text="Add UPS or other device"
+                           Text="Device status:"
+                           FontFamily="Segoe UI" Margin="0,0,6,0"
+                           FontSize="15" />
+                <TextBlock VerticalAlignment="Center" FontWeight="SemiBold"
+                           Text="{Binding Path=ActiveDevice.StatusDisplayString}" 
+                           Foreground="{Binding Path=ActiveDevice.StatusSeverity, Converter={StaticResource DeviceSeverityToColor}}"
                            FontFamily="Segoe UI"
-                           FontSize="16" />
+                           FontSize="15" />
             </StackPanel>
-        </Button>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock VerticalAlignment="Center" 
+                           Text="Estimated runtime:"
+                           FontFamily="Segoe UI" Margin="0,0,6,0"
+                           FontSize="15" />
+                <TextBlock VerticalAlignment="Center" FontWeight="SemiBold"
+                           Text="{Binding Path=ActiveDevice.EstimatedRuntimeDisplayString}" 
+                           Foreground="{Binding Path=ActiveDevice.EstimatedRuntimeSeverity, Converter={StaticResource DeviceSeverityToColor}}"
+                           FontFamily="Segoe UI"
+                           FontSize="15" />
+            </StackPanel>
+            <TextBlock Text="Your device is online and operating normally"
+                       FontFamily="Segoe UI" Foreground="#888"
+                       FontSize="15" />
 
-        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalAlignment="Left" Margin="0,16,0,0">
-            <ItemsControl ItemsSource="{Binding Path=HomePage.DeviceGroups}" Focusable="False">
+            <StackPanel Orientation="Horizontal" Margin="0,16,0,0">
+                <Button Style="{StaticResource FluentPageButton}"
+                        HorizontalAlignment="Left"
+                        Command="{Binding Path=RemoveDeviceCommand}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock FontFamily="Segoe MDL2 Assets"
+                                   Text="&#xE74D;"
+                                   FontSize="16" 
+                                   VerticalAlignment="Center"/>
+                        <TextBlock VerticalAlignment="Center" 
+                                   Margin="8,0,0,0"
+                                   Text="Remove device"
+                                   FontFamily="Segoe UI"
+                                   FontSize="14" />
+                    </StackPanel>
+                </Button>
+
+                <Rectangle VerticalAlignment="Stretch" Width="1" Margin="8,4" Stroke="Black" />
+
+                <Button Style="{StaticResource FluentPageButton}"
+                        HorizontalAlignment="Left"
+                        Command="{Binding Path=AddDeviceCommand}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock FontFamily="Segoe MDL2 Assets"
+                                   Text="&#xE836;"
+                                   FontSize="16" 
+                                   VerticalAlignment="Center"/>
+
+                        <TextBlock VerticalAlignment="Center" 
+                                   Margin="8,0,0,0"
+                                   Text="Add another UPS or other device"
+                                   FontFamily="Segoe UI"
+                                   FontSize="14" />
+                    </StackPanel>
+                </Button>
+
+            </StackPanel>
+        </StackPanel>
+
+        <!--<ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalAlignment="Left" Margin="0,16,0,0">
+            <ItemsControl ItemsSource="{Binding Path=DeviceGroups}" Focusable="False">
                 <ItemsControl.Resources>
                     <ResourceDictionary>
                         <DataTemplate DataType="{x:Type viewModels:DeviceReferenceGroupViewModel}">
@@ -61,6 +175,35 @@
                     </ResourceDictionary>
                 </ItemsControl.Resources>
             </ItemsControl>
-        </ScrollViewer>
+        </ScrollViewer>-->
+
+        <!--<ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalAlignment="Left" Margin="0,16,0,0">
+            <ItemsControl ItemsSource="{Binding Path=DeviceGroups}" Focusable="False">
+                <ItemsControl.Resources>
+                    <ResourceDictionary>
+                        <DataTemplate DataType="{x:Type viewModels:DeviceReferenceGroupViewModel}">
+                            <StackPanel>
+                                <Border Height="48" 
+                                        Background="Transparent" 
+                                        BorderThickness="0"
+                                        Padding="0">
+                                    <TextBlock Style="{StaticResource TextHeader1Style}"
+                                               Text="{Binding Path=Header}"
+                                               VerticalAlignment="Center" />
+                                </Border>
+                                <ItemsControl ItemsSource="{Binding Path=Devices}" Focusable="False">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <controls:DeviceTile DataContext="{Binding}"
+                                                                 DisplayMode="RemoveDevice"/>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ResourceDictionary>
+                </ItemsControl.Resources>
+            </ItemsControl>
+        </ScrollViewer>-->
     </StackPanel>
 </UserControl>

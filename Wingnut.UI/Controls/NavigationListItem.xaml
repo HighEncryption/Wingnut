@@ -3,9 +3,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:navigation="clr-namespace:Wingnut.UI.Navigation"
+             xmlns:ui="clr-namespace:Wingnut.UI"
+             xmlns:viewModels="clr-namespace:Wingnut.UI.ViewModels"
              mc:Ignorable="d"
-             d:DataContext="{d:DesignInstance navigation:NavigationSectionViewModel}"
+             d:DataContext="{d:DesignInstance viewModels:MainWindowViewModel}"
              d:DesignHeight="48" d:DesignWidth="200">
     <Border Height="42" 
             Padding="0,6" 
@@ -48,7 +49,17 @@
                 <TextBlock FontSize="14"
                            Text="{Binding Path=NavigationHeader}"
                            Margin="12,0,0,0"
-                           VerticalAlignment="Bottom" />
+                           VerticalAlignment="Bottom" >
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=ui:MainWindow}, Path=DataContext.IsNavigationCollapsed}" Value="True">
+                                    <Setter Property="Visibility" Value="Hidden" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
             </StackPanel>
         </Border>
     </Border>

@@ -3,4 +3,13 @@
                     xmlns:converters="clr-namespace:Wingnut.UI.Converters">
     <converters:DeviceSeverityToColorConverter x:Key="DeviceSeverityToColor" />
     <converters:DoubleToPercentageStringConverter x:Key="DoubleToPercentageString" />
+
+    <converters:CollectionToVisibilityConverter x:Key="CollectionToVisibilityCollapsed"  EmptyIsCollapsed="True" />
+    <converters:CollectionToVisibilityConverter x:Key="CollectionToVisibilityCollapsedReversed"  EmptyIsCollapsed="True" ReverseValue="True" />
+
+    <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibility" />
+    <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityCollapsed" CollapsedWhenFalse="True" />
+    <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityReversed" ReverseValue="True" />
+    <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityCollapsedReversed" CollapsedWhenFalse="True" ReverseValue="True" />
+
 </ResourceDictionary>

@@ -7,121 +7,191 @@
                          xmlns:fluentWpf="clr-namespace:SourceChord.FluentWPF;assembly=FluentWPF"
                          xmlns:controls="clr-namespace:Wingnut.UI.Controls"
                          mc:Ignorable="d"
-                         Title="AddDeviceWindow" Height="800" Width="702" UseLayoutRounding="True"
-                         AcrylicWindowStyle="NoIcon" ExtendViewIntoTitleBar="True"
+                         Title="AddDeviceWindow" 
+                         SizeToContent="Height"
+                         Width="500" 
+                         UseLayoutRounding="True"
+                         AcrylicWindowStyle="NoIcon" 
+                         ExtendViewIntoTitleBar="True"
+                         Icon="../Resources/Graphics/battery_charge.ico"
                          d:DataContext="{d:DesignInstance viewModels:AddDeviceWindowViewModel}">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Converters.xaml" />
                 <ResourceDictionary Source="/XamlResources.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
             <Style TargetType="TextBlock" x:Key="PropertyHeaderStyle">
                 <Setter Property="Margin" Value="0,16,0,4" />
                 <Setter Property="FontFamily" Value="Segoe UI" />
-                <Setter Property="FontSize" Value="16" />
+                <Setter Property="FontSize" Value="14" />
             </Style>
             <Style TargetType="TextBox" x:Key="PropertyTextBoxStyle">
                 <Setter Property="BorderThickness" Value="2" />
                 <Setter Property="BorderBrush" Value="#999999" />
-                <Setter Property="Width" Value="300" />
                 <Setter Property="Height" Value="32" />
-                <Setter Property="FontSize" Value="15" />
+                <Setter Property="FontSize" Value="14" />
                 <Setter Property="Padding" Value="4,0" />
-                <Setter Property="HorizontalAlignment" Value="Left" />
+                <Setter Property="HorizontalAlignment" Value="Stretch" />
                 <Setter Property="VerticalContentAlignment" Value="Center" />
             </Style>
             <Style TargetType="PasswordBox" x:Key="PropertyPasswordBoxStyle">
                 <Setter Property="BorderThickness" Value="2" />
                 <Setter Property="BorderBrush" Value="#999999" />
-                <Setter Property="Width" Value="300" />
                 <Setter Property="Height" Value="32" />
-                <Setter Property="FontSize" Value="15" />
+                <Setter Property="FontSize" Value="14" />
                 <Setter Property="Padding" Value="4,0" />
-                <Setter Property="HorizontalAlignment" Value="Left" />
+                <Setter Property="HorizontalAlignment" Value="Stretch" />
                 <Setter Property="VerticalContentAlignment" Value="Center" />
             </Style>
         </ResourceDictionary>
     </Window.Resources>
     <Grid Background="White">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
             <RowDefinition />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <StackPanel Margin="120,32,120,0">
-
+        <StackPanel Margin="32,32,32,16">
             <TextBlock Style="{StaticResource TextHeader1Style}"
                        Margin="0,0,0,0"
                        Text="Add Device" />
-            <TextBlock Style="{StaticResource SubTextStyle}"
-                       Margin="0,0,0,24" Width="500"
-                       Text="This is a short little text block about the overall info about your device. It should be about two sentences in length." />
+            <!--<TextBlock Style="{StaticResource SubTextStyle}"
+                       Margin="0,0,0,24" 
+                       Width="500"
+                       Text="This is a short little text block about the overall info about your device. It should be about two sentences in length." />-->
 
-            <TextBlock Style="{StaticResource PropertyHeaderStyle}" 
-                       Margin="0,0,0,4"
-                       Text="Server address" />
+        </StackPanel>
+        <StackPanel Grid.Row="1" Background="#E9E9E9">
+            <StackPanel  Margin="32,32,32,24">
 
-            <TextBox Style="{StaticResource PropertyTextBoxStyle}"
-                     Text="{Binding Path=ServerAddress, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBlock Style="{StaticResource SubTextStyle}"
+                           Margin="0,0,0,24" 
+                           Text="This is a short little text block about the overall info about your device. It should be about two sentences in length." />
 
-            <TextBlock Style="{StaticResource PropertyHeaderStyle}" 
-                       Text="Server port" />
+                <Grid VerticalAlignment="Top">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
 
-            <TextBox Style="{StaticResource PropertyTextBoxStyle}"
-                     Text="{Binding Path=ServerPort, UpdateSourceTrigger=PropertyChanged}"/>
+                    <Grid.RowDefinitions>
+                        <RowDefinition  Height="Auto"/>
+                        <RowDefinition  Height="Auto"/>
+                        <RowDefinition  Height="16"/>
+                        <RowDefinition  Height="Auto"/>
+                        <RowDefinition  Height="Auto"/>
+                        <RowDefinition  Height="16"/>
+                        <RowDefinition  Height="Auto"/>
+                        <RowDefinition  Height="Auto"/>
+                        <RowDefinition  Height="16"/>
+                        <RowDefinition  Height="Auto"/>
+                        <RowDefinition  Height="Auto"/>
+                    </Grid.RowDefinitions>
 
-            <TextBlock Style="{StaticResource PropertyHeaderStyle}" 
-                       Text="Username" />
-
-            <TextBox Style="{StaticResource PropertyTextBoxStyle}"
-                     Text="{Binding Path=Username, UpdateSourceTrigger=PropertyChanged}"/>
-
-            <TextBlock Style="{StaticResource PropertyHeaderStyle}" 
-                       Text="Username" />
-
-            <StackPanel Orientation="Horizontal">
-                <PasswordBox Style="{StaticResource PropertyPasswordBoxStyle}"
-                             PasswordChanged="PasswordBox_OnPasswordChanged" />
-
-                <Button Style="{StaticResource CommonButtonStyle}"
-                        Margin="16,0,0,0"
-                        Command="{Binding Path=GetDevicesCommand}">
-                    <TextBlock Text="Get Devices"
+                    <TextBlock Grid.Column="0"
+                               Grid.Row="0"
+                               Style="{StaticResource PropertyHeaderStyle}" 
+                               Margin="0,0,16,0"
                                VerticalAlignment="Center"
-                               FontFamily="Segoe UI"
-                               FontSize="15"/>
-                </Button>
-            </StackPanel>
+                               Text="Server address" />
 
-            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalAlignment="Left" Margin="0,16,0,0">
-                <ItemsControl ItemsSource="{Binding Path=DeviceGroups}" Focusable="False">
-                    <ItemsControl.Resources>
-                        <ResourceDictionary>
-                            <DataTemplate DataType="{x:Type viewModels:DeviceReferenceGroupViewModel}">
-                                <StackPanel>
-                                    <Border Height="48" 
-                                            Background="Transparent" 
-                                            BorderThickness="0"
-                                            Padding="0">
-                                        <TextBlock Style="{StaticResource TextHeader1Style}"
-                                                   Text="{Binding Path=Header}"
-                                                   VerticalAlignment="Center" />
-                                    </Border>
-                                    <ItemsControl ItemsSource="{Binding Path=Devices}" Focusable="False">
-                                        <ItemsControl.ItemTemplate>
-                                            <DataTemplate>
-                                                <controls:DeviceTile DataContext="{Binding}"
-                                                                     DisplayMode="AddDevice"/>
-                                            </DataTemplate>
-                                        </ItemsControl.ItemTemplate>
-                                    </ItemsControl>
-                                </StackPanel>
-                            </DataTemplate>
-                        </ResourceDictionary>
-                    </ItemsControl.Resources>
-                </ItemsControl>
-            </ScrollViewer>
+                    <TextBox Grid.Column="1"
+                             Grid.Row="0"
+                             Style="{StaticResource PropertyTextBoxStyle}"
+                             Text="{Binding Path=ServerAddress, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBlock Grid.Column="1"
+                               Grid.Row="1"
+                               Style="{StaticResource SubTextSmallStyle}" 
+                               Text="The name or IP address of the computer where Network Ups Tools is installed, or leave blank if installed on the local computer." />
+
+                    <TextBlock Grid.Column="0"
+                               Grid.Row="3"
+                               Margin="0,0,16,0"
+                               VerticalAlignment="Center"
+                               Style="{StaticResource PropertyHeaderStyle}" 
+                               Text="Server Port" />
+
+                    <TextBox Grid.Column="1"
+                             Grid.Row="3"
+                             Style="{StaticResource PropertyTextBoxStyle}"
+                            Text="{Binding Path=ServerPort, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBlock Grid.Column="1"
+                               Grid.Row="4"
+                               Style="{StaticResource SubTextSmallStyle}" 
+                               Text="The port number used by Network Ups Tools. If you don't know it, use the default value of 3493." />
+
+                    <TextBlock Grid.Column="0"
+                               Grid.Row="6"
+                               Margin="0,0,16,0"
+                               VerticalAlignment="Center"
+                               Style="{StaticResource PropertyHeaderStyle}" 
+                               Text="Username" />
+
+                    <TextBox Grid.Column="1"
+                             Grid.Row="6"
+                             Style="{StaticResource PropertyTextBoxStyle}"
+                             Text="{Binding Path=Username, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBlock Grid.Column="1"
+                               Grid.Row="7"
+                               Style="{StaticResource SubTextSmallStyle}" 
+                               Text="The name of the monitoring account in upsd." />
+
+                    <TextBlock Grid.Column="0"
+                               Grid.Row="9"
+                               Style="{StaticResource PropertyHeaderStyle}" 
+                               Margin="0,0,16,0"
+                               VerticalAlignment="Center"
+                               Text="Password" />
+
+                    <PasswordBox Grid.Column="1"
+                                 Grid.Row="9"
+                                 Style="{StaticResource PropertyPasswordBoxStyle}"
+                                 PasswordChanged="PasswordBox_OnPasswordChanged" />
+                    <TextBlock Grid.Column="1"
+                               Grid.Row="10"
+                               Style="{StaticResource SubTextSmallStyle}" 
+                               Text="The password of the monitoring account in upsd." />
+
+                </Grid>
+
+                <Grid Margin="0,32,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+
+                    <Button Grid.Column="0" 
+                            Style="{StaticResource DialogButton}"
+                            IsDefault="True"
+                            Command="{Binding Path=GetDevicesCommand}">
+                        <TextBlock Text="Get Devices"
+                               FontWeight="SemiBold"
+                               VerticalAlignment="Center"
+                               HorizontalAlignment="Center"
+                               FontFamily="Segoe UI"
+                               FontSize="14"/>
+                    </Button>
+                    <Button Grid.Column="1"
+                            Style="{StaticResource DialogButton}"
+                            Margin="8,0,0,0"
+                            Command="{Binding Path=CancelCommand}">
+                        <TextBlock Text="Cancel"
+                               FontWeight="SemiBold"
+                               VerticalAlignment="Center"
+                               HorizontalAlignment="Center"
+                               FontFamily="Segoe UI"
+                               FontSize="14"/>
+                    </Button>
+                </Grid>
+
+                <TextBlock Style="{StaticResource SubTextStyle}"
+                           Margin="0,32,0,0"
+                           Text="No devices were found."
+                           Visibility="{Binding Path=NoDevicesFound, Converter={StaticResource BooleanToVisibilityCollapsed}}"/>
+            </StackPanel>
         </StackPanel>
     </Grid>
 </fluentWpf:AcrylicWindow>

@@ -5,15 +5,16 @@
                       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                       xmlns:fluent="clr-namespace:SourceChord.FluentWPF;assembly=FluentWPF"
                       xmlns:system="clr-namespace:System;assembly=mscorlib"
-                      xmlns:navigation="clr-namespace:Wingnut.UI.Navigation"
                       xmlns:viewModels="clr-namespace:Wingnut.UI.ViewModels"
                       xmlns:controls="clr-namespace:Wingnut.UI.Controls"
                       xmlns:pages="clr-namespace:Wingnut.UI.Pages"
                       mc:Ignorable="d"
                       d:DataContext="{d:DesignInstance viewModels:MainWindowViewModel}"
-                      ExtendViewIntoTitleBar="True" AcrylicWindowStyle="NoIcon"
+                      ExtendViewIntoTitleBar="True" 
+                      AcrylicWindowStyle="NoIcon"
+                      Icon="Resources/Graphics/battery_charge.ico"
                       TintOpacity="0.85"
-                      TintColor="#EEEEEEEE" 
+                      TintColor="#EEEEEEEE"
                       NoiseOpacity="0"
                       Title="MainWindow" 
                       Height="700" Width="1000">
@@ -27,62 +28,89 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <!-- Left column to allow acrylic to show through -->
-            <ColumnDefinition Width="200" />
+            <ColumnDefinition Width="Auto" />
             <!-- Remainder of the window is opaque white -->
             <ColumnDefinition  />
         </Grid.ColumnDefinitions>
-        <Border Grid.Column="0" Margin="0,50,-1,0" Background="Transparent">
-            <!--<ScrollViewer VerticalScrollBarVisibility="Auto">-->
+
+        <Grid Grid.Column="0">
+            <Grid.Style>
+                <Style TargetType="Grid">
+                    <Setter Property="Width" Value="160" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Path=IsNavigationCollapsed}" Value="True">
+                            <Setter Property="Width" Value="48" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Style>
+            <Border Grid.Column="0" Margin="0,50,-1,0">
                 <StackPanel>
-                    <ItemsControl ItemsSource="{Binding Path=NavigationSections}" Focusable="False">
-                        <ItemsControl.Resources>
-                            <ResourceDictionary>
-                                <DataTemplate DataType="{x:Type navigation:NavigationSectionViewModel}">
-                                    <controls:NavigationListItem DataContext="{Binding}" />
-                                </DataTemplate>
-                                <DataTemplate DataType="{x:Type navigation:NavigationSectionGroupViewModel}">
-                                    <StackPanel Margin="0,0,0,0">
-                                        <Border Height="42" 
-                                                Background="Transparent" 
-                                                BorderThickness="0"
-                                                Padding="16,0,0,0">
-                                            <TextBlock FontSize="16"
-                                                       FontWeight="SemiBold"
-                                                       Text="{Binding Path=NavigationHeader}"
-                                                       VerticalAlignment="Center" />
-                                        </Border>
-                                        <ItemsControl ItemsSource="{Binding Path=Sections}" Focusable="False">
-                                            <ItemsControl.ItemTemplate>
-                                                <DataTemplate>
-                                                    <controls:NavigationListItem DataContext="{Binding}" />
-                                                </DataTemplate>
-                                            </ItemsControl.ItemTemplate>
-                                        </ItemsControl>
-                                    </StackPanel>
-                                </DataTemplate>
-                            </ResourceDictionary>
-                        </ItemsControl.Resources>
+                    <Button Margin="0,0,0,10"
+                            Command="{Binding Path=ToggleNavigationPane}"
+                            HorizontalAlignment="Left">
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="Background" Value="Transparent" />
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate>
+                                            <Border BorderThickness="0"
+                                                    Padding="0"
+                                                    Width="48"
+                                                    Height="48"
+                                                    Background="{TemplateBinding Background}"
+                                                    BorderBrush="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Border}, Path=BorderBrush}">
+                                                <TextBlock FontFamily="Segoe MDL2 Assets"
+                                                           Text="&#xe700;"
+                                                           FontSize="16" 
+                                                           VerticalAlignment="Center"
+                                                           HorizontalAlignment="Center"/>
+                                            </Border>
+
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsMouseOver}" Value="True">
+                                        <Setter Property="Background" Value="#DDDEDEDE"/>
+                                    </DataTrigger>
+                                    <Trigger Property="IsPressed" Value="True">
+                                        <Setter Property="Background" Value="#EEC0C0C0"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+
+                    <ItemsControl ItemsSource="{Binding Path=Pages}" Focusable="False">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <controls:NavigationListItem DataContext="{Binding}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
                     </ItemsControl>
                 </StackPanel>
-            <!--</ScrollViewer>-->
-        </Border>
+            </Border>
+        </Grid>
 
         <Grid Grid.Column="1" Background="White">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
                 <RowDefinition />
             </Grid.RowDefinitions>
 
-            <Border Margin="0,0,0,-1">
+            <Border Grid.Row="1" Margin="0,0,0,-1">
                 <StackPanel Margin="24,0" VerticalAlignment="Bottom">
-                    <TextBlock Text="{Binding Path=SelectedNavigationSection.PageHeader}"
+                    <TextBlock Text="{Binding Path=SelectedPage.PageHeader}"
                                Margin="0,48,0,0"
                                FontFamily="Segoe UI Light"
                                FontSize="30" />
                 </StackPanel>
             </Border>
 
-            <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Row="1" Focusable="False">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Row="2" Focusable="False">
                 <ScrollViewer.Resources>
                     <system:Double x:Key="{x:Static SystemParameters.VerticalScrollBarWidthKey}">12</system:Double>
                 </ScrollViewer.Resources>
@@ -94,22 +122,22 @@
                         <ColumnDefinition Width="220" />
                     </Grid.ColumnDefinitions>
 
-                    <ContentControl Grid.Column="0" Content="{Binding Path=SelectedNavigationSection}">
+                    <ContentControl Grid.Column="0" Content="{Binding Path=SelectedPage}">
                         <ContentControl.Resources>
                             <ResourceDictionary>
-                                <DataTemplate DataType="{x:Type navigation:HomePageNavigationViewModel}">
+                                <DataTemplate DataType="{x:Type viewModels:HomePageViewModel}">
                                     <pages:HomePage DataContext="{Binding}" />
                                 </DataTemplate>
-                                <DataTemplate DataType="{x:Type navigation:UpsStatusNavigationViewModel}">
+                                <DataTemplate DataType="{x:Type viewModels:StatusPageViewModel}">
                                     <pages:UpsStatusPage DataContext="{Binding}" />
                                 </DataTemplate>
-                                <DataTemplate DataType="{x:Type navigation:UpsNotificationsNavigationViewModel}">
+                                <DataTemplate DataType="{x:Type viewModels:NotificationsPageViewModel}">
                                     <pages:UpsNotificationsPage DataContext="{Binding}" />
                                 </DataTemplate>
-                                <DataTemplate DataType="{x:Type navigation:UpsEnergyUsageNavigationViewModel}">
+                                <DataTemplate DataType="{x:Type viewModels:EnergyUsagePageViewModel}">
                                     <pages:DeviceEnergyUsagePage DataContext="{Binding}" />
                                 </DataTemplate>
-                                <DataTemplate DataType="{x:Type navigation:UpsSettingsNavigationViewModel}">
+                                <DataTemplate DataType="{x:Type viewModels:SettingsPageViewModel}">
                                     <pages:UpsSettingsPage DataContext="{Binding}" />
                                 </DataTemplate>
                             </ResourceDictionary>
@@ -117,6 +145,24 @@
                     </ContentControl>
                 </Grid>
             </ScrollViewer>
+        </Grid>
+
+        <Grid Grid.Column="0" Grid.ColumnSpan="2" 
+              VerticalAlignment="Top">
+            <TextBlock Text="Wingnut" 
+                       VerticalAlignment="Top"
+                       HorizontalAlignment="Left">
+                <TextBlock.Style>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="Margin" Value="16,8,0,0" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Path=IsNavigationCollapsed}" Value="True">
+                                <Setter Property="Margin" Value="72,8,0,0" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
         </Grid>
 
         <Border Grid.Column="1" BorderBrush="#DDDDDD" BorderThickness="1,0,0,0" ClipToBounds="True">

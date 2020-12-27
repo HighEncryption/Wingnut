@@ -9,11 +9,16 @@
     <Style TargetType="TextBlock" x:Key="SubTextStyle">
         <Style.Setters>
             <Setter Property="FontFamily" Value="Segoe UI" />
-            <Setter Property="FontSize" Value="15" />
-            <Setter Property="Foreground" Value="#888" />
+            <Setter Property="FontSize" Value="14" />
+            <!--<Setter Property="Foreground" Value="#888" />-->
+            <Setter Property="Foreground" Value="Black" />
             <Setter Property="TextWrapping" Value="Wrap" />
             <Setter Property="HorizontalAlignment" Value="Left" />
         </Style.Setters>
+    </Style>
+
+    <Style TargetType="TextBlock" x:Key="SubTextSmallStyle" BasedOn="{StaticResource SubTextStyle}">
+        <Setter Property="FontWeight" Value="Light" />
     </Style>
 
     <Style TargetType="Button" x:Key="CommonButtonStyle">
@@ -39,9 +44,22 @@
                             <MultiTrigger.Conditions>
                                 <Condition Property="IsMouseOver" Value="true" />
                                 <Condition Property="IsEnabled" Value="true" />
+                                <Condition Property="IsDefault" Value="False" />
                             </MultiTrigger.Conditions>
                             <!--<Setter Property="Background" TargetName="buttonBorder" Value="#F2F2F2"/>-->
                             <Setter Property="BorderBrush" TargetName="buttonBorder" Value="#999999"/>
+                            <Setter Property="Background" TargetName="buttonBorder" Value="#D6D6D6"/>
+                        </MultiTrigger>
+
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsMouseOver" Value="true" />
+                                <Condition Property="IsEnabled" Value="true" />
+                                <Condition Property="IsDefault" Value="True" />
+                            </MultiTrigger.Conditions>
+                            <!--<Setter Property="Background" TargetName="buttonBorder" Value="#F2F2F2"/>-->
+                            <Setter Property="Background" TargetName="buttonBorder" Value="#338FD8"/>
+                            <Setter Property="Foreground" Value="White" />
                         </MultiTrigger>
 
                         <MultiTrigger>
@@ -52,6 +70,15 @@
                             <Setter Property="Background" TargetName="buttonBorder" Value="#999999"/>
                             <Setter Property="BorderBrush" TargetName="buttonBorder" Value="#999999"/>
                         </MultiTrigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsMouseOver" Value="False" />
+                                <Condition Property="IsDefault" Value="True" />
+                                <Condition Property="IsEnabled" Value="True" />
+                            </MultiTrigger.Conditions>
+                            <Setter Property="Background" TargetName="buttonBorder" Value="#0078D4" />
+                            <Setter Property="Foreground" Value="White" />
+                        </MultiTrigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter Property="Foreground" Value="#7A7A7A" />
                         </Trigger>
@@ -59,6 +86,11 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+    </Style>
+
+    <Style TargetType="Button" x:Key="DialogButton" BasedOn="{StaticResource CommonButtonStyle}">
+        <Setter Property="Height" Value="36" />
+        <Setter Property="BorderThickness" Value="0" />
     </Style>
 
     <Style TargetType="ToggleButton" x:Key="FluentToggleSwitchStyle">
@@ -119,6 +151,39 @@
     </Style>
 
     <Style TargetType="Button" x:Key="FluentPageButton">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="4" />
+        <Setter Property="UseLayoutRounding" Value="True" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border x:Name="buttonBorder"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            Background="{TemplateBinding Background}">
+                        <ContentPresenter x:Name="buttonContentPresenter" 
+                                          Margin="{TemplateBinding Padding}"
+                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsMouseOver" Value="true" />
+                                <Condition Property="IsEnabled" Value="true" />
+                            </MultiTrigger.Conditions>
+                            <Setter Property="BorderBrush" TargetName="buttonBorder" Value="#BBB"/>
+                            <!--<Setter Property="BorderBrush" TargetName="buttonBorder" Value="#7d7d7d"/>-->
+                        </MultiTrigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+
+    <Style TargetType="Button" x:Key="FluentPageButtonOld">
         <Setter Property="Height" Value="60" />
         <Setter Property="Width" Value="460" />
         <Setter Property="Background" Value="Transparent" />
