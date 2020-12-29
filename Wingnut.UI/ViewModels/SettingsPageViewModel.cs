@@ -8,5 +8,7 @@
             this.PageHeader = "Settings";
             this.Glyph = "\uE713";
         }
+
+        public override bool IsEnabled => true;
     }
 }

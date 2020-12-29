@@ -16,7 +16,7 @@
         {
         }
 
-        public void UpsDeviceRemoved(Ups ups)
+        public void UpsDeviceRemoved(string serverName, string upsName)
         {
         }
     }

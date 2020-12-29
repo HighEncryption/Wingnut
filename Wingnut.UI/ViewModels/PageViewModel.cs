@@ -24,6 +24,14 @@
             set => this.SetProperty(ref this.navigationHeader, value);
         }
 
+        private string headerImage;
+
+        public string HeaderImage
+        {
+            get => this.headerImage;
+            set => this.SetProperty(ref this.headerImage, value);
+        }
+
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private string glyph;
 
@@ -48,6 +56,9 @@
             }
         }
 
+        public virtual bool IsEnabled =>
+            App.Current.MainWindowViewModel.SelectedDevice != null;
+
         protected PageViewModel()
         {
             App.Current.MainWindowViewModel.PropertyChanged += (sender, args) =>
@@ -55,6 +66,7 @@
                 if (args.PropertyName == nameof(MainWindowViewModel.SelectedDevice))
                 {
                     this.RaisePropertyChanged(nameof(this.ActiveDevice));
+                    this.RaisePropertyChanged(nameof(this.IsEnabled));
                 }
             };
         }

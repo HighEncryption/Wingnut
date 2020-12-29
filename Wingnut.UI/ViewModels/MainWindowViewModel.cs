@@ -16,29 +16,6 @@
 
     public class MainWindowViewModel : ViewModelBase, IDisposable
     {
-        //private ObservableCollection<NavigationSectionViewModel> navigationSections;
-
-        //public ObservableCollection<NavigationSectionViewModel> NavigationSections =>
-        //    this.navigationSections ?? (this.navigationSections = new ObservableCollection<NavigationSectionViewModel>());
-
-        //[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        //private NavigationSectionViewModel selectedNavigationSection;
-
-        //public NavigationSectionViewModel SelectedNavigationSection
-        //{
-        //    get => this.selectedNavigationSection;
-        //    set
-        //    {
-        //        var previousNavSection = this.selectedNavigationSection;
-
-        //        if (this.SetProperty(ref this.selectedNavigationSection, value) &&
-        //            previousNavSection != null)
-        //        {
-        //            previousNavSection.IsSelected = false;
-        //        }
-        //    } 
-        //}
-
         private ObservableCollection<PageViewModel> pages;
 
         public ObservableCollection<PageViewModel> Pages =>
@@ -58,6 +35,14 @@
                     previousPath.IsSelected = false;
                 }
             }
+        }
+
+        private SettingsPageViewModel settingsPageViewModel;
+
+        public SettingsPageViewModel SettingsPageViewModel
+        {
+            get => this.settingsPageViewModel;
+            set => this.SetProperty(ref this.settingsPageViewModel, value);
         }
 
         private bool isNavigationCollapsed;
@@ -124,7 +109,6 @@
                 {
                     if (viewModel.Ups.QualifiedName == ups.QualifiedName)
                     {
-                        //viewModel.Update(ups);
                         viewModel.Ups.UpdateVariables(ups);
                         return;
                     }
@@ -251,19 +235,8 @@
             this.Pages.Add(new StatusPageViewModel());
             this.Pages.Add(new NotificationsPageViewModel());
             this.Pages.Add(new EnergyUsagePageViewModel());
-            this.Pages.Add(new SettingsPageViewModel());
+
+            this.SettingsPageViewModel = new SettingsPageViewModel();
         }
-
-        //public void Initialize()
-        //{
-        //    var homePageSection = new HomePageNavigationViewModel(new HomePageViewModel());
-        //    this.NavigationSections.Add(homePageSection);
-        //    homePageSection.IsSelected = true;
-
-        //    this.NavigationSections.Add(new UpsStatusNavigationViewModel());
-        //    this.NavigationSections.Add(new UpsNotificationsNavigationViewModel());
-        //    this.NavigationSections.Add(new UpsEnergyUsageNavigationViewModel());
-        //    this.NavigationSections.Add(new UpsSettingsNavigationViewModel());
-        //}
     }
 }

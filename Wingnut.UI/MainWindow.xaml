@@ -13,13 +13,17 @@
                       ExtendViewIntoTitleBar="True" 
                       AcrylicWindowStyle="NoIcon"
                       Icon="Resources/Graphics/battery_charge.ico"
-                      TintOpacity="0.85"
+                      TintOpacity="0.75"
                       TintColor="#EEEEEEEE"
                       NoiseOpacity="0"
                       Title="MainWindow" 
                       Height="700" Width="1000">
     <fluent:AcrylicWindow.Resources>
         <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Converters.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
             <Style TargetType="{x:Type TextBlock}">
                 <Setter Property="FontFamily" Value="Segoe UI" />
             </Style>
@@ -92,6 +96,9 @@
                     </ItemsControl>
                 </StackPanel>
             </Border>
+
+            <controls:NavigationListItem DataContext="{Binding Path=SettingsPageViewModel}"
+                                         VerticalAlignment="Bottom"/>
         </Grid>
 
         <Grid Grid.Column="1" Background="White">
@@ -101,13 +108,40 @@
                 <RowDefinition />
             </Grid.RowDefinitions>
 
-            <Border Grid.Row="1" Margin="0,0,0,-1">
-                <StackPanel Margin="24,0" VerticalAlignment="Bottom">
-                    <TextBlock Text="{Binding Path=SelectedPage.PageHeader}"
-                               Margin="0,48,0,0"
-                               FontFamily="Segoe UI Light"
-                               FontSize="30" />
-                </StackPanel>
+            <Border x:Name="BdHeader" Grid.Row="1" Margin="0,0,0,-1">
+                <Grid>
+                    <Image x:Name="ImgHeader" Source="{Binding Path=SelectedPage.HeaderImage}"
+                           Visibility="{Binding Path=SelectedPage.HeaderImage, Converter={StaticResource StringToVisibilityConverter}}" />
+                    <StackPanel Margin="24,0" VerticalAlignment="Bottom">
+                        <TextBlock Text="{Binding Path=SelectedPage.PageHeader}"
+                                   Margin="0,40,0,8"
+                                   FontFamily="Segoe UI Light"
+                                   FontSize="30">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Path=SelectedPage.HeaderImage, Converter={StaticResource StringToVisibilityConverter}}"
+                                                     Value="{x:Static Visibility.Visible}">
+                                            <Setter Property="Foreground" Value="White"></Setter>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </StackPanel>
+                    <!-- 
+                        This border provides a white drop shadow at the top of the window for the title bar 
+                    -->
+                    <Border Height="42" BorderThickness="0" VerticalAlignment="Top">
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                <GradientStop Color="#DDFFFFFF" Offset="0" />
+                                <GradientStop Color="#AAFFFFFF" Offset="0.2" />
+                                <GradientStop Color="#00FFFFFF" Offset="1" />
+                            </LinearGradientBrush>
+                        </Border.Background>
+                    </Border>
+                </Grid>
             </Border>
 
             <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Row="2" Focusable="False">
@@ -145,6 +179,20 @@
                     </ContentControl>
                 </Grid>
             </ScrollViewer>
+
+            <!--
+                This border creates the drop shadow effect between the navigation menu and the main content
+                area. It is only used when there is a header image present (otherwise the lower drop shadow
+                border is used).
+            -->
+            <Border Grid.Row="2" 
+                    BorderBrush="#DDDDDD" 
+                    BorderThickness="1,0,0,0" ClipToBounds="True"
+                    Visibility="{Binding Path=SelectedPage.HeaderImage, Converter={StaticResource StringToVisibilityConverter}}">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="10" RenderingBias="Quality" ShadowDepth="0"/>
+                </Border.Effect>
+            </Border>
         </Grid>
 
         <Grid Grid.Column="0" Grid.ColumnSpan="2" 
@@ -165,7 +213,8 @@
             </TextBlock>
         </Grid>
 
-        <Border Grid.Column="1" BorderBrush="#DDDDDD" BorderThickness="1,0,0,0" ClipToBounds="True">
+        <Border Grid.Column="1" BorderBrush="#DDDDDD" BorderThickness="1,0,0,0" ClipToBounds="True"
+                Visibility="{Binding Path=SelectedPage.HeaderImage, Converter={StaticResource StringToVisibilityConverterReversed}}">
             <Border.Effect>
                 <DropShadowEffect BlurRadius="10" RenderingBias="Quality" ShadowDepth="0"/>
             </Border.Effect>

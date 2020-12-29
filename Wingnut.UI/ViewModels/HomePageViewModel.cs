@@ -42,6 +42,7 @@
             this.Glyph = "\uE80F";
             this.NavigationHeader = "Home";
             this.PageHeader = "Home";
+            this.HeaderImage = "Resources/Graphics/ups_header.jpg";
 
             this.AddDeviceCommand = new DelegatedCommand(this.AddDevice, this.CanAddDevice);
 
@@ -52,6 +53,8 @@
             App.Current.MainWindowViewModel.DeviceViewModels.CollectionChanged +=
                 this.BuildDeviceGroups;
         }
+
+        public override bool IsEnabled => true;
 
         private bool CanRemoveDevice(object obj)
         {

@@ -12,4 +12,7 @@
     <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityReversed" ReverseValue="True" />
     <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityCollapsedReversed" CollapsedWhenFalse="True" ReverseValue="True" />
 
+    <converters:StringToVisibilityConverter x:Key="StringToVisibilityConverter" />
+    <converters:StringToVisibilityConverter x:Key="StringToVisibilityConverterReversed" ReverseValue="True" />
+
 </ResourceDictionary>
