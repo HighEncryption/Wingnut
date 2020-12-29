@@ -68,13 +68,18 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="ColorExtensions.cs" />
     <Compile Include="Controls\DeviceTile.xaml.cs">
       <DependentUpon>DeviceTile.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\NavigationListItem.xaml.cs">
       <DependentUpon>NavigationListItem.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Converters\BooleanToVisibilityConverter.cs" />
+    <Compile Include="Converters\CollectionToVisibilityConverter.cs" />
     <Compile Include="Converters\DeviceSeverityToColorConverter.cs" />
+    <Compile Include="Converters\DoubleToPercentageStringConverter.cs" />
+    <Compile Include="Converters\StringToVisibilityConverter.cs" />
     <Compile Include="Pages\DeviceEnergyUsagePage.xaml.cs">
       <DependentUpon>DeviceEnergyUsagePage.xaml</DependentUpon>
     </Compile>

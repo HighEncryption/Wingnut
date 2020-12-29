@@ -26,14 +26,6 @@
             set => this.SetProperty(ref this.showStatusMessage, value);
         }
 
-        private bool? showNoDevicesMonitored;
-
-        public bool? ShowNoDevicesMonitored
-        {
-            get => this.showNoDevicesMonitored;
-            set => this.SetProperty(ref this.showNoDevicesMonitored, value);
-        }
-
         public MainWindowViewModel MainWindow
             => App.Current.MainWindowViewModel;
 
