@@ -110,7 +110,7 @@
 
             <Border x:Name="BdHeader" Grid.Row="1" Margin="0,0,0,-1">
                 <Grid>
-                    <Image x:Name="ImgHeader" Source="{Binding Path=SelectedPage.HeaderImage}"
+                    <Image x:Name="ImgHeader" Source="{Binding Path=SelectedPage.HeaderImage, Converter={StaticResource NullImageConverter}}"
                            Visibility="{Binding Path=SelectedPage.HeaderImage, Converter={StaticResource StringToVisibilityConverter}}" />
                     <StackPanel Margin="24,0" VerticalAlignment="Bottom">
                         <TextBlock Text="{Binding Path=SelectedPage.PageHeader}"

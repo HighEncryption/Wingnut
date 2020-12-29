@@ -69,9 +69,6 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="ColorExtensions.cs" />
-    <Compile Include="Controls\DeviceTile.xaml.cs">
-      <DependentUpon>DeviceTile.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Controls\NavigationListItem.xaml.cs">
       <DependentUpon>NavigationListItem.xaml</DependentUpon>
     </Compile>
@@ -79,6 +76,7 @@
     <Compile Include="Converters\CollectionToVisibilityConverter.cs" />
     <Compile Include="Converters\DeviceSeverityToColorConverter.cs" />
     <Compile Include="Converters\DoubleToPercentageStringConverter.cs" />
+    <Compile Include="Converters\NullImageConverter.cs" />
     <Compile Include="Converters\StringToVisibilityConverter.cs" />
     <Compile Include="Pages\DeviceEnergyUsagePage.xaml.cs">
       <DependentUpon>DeviceEnergyUsagePage.xaml</DependentUpon>
@@ -117,10 +115,6 @@
     <Compile Include="Windows\SelectDeviceWindow.xaml.cs">
       <DependentUpon>SelectDeviceWindow.xaml</DependentUpon>
     </Compile>
-    <Page Include="Controls\DeviceTile.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Controls\NavigationListItem.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
