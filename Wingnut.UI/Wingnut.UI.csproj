@@ -94,11 +94,17 @@
     <Compile Include="ViewModels\AddDeviceWindowViewModel.cs" />
     <Compile Include="ViewModels\DevicePropertyViewModel.cs" />
     <Compile Include="ViewModels\DeviceViewModel.cs" />
+    <Compile Include="ViewModels\EnergyUsagePageViewModel.cs" />
     <Compile Include="ViewModels\FormatHelpers.cs" />
     <Compile Include="ViewModels\HomePageViewModel.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
     <Compile Include="Startup.cs" />
+    <Compile Include="ViewModels\NotificationsPageViewModel.cs" />
+    <Compile Include="ViewModels\PageViewModel.cs" />
     <Compile Include="ViewModels\RequestClose.cs" />
+    <Compile Include="ViewModels\SelectDeviceWindowViewModel.cs" />
+    <Compile Include="ViewModels\SettingsPageViewModel.cs" />
+    <Compile Include="ViewModels\StatusPageViewModel.cs" />
     <Compile Include="ViewModels\UpsDeviceViewModel.cs" />
     <Compile Include="Windows\AddDeviceWindow.xaml.cs">
       <DependentUpon>AddDeviceWindow.xaml</DependentUpon>

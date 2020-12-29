@@ -1,7 +1,6 @@
 ﻿namespace Wingnut.UI.ViewModels
 {
     using System;
-    using System.Collections.ObjectModel;
     using System.Collections.Specialized;
     using System.Diagnostics;
     using System.Windows;
@@ -12,65 +11,6 @@
     using Wingnut.Tracing;
     using Wingnut.UI.Framework;
     using Wingnut.UI.Windows;
-
-    public abstract class PageViewModel : ViewModelBase
-    {
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private string pageHeader;
-
-        public string PageHeader
-        {
-            get => this.pageHeader;
-            set => this.SetProperty(ref this.pageHeader, value);
-        }
-
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private string navigationHeader;
-
-        public string NavigationHeader
-        {
-            get => this.navigationHeader;
-            set => this.SetProperty(ref this.navigationHeader, value);
-        }
-
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private string glyph;
-
-        public string Glyph
-        {
-            get => this.glyph;
-            set => this.SetProperty(ref this.glyph, value);
-        }
-
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private bool isSelected;
-
-        public bool IsSelected
-        {
-            get => this.isSelected;
-            set
-            {
-                if (this.SetProperty(ref this.isSelected, value) && value)
-                {
-                    App.Current.MainWindowViewModel.SelectedPage = this;
-                }
-            }
-        }
-
-        protected PageViewModel()
-        {
-            App.Current.MainWindowViewModel.PropertyChanged += (sender, args) =>
-            {
-                if (args.PropertyName == nameof(MainWindowViewModel.SelectedDevice))
-                {
-                    this.RaisePropertyChanged(nameof(this.ActiveDevice));
-                }
-            };
-        }
-
-        public UpsDeviceViewModel ActiveDevice =>
-            App.Current.MainWindowViewModel.SelectedDevice as UpsDeviceViewModel;
-    }
 
     public class HomePageViewModel : PageViewModel
     {
@@ -129,7 +69,9 @@
 
             if (result == MessageBoxResult.Yes)
             {
-                
+                App.Current.MainWindowViewModel.Channel.RemoveUps(
+                    this.ActiveDevice.Device.Server.Name,
+                    this.ActiveDevice.DeviceName);
             }
         }
 
@@ -184,12 +126,6 @@
             }
         }
 
-        //private ObservableCollection<DeviceReferenceGroupViewModel> deviceGroups;
-
-        //public ObservableCollection<DeviceReferenceGroupViewModel> DeviceGroups =>
-        //    this.deviceGroups ?? (this.deviceGroups = new ObservableCollection<DeviceReferenceGroupViewModel>());
-
-
         private bool CanAddDevice(object obj)
         {
             return true;
@@ -211,16 +147,13 @@
             {
                 if (windowViewModel.DeviceToAdd is Ups ups)
                 {
-                    Ups addedUps =
-                        App.Current.MainWindowViewModel.Channel.AddUps(
-                            ups.Server,
-                            windowViewModel.Password.GetDecrypted(),
-                            ups.Name,
-                            Constants.DefaultNumPowerSupplies,
-                            false,
-                            false);
-
-                    App.Current.MainWindowViewModel.AddDeviceToService(addedUps);
+                    App.Current.MainWindowViewModel.Channel.AddUps(
+                        ups.Server,
+                        windowViewModel.Password.GetDecrypted(),
+                        ups.Name,
+                        Constants.DefaultNumPowerSupplies,
+                        false,
+                        false);
                 }
                 else
                 {
@@ -232,47 +165,6 @@
                 Logger.Error("Failed to add UPS device. The error was: {0}", e.Message);
                 Logger.Debug("Failed to add UPS device. Exception: {0}", e);
             }
-        }
-    }
-
-    public class StatusPageViewModel : PageViewModel
-    {
-        public StatusPageViewModel()
-        {
-            this.NavigationHeader = "Status";
-            this.PageHeader = "Status";
-            this.Glyph = "\uEC4A";
-        }
-    }
-
-    public class NotificationsPageViewModel : PageViewModel
-    {
-        public NotificationsPageViewModel()
-        {
-            this.NavigationHeader = "Notifications";
-            this.PageHeader = "Notifications";
-            this.Glyph = "\uEC42";
-        }
-    }
-
-
-    public class EnergyUsagePageViewModel : PageViewModel
-    {
-        public EnergyUsagePageViewModel()
-        {
-            this.NavigationHeader = "Energy Usage";
-            this.PageHeader = "Energy Usage";
-            this.Glyph = "\uE9D2";
-        }
-    }
-
-    public class SettingsPageViewModel : PageViewModel
-    {
-        public SettingsPageViewModel()
-        {
-            this.NavigationHeader = "Settings";
-            this.PageHeader = "Settings";
-            this.Glyph = "\uE713";
         }
     }
 }

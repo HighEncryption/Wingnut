@@ -5,6 +5,7 @@
     using System.Linq;
     using System.ServiceModel;
     using System.Threading;
+    using System.Threading.Tasks;
 
     using Wingnut.Channels;
     using Wingnut.Data;
@@ -199,6 +200,26 @@
 
                 ServiceRuntime.Instance.UpsContexts.Add(upsContext);
 
+#pragma warning disable 4014
+                Task.Run(() =>
+                {
+                    foreach (IManagementCallback callbackChannel in
+                        ServiceRuntime.Instance.ClientCallbackChannels)
+                    {
+                        try
+                        {
+                            callbackChannel.UpsDeviceAdded(ups);
+                        }
+                        catch (Exception e)
+                        {
+                            Logger.Error("Caught exception while updating device. " + e.Message);
+                            ServiceRuntime.Instance.ClientCallbackChannels.Remove(callbackChannel);
+                            break;
+                        }
+                    }
+                });
+#pragma warning restore 4014
+
                 return ups;
             }
             catch (Exception exception)
@@ -218,6 +239,62 @@
 
                 throw;
             }
+        }
+
+        public bool RemoveUps(string serverName, string upsName)
+        {
+            string[] serverNameParts = serverName.Split(':');
+            string serverAddress = serverNameParts[0];
+            int serverPort = Convert.ToInt32(serverNameParts[1]);
+
+            var deviceConfig =
+                ServiceRuntime.Instance.Configuration.UpsConfigurations.FirstOrDefault(
+                    config => config.ServerConfiguration.Address == serverAddress &&
+                              config.ServerConfiguration.Port == serverPort &&
+                              config.DeviceName == upsName);
+
+            if (deviceConfig == null)
+            {
+                // There was no config for this device, so it did not exist.
+                return false;
+            }
+
+            ServiceRuntime.Instance.Configuration.UpsConfigurations.Remove(deviceConfig);
+            ServiceRuntime.Instance.SaveConfiguration();
+
+            var upsContext =
+                ServiceRuntime.Instance.UpsContexts.FirstOrDefault(
+                    ctx => ctx.Name == upsName &&
+                           ctx.UpsConfiguration.ServerConfiguration.Address == serverAddress &&
+                           ctx.UpsConfiguration.ServerConfiguration.Port == serverPort);
+
+            if (upsContext != null)
+            {
+                upsContext.StopMonitoring();
+                ServiceRuntime.Instance.UpsContexts.Remove(upsContext);
+            }
+
+#pragma warning disable 4014
+            Task.Run(() =>
+            {
+                foreach (IManagementCallback callbackChannel in
+                    ServiceRuntime.Instance.ClientCallbackChannels)
+                {
+                    try
+                    {
+                        callbackChannel.UpsDeviceRemoved(serverName, upsName);
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Error("Caught exception while updating device. " + e.Message);
+                        ServiceRuntime.Instance.ClientCallbackChannels.Remove(callbackChannel);
+                        break;
+                    }
+                }
+            });
+#pragma warning restore 4014
+
+            return true;
         }
 
         public List<Ups> GetUps(string serverName, string upsName)

@@ -7,9 +7,17 @@
 
     public class CallbackClient : IManagementCallback
     {
-        public void UpsDeviceChanged(Ups ups)
+        public void UpsDeviceAdded(Ups ups)
         {
             throw new System.NotImplementedException();
+        }
+
+        public void UpsDeviceChanged(Ups ups)
+        {
+        }
+
+        public void UpsDeviceRemoved(Ups ups)
+        {
         }
     }
 

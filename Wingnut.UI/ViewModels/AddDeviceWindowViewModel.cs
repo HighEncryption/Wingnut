@@ -91,45 +91,14 @@
             set => this.SetProperty(ref this.noDevicesFound, value);
         }
 
-        //private DeviceReferenceViewModel selectedDevice;
-
-        //public DeviceReferenceViewModel SelectedDevice
-        //{
-        //    get => this.selectedDevice;
-        //    set
-        //    {
-        //        DeviceReferenceViewModel previousValue = this.selectedDevice;
-        //        if (this.SetProperty(ref this.selectedDevice, value) && 
-        //            previousValue != null &&
-        //            previousValue != value)
-        //        {
-        //            previousValue.IsSelected = false;
-        //        }
-        //    }
-        //}
-
         public ICommand GetDevicesCommand { get; set; }
 
         public ICommand CancelCommand { get; set; }
-
-        //private ObservableCollection<DeviceReferenceGroupViewModel> deviceGroups;
-
-        //public ObservableCollection<DeviceReferenceGroupViewModel> DeviceGroups =>
-        //    this.deviceGroups ?? (this.deviceGroups = new ObservableCollection<DeviceReferenceGroupViewModel>());
 
         private ObservableCollection<DeviceReferenceViewModel> deviceReferences;
 
         public ObservableCollection<DeviceReferenceViewModel> DeviceReferences =>
             this.deviceReferences ?? (this.deviceReferences = new ObservableCollection<DeviceReferenceViewModel>());
-
-        private DeviceReferenceViewModel selectedDeviceReference;
-
-        public DeviceReferenceViewModel SelectedDeviceReference
-        {
-            get => this.selectedDeviceReference;
-            set => this.SetProperty(ref this.selectedDeviceReference, value);
-        }
-
 
         public AddDeviceWindowViewModel()
         {
@@ -184,15 +153,11 @@
 
                 App.DispatcherInvoke(() =>
                 {
-                    //this.DeviceGroups.Clear();
                     this.DeviceReferences.Clear();
                 });
 
                 if (devices.Any())
                 {
-                    //DeviceReferenceGroupViewModel referenceGroupViewModel = new DeviceReferenceGroupViewModel(
-                    //    "Uninterruptible power supply");
-
                     foreach (Ups device in devices)
                     {
                         var deviceReference = new DeviceReferenceViewModel(
@@ -200,34 +165,16 @@
                                 device);
 
                         deviceReference.IsEnabled = device.IsManaged == false;
-                        //var deviceReference = new DeviceReferenceViewModel(
-                        //    this,
-                        //    "\uF607",
-                        //    device);
-
-                        //deviceReference.OnDeviceAdded += (sender, args) =>
-                        //{
-                        //    this.DeviceToAdd = ((DeviceReferenceViewModel) sender).Device;
-                        //    this.CloseWindow(true);
-                        //};
-
-                        //referenceGroupViewModel.Devices.Add(deviceReference);
 
                         App.DispatcherInvoke(() =>
                         {
                             this.DeviceReferences.Add(deviceReference);
                         });
                     }
-
-                    //App.DispatcherInvoke(() =>
-                    //{
-                    //    this.DeviceGroups.Add(referenceGroupViewModel);
-                    //});
                 }
 
                 App.DispatcherInvoke(() =>
                 {
-                    //this.ShowDeviceReferences = true;
                     this.DevicesFound = DeviceReferences.Any();
                     this.NoDevicesFound = !DeviceReferences.Any();
 
@@ -241,8 +188,12 @@
                         };
 
                         var dialogResult = selectDeviceWindow.ShowDialog();
+                        if (dialogResult == true)
+                        {
+                            this.DeviceToAdd = selectDeviceWindowViewModel.SelectedDeviceReference.Device;
+                            this.CloseWindow(true);
+                        }
                     }
-
                 });
             }
             catch (Exception exception)
@@ -253,53 +204,6 @@
             {
                 this.IsConnecting = false;
             }
-        }
-    }
-
-    public class SelectDeviceWindowViewModel : ViewModelBase
-    {
-        public event RequestCloseEventHandler RequestClose;
-
-        public ICommand SelectDeviceCommand { get; set; }
-
-        public ICommand CancelCommand { get; set; }
-
-        public List<DeviceReferenceViewModel> DeviceReferences { get; }
-
-        private DeviceReferenceViewModel selectedDeviceReference;
-
-        public DeviceReferenceViewModel SelectedDeviceReference
-        {
-            get => this.selectedDeviceReference;
-            set => this.SetProperty(ref this.selectedDeviceReference, value);
-        }
-
-        public SelectDeviceWindowViewModel()
-        {
-            this.DeviceReferences = new List<DeviceReferenceViewModel>();
-
-            this.SelectDeviceCommand = new DelegatedCommand(
-                this.SelectDeviceOnExecute,
-                this.SelectDeviceCanExecute);
-
-            this.CancelCommand = new DelegatedCommand(
-                o => this.CloseWindow(false));
-        }
-
-        private bool SelectDeviceCanExecute(object obj)
-        {
-            return this.SelectedDeviceReference != null && 
-                   this.SelectedDeviceReference.Device.IsManaged == false;
-        }
-
-        private void SelectDeviceOnExecute(object obj)
-        {
-            this.CloseWindow(true);
-        }
-
-        public void CloseWindow(bool dialogResult)
-        {
-            this.RequestClose?.Invoke(this, new RequestCloseEventArgs(dialogResult));
         }
     }
 }

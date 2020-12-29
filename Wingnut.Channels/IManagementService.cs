@@ -56,14 +56,26 @@
             bool force);
 
         [OperationContract]
+        bool RemoveUps(
+            string serverName,
+            string upsName);
+
+        [OperationContract]
         List<Ups> GetUps(
             string serverName, 
             string upsName);
     }
 
+    [ServiceContract]
     public interface IManagementCallback
     {
         [OperationContract(IsOneWay = true)]
+        void UpsDeviceAdded(Ups ups);
+
+        [OperationContract(IsOneWay = true)]
         void UpsDeviceChanged(Ups ups);
+
+        [OperationContract(IsOneWay = true)]
+        void UpsDeviceRemoved(string serverName, string upsName);
     }
 }

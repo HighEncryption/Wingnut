@@ -107,6 +107,14 @@
 
         private class CallbackClient : IManagementCallback
         {
+            public void UpsDeviceAdded(Ups ups)
+            {
+                Task.Run(() =>
+                {
+                    App.Current.MainWindowViewModel.AddDeviceToService(ups);
+                });
+            }
+
             public void UpsDeviceChanged(Ups ups)
             {
                 ups.Initialize();
@@ -121,6 +129,23 @@
                         return;
                     }
                 }
+            }
+
+            public void UpsDeviceRemoved(string serverName, string upsName)
+            {
+                DeviceViewModel deviceViewModel =
+                    App.Current.MainWindowViewModel.DeviceViewModels.FirstOrDefault(
+                        d => d.Device.Server.Name == serverName &&
+                             d.Device.Name == upsName);
+
+                var ups = deviceViewModel?.Device as Ups;
+
+                if (ups == null)
+                {
+                    return;
+                }
+
+                App.Current.MainWindowViewModel.RemoveDevice(ups);
             }
         }
 
@@ -201,6 +226,16 @@
                     this.SelectedDevice = deviceViewModel;
                 }
             });
+        }
+
+        private void RemoveDevice(Ups ups)
+        {
+            this.SelectedDevice = this.DeviceViewModels.FirstOrDefault(d => d.Device != ups);
+            var viewModel = this.DeviceViewModels.FirstOrDefault(vm => vm.Device == ups);
+            if (viewModel != null)
+            {
+                this.DeviceViewModels.Remove(viewModel);
+            }
         }
 
         public void Dispose()
