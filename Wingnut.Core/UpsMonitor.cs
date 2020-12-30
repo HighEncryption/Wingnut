@@ -403,6 +403,15 @@
 
         private void InitiateShutdown()
         {
+            ShutdownConfiguration shutdownConfig =
+                ServiceRuntime.Instance.Configuration.ShutdownConfiguration;
+
+            if (shutdownConfig.EnableShutdown == false)
+            {
+                Logger.Warning("Shutdown blocked by configuration. The computer will not be shut down.");
+                return;
+            }
+
             Logger.InitiatingShutdown();
 
             // TODO: Check if there is a user-defined action that needs to be performed prior to
@@ -414,9 +423,6 @@
                 Environment.ExpandEnvironmentVariables("%system32%\\shutdown.exe");
 
             List<string> shutdownArgs = new List<string>();
-
-            ShutdownConfiguration shutdownConfig = 
-                ServiceRuntime.Instance.Configuration.ShutdownConfiguration;
 
             if (shutdownConfig.HibernateInsteadOfShutdown)
             {

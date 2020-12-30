@@ -2,6 +2,8 @@
 {
     public class ShutdownConfiguration
     {
+        public bool EnableShutdown { get; set; }
+
         public bool HibernateInsteadOfShutdown { get; set; }
 
         public bool AutoSignInNextBoot { get; set; }
@@ -12,6 +14,7 @@
         {
             return new ShutdownConfiguration
             {
+                EnableShutdown = false,
                 HibernateInsteadOfShutdown = false,
                 AutoSignInNextBoot = false,
                 ShutdownDelayInSeconds = 5,
