@@ -55,6 +55,11 @@
 
         public List<IManagementCallback> ClientCallbackChannels { get; }
 
+        /// <summary>
+        /// The path where service data is stored, typically under %localappdata%\Wingnut
+        /// </summary>
+        public string AppDataPath { get; private set; }
+
         public void Initialize()
         {
             if (this.isInitialized)
@@ -64,18 +69,18 @@
 
             Logger.ServiceStarting(GetAssemblyVersionString());
 
-            string appDataPath = Path.Combine(
+            this.AppDataPath = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
                 "Wingnut");
 
             Logger.Info(
-                "ServiceRuntime: Initializing runtime with app data path: {0}", 
-                appDataPath);
+                "ServiceRuntime: Initializing runtime with app data path: {0}",
+                this.AppDataPath);
 
             // Create the directory (safe to call even if the directory exists)
-            Directory.CreateDirectory(appDataPath);
+            Directory.CreateDirectory(this.AppDataPath);
 
-            configurationPath = Path.Combine(appDataPath, WingnutConfiguration.FileName);
+            configurationPath = Path.Combine(this.AppDataPath, WingnutConfiguration.FileName);
             if (File.Exists(configurationPath))
             {
                 LoadConfiguration();

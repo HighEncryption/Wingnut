@@ -1,6 +1,7 @@
 ﻿namespace Wingnut.Data
 {
     using System;
+    using System.Diagnostics.Contracts;
     using System.Runtime.InteropServices;
     using System.Security;
 
@@ -36,10 +37,18 @@
 
     public static class DateTimeExtensions
     {
+        public static readonly DateTime UnixEpoch = 
+            new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+
         public static bool OlderThan(this DateTime dateTime, TimeSpan timeSpan)
         {
             return dateTime.ToUniversalTime() < DateTime.UtcNow.Subtract(timeSpan);
         }
-    }
 
+        [Pure]
+        public static long ToEpochSeconds(this DateTime datetime)
+        {
+            return Convert.ToInt64((datetime - UnixEpoch).TotalSeconds);
+        }
+    }
 }

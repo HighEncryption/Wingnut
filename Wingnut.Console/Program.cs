@@ -1,6 +1,7 @@
 ﻿namespace Wingnut.Console
 {
     using System;
+    using System.Data.SQLite;
 
     using Wingnut.Core;
     using Wingnut.Tracing;
@@ -11,6 +12,12 @@
     {
         static void Main(string[] args)
         {
+            // This reference is needed to ensure that the sqlite binaries get copied to
+            // the output directory correctly.
+#pragma warning disable 168
+            SQLiteConnection connection;
+#pragma warning restore 168
+
             Logger.SetOutputType(Logger.OutputType.Console);
             Logger.OutputLogLevel = Logger.LogLevel.Debug;
 
