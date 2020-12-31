@@ -214,7 +214,7 @@
                     "UpdateStatusAsync[Ups={0}]: Successfully queried server",
                     this.QualifiedName);
 
-                this.MetricDatabase.UpdateMetrics(deviceVars);
+                var metricMeasurements = this.MetricDatabase.UpdateMetrics(deviceVars);
 
                 if (this.State == null)
                 {
@@ -263,7 +263,7 @@
                         {
                             try
                             {
-                                callbackChannel.UpsDeviceChanged(this.State);
+                                callbackChannel.UpsDeviceChanged(this.State, metricMeasurements.ToArray());
                             }
                             catch (Exception e)
                             {
@@ -389,7 +389,6 @@
                     cmd.CommandText =
                         @"CREATE TABLE IF NOT EXISTS vars (id INT PRIMARY KEY, variableName VARCHAR, dataType INT, tableName VARCHAR)";
 
-                    Logger.Debug("--- SQLite: CREATE TABLE");
                     cmd.ExecuteNonQuery();
                 }
                 connection.Close();
@@ -429,16 +428,16 @@
         public SQLiteConnection CreateConnection()
         {
             var connection = new SQLiteConnection(this.ConnectionString);
-            Logger.Debug("+++ CreateConnection()");
             return connection.OpenAndReturn();
         }
 
-        public void UpdateMetrics(Dictionary<string, string> deviceVars)
+        public List<MetricMeasurement> UpdateMetrics(Dictionary<string, string> deviceVars)
         {
             SQLiteConnection connection;
+            List<MetricMeasurement> metricMeasurements = new List<MetricMeasurement>();
+
             using (connection = this.CreateConnection())
             {
-                Logger.Debug(">>> CreateConnection");
                 foreach (KeyValuePair<string, string> deviceVar in deviceVars)
                 {
                     if (!TryGetVariableMetric(deviceVar.Key, out VariableMetric metric))
@@ -451,55 +450,67 @@
                         InitializeMetric(connection, metric);
                     }
 
-                    InsertMetricRaw(connection, metric, deviceVar.Value);
+                    MetricMeasurement metricMeasurement = new MetricMeasurement()
+                    {
+                        VariableName = metric.VariableName,
+                        Timestamp = DateTime.UtcNow,
+                        Value = double.Parse(deviceVar.Value)
+                    };
 
-                    InsertMetric1Minute(connection, metric, deviceVar.Value);
+                    InsertMetricRaw(connection, metric, metricMeasurement);
+
+                    InsertMetric1Minute(connection, metric, metricMeasurement);
+
+                    metricMeasurements.Add(metricMeasurement);
                 }
 
                 connection.Close();
-                Logger.Debug("<<< CreateConnection");
             }
+
+            return metricMeasurements;
         }
 
         private static void InsertMetricRaw(
             SQLiteConnection connection, 
-            VariableMetric metric, 
-            string deviceVarValue)
+            VariableMetric metric,
+            MetricMeasurement metricMeasurement)
         {
             if (!metric.Initialized)
             {
                 throw new Exception("Metric is not initialized!");
             }
 
+
+
             SQLiteCommand cmd;
             using (cmd = new SQLiteCommand(connection))
             {
                 cmd.CommandText = $"INSERT INTO [{metric.TableName}_raw] (timestamp, value) VALUES (@timestamp, @value)";
-                cmd.Parameters.AddWithValue("@timestamp", DateTime.UtcNow.ToEpochSeconds());
-                cmd.Parameters.AddWithValue("@value", double.Parse(deviceVarValue));
+                cmd.Parameters.AddWithValue("@timestamp", metricMeasurement.Timestamp.ToEpochSeconds());
+                cmd.Parameters.AddWithValue("@value", metricMeasurement.Value);
 
-                Logger.Debug("--- SQLite: INSERT");
                 cmd.ExecuteNonQuery();
             }
         }
 
         private static void InsertMetric1Minute(
             SQLiteConnection connection, 
-            VariableMetric metric, 
-            string deviceVarValue)
+            VariableMetric metric,
+            MetricMeasurement metricMeasurement)
         {
             if (!metric.Initialized)
             {
                 throw new Exception("Metric is not initialized!");
             }
 
-            var now = DateTime.UtcNow;
-
             var timestamp = new DateTime(
-                now.Year, now.Month, now.Day,
-                now.Hour, now.Minute, 0);
+                metricMeasurement.Timestamp.Year,
+                metricMeasurement.Timestamp.Month, 
+                metricMeasurement.Timestamp.Day,
+                metricMeasurement.Timestamp.Hour, 
+                metricMeasurement.Timestamp.Minute, 
+                0);
 
-            double thisValue = double.Parse(deviceVarValue);
             double? newValue = null;
             int valueCount = 0;
 
@@ -508,7 +519,6 @@
                 cmd.CommandText = $"SELECT * FROM [{metric.TableName}_1m] WHERE [timestamp] = @ts";
                 cmd.Parameters.AddWithValue("@ts", timestamp.ToEpochSeconds());
 
-                Logger.Debug("--- SQLite: SELECT");
                 using (var reader = cmd.ExecuteReader())
                 {
                     while (reader.Read())
@@ -521,7 +531,7 @@
                         double value = (double) reader["value"];
                         valueCount = (int) reader["count"];
 
-                        newValue = ((value * valueCount) + thisValue) / (valueCount + 1);
+                        newValue = ((value * valueCount) + metricMeasurement.Value) / (valueCount + 1);
                         break;
                     }
                 }
@@ -536,7 +546,6 @@
                     cmd.Parameters.AddWithValue("@count", valueCount + 1);
                     cmd.Parameters.AddWithValue("@ts", timestamp.ToEpochSeconds());
 
-                    Logger.Debug("--- SQLite: UPDATE");
                     cmd.ExecuteNonQuery();
                 }
 
@@ -547,10 +556,9 @@
             {
                 cmd.CommandText = $"INSERT INTO [{metric.TableName}_1m] (timestamp, value, count) VALUES (@ts, @value, @count)";
                 cmd.Parameters.AddWithValue("@ts", timestamp.ToEpochSeconds());
-                cmd.Parameters.AddWithValue("@value", thisValue);
+                cmd.Parameters.AddWithValue("@value", metricMeasurement.Value);
                 cmd.Parameters.AddWithValue("@count", 1);
 
-                Logger.Debug("--- SQLite: INSERT");
                 cmd.ExecuteNonQuery();
             }
         }
@@ -576,7 +584,6 @@
                 cmd.CommandText = @"SELECT * FROM [vars] WHERE [variableName] = '@name'";
                 cmd.Parameters.AddWithValue("@name", metric.VariableName);
 
-                Logger.Debug("--- SQLite: SELECT");
                 using (var reader = cmd.ExecuteReader())
                 {
                     while (reader.Read())
@@ -603,7 +610,6 @@
                 cmd.Parameters.AddWithValue("@dataType", (int)metric.DataType);
                 cmd.Parameters.AddWithValue("@tableName", metric.TableName);
 
-                Logger.Debug("--- SQLite: INSERT");
                 cmd.ExecuteNonQuery();
             }
 
@@ -613,7 +619,6 @@
                     @"CREATE TABLE IF NOT EXISTS [{0}_raw] (timestamp INT PRIMARY KEY, value DOUBLE)",
                     metric.TableName);
 
-                Logger.Debug("--- SQLite: CREATE TABLE");
                 cmd.ExecuteNonQuery();
             }
 
@@ -623,7 +628,6 @@
                     @"CREATE TABLE IF NOT EXISTS [{0}_1m] (timestamp INT PRIMARY KEY, value DOUBLE, count INT)",
                     metric.TableName);
 
-                Logger.Debug("--- SQLite: CREATE TABLE");
                 cmd.ExecuteNonQuery();
             }
 

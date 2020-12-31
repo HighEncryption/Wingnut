@@ -1,12 +1,18 @@
 ﻿namespace Wingnut.UI.ViewModels
 {
     using System;
+    using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.ComponentModel;
 
     using Wingnut.Data;
     using Wingnut.Data.Configuration;
     using Wingnut.Data.Models;
+
+    public class NewMetricsEventArgs : EventArgs
+    {
+        public List<MetricMeasurement> Metrics { get; set; }
+    }
 
     public class UpsDeviceViewModel : DeviceViewModel
     {
@@ -15,6 +21,18 @@
         public Ups Ups { get; }
 
         public override Device Device => this.Ups;
+
+        public event EventHandler<NewMetricsEventArgs> NewMetrics;
+
+        public void RaiseNewMetricsEvent(List<MetricMeasurement> metrics)
+        {
+            NewMetricsEventArgs args = new NewMetricsEventArgs()
+            {
+                Metrics = metrics
+            };
+
+            NewMetrics?.Invoke(this, args);
+        }
 
         #region Status Page Properties
 

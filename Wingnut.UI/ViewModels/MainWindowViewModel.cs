@@ -73,7 +73,14 @@
         public DeviceViewModel SelectedDevice
         {
             get => this.selectedDevice;
-            set => this.SetProperty(ref this.selectedDevice, value);
+            //set => this.SetProperty(ref this.selectedDevice, value);
+            set
+            {
+                if (this.SetProperty(ref this.selectedDevice, value) && value != null)
+                {
+                    //this.Pages.OfType<EnergyUsagePageViewModel>().First().Foo();
+                }
+            }
         }
 
         public MainWindowViewModel()
@@ -100,7 +107,9 @@
                 });
             }
 
-            public void UpsDeviceChanged(Ups ups)
+            public void UpsDeviceChanged(
+                Ups ups,
+                MetricMeasurement[] metricMeasurements)
             {
                 ups.Initialize();
 
@@ -110,6 +119,10 @@
                     if (viewModel.Ups.QualifiedName == ups.QualifiedName)
                     {
                         viewModel.Ups.UpdateVariables(ups);
+
+                        viewModel.RaiseNewMetricsEvent(
+                            new List<MetricMeasurement>(metricMeasurements));
+
                         return;
                     }
                 }

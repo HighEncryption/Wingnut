@@ -12,7 +12,9 @@
             throw new System.NotImplementedException();
         }
 
-        public void UpsDeviceChanged(Ups ups)
+        public void UpsDeviceChanged(
+            Ups ups,
+            MetricMeasurement[] metricMeasurements)
         {
         }
 

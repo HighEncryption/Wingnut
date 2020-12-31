@@ -73,7 +73,7 @@
         void UpsDeviceAdded(Ups ups);
 
         [OperationContract(IsOneWay = true)]
-        void UpsDeviceChanged(Ups ups);
+        void UpsDeviceChanged(Ups ups, MetricMeasurement[] metricMeasurements);
 
         [OperationContract(IsOneWay = true)]
         void UpsDeviceRemoved(string serverName, string upsName);

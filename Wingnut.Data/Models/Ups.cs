@@ -217,5 +217,19 @@
             : base(name, server)
         {
         }
-    } 
+    }
+
+    [DataContract]
+    public class MetricMeasurement
+    {
+        [DataMember]
+        public string VariableName { get; set; }
+
+        [DataMember]
+        public DateTime Timestamp { get; set; }
+
+        [DataMember]
+        public double Value { get; set; }
+    }
+
 }
