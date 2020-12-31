@@ -1,0 +1,42 @@
+﻿battery.charge: 98
+battery.charge.low: 10
+battery.charge.warning: 50
+battery.date: 2001/09/25
+battery.mfr.date: 2020/08/08
+battery.runtime: 35280
+battery.runtime.low: 120
+battery.type: PbAc
+battery.voltage: 27.3
+battery.voltage.nominal: 24.0
+device.mfr: American Power Conversion
+device.model: Back-UPS XS 1500M
+device.serial: 3B2032X71234
+device.type: ups
+driver.name: usbhid-ups
+driver.parameter.pollfreq: 30
+driver.parameter.pollinterval: 2
+driver.parameter.port: auto
+driver.version: Windows-v2.6.5-5-7-g72f380c
+driver.version.data: APC HID 0.95
+driver.version.internal: 0.38
+input.sensitivity: medium
+input.transfer.high: 139
+input.transfer.low: 88
+input.voltage: 119.0
+input.voltage.nominal: 120
+ups.beeper.status: enabled
+ups.delay.shutdown: 20
+ups.firmware: 947.d10 .D
+ups.firmware.aux: d10
+ups.load: 0
+ups.mfr: American Power Conversion
+ups.mfr.date: 2020/08/08
+ups.model: Back-UPS XS 1500M
+ups.productid: 0002
+ups.realpower.nominal: 900
+ups.serial: 3B2032X71234
+ups.status: OL OFF
+ups.test.result: No test initiated
+ups.timer.reboot: 0
+ups.timer.shutdown: -1
+ups.vendorid: 051d

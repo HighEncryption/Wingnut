@@ -15,6 +15,7 @@
         Required = 3
     }
 
+    [AttributeUsage(AttributeTargets.Field, AllowMultiple = true)]
     public sealed class DeviceStatusIdentifierAttribute : Attribute
     {
         public string Name { get; set; }
@@ -87,6 +88,7 @@
         Off = 0x0001,
 
         [DeviceStatusIdentifier("OL")]
+        [DeviceStatusIdentifier("ONLINE")]
         [DeviceStatusSeverity(DeviceSeverityType.OK)]
         [DeviceStatusDisplayName("Online")]
         Online = 0x0002,
@@ -97,6 +99,7 @@
         OnBattery = 0x0004,
 
         [DeviceStatusIdentifier("LB")]
+        [DeviceStatusIdentifier("LOWBATT")]
         [DeviceStatusSeverity(DeviceSeverityType.Error)]
         [DeviceStatusDisplayName("Low Battery")]
         LowBattery = 0x0008,
@@ -129,7 +132,17 @@
         [DeviceStatusIdentifier("BYPASS")]
         [DeviceStatusSeverity(DeviceSeverityType.Error)]
         [DeviceStatusDisplayName("Bypass")]
-        Bypass = 0x0200
+        Bypass = 0x0200,
+
+        [DeviceStatusIdentifier("CHRG")]
+        [DeviceStatusSeverity(DeviceSeverityType.OK)]
+        [DeviceStatusDisplayName("Charging")]
+        Charging = 0x0400,
+
+        [DeviceStatusIdentifier("DISCHRG")]
+        [DeviceStatusSeverity(DeviceSeverityType.OK)]
+        [DeviceStatusDisplayName("Discharging")]
+        Discharging = 0x0800
     }
 
     public enum DeviceSeverityType
@@ -164,7 +177,7 @@
         {
             internal class DeviceStatusInfo
             {
-                public string Identifier;
+                public string[] Identifiers;
                 public string DisplayName;
                 public DeviceStatusType StatusType;
                 public DeviceSeverityType Severity;
@@ -181,12 +194,12 @@
 
                 foreach (FieldInfo enumValue in enumValues)
                 {
-                    DeviceStatusIdentifierAttribute idAttribute =
+                    List<DeviceStatusIdentifierAttribute> idAttributes =
                         enumValue.GetCustomAttributes()
                             .OfType<DeviceStatusIdentifierAttribute>()
-                            .FirstOrDefault();
+                            .ToList();
 
-                    if (idAttribute == null)
+                    if (!idAttributes.Any())
                     {
                         continue;
                     }
@@ -204,7 +217,7 @@
                     statusInfos.Add(
                         new DeviceStatusInfo()
                         {
-                            Identifier = idAttribute.Name,
+                            Identifiers = idAttributes.Select(a => a.Name).ToArray(),
                             DisplayName = displayNameAttribute?.DisplayName,
                             Severity = severityAttribute.Severity,
                             StatusType = (DeviceStatusType)enumValue.GetRawConstantValue()
@@ -243,7 +256,8 @@
                 {
                     DeviceStatusInfo statusInfo =
                         statusInfos.FirstOrDefault(
-                            s => string.Equals(s.Identifier, token, StringComparison.OrdinalIgnoreCase));
+                            s => s.Identifiers.Contains(token, StringComparer.OrdinalIgnoreCase));
+//                            s => string.Equals(s.Identifier, token, StringComparison.OrdinalIgnoreCase));
 
                     if (statusInfo == null)
                     {

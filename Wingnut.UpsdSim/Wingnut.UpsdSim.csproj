@@ -50,6 +50,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="DeviceFiles\bx1500m.txt" />
     <Content Include="DeviceFiles\powermust2000.txt" />
     <Content Include="DeviceFiles\su450.txt" />
     <Content Include="DeviceFiles\sua1500rm2u.txt" />
